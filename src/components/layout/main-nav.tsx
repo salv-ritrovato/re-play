@@ -14,6 +14,7 @@ export const NAV_ITEMS = [
   { href: "/library", label: "Library" },
   { href: "/reviews", label: "Reviews" },
   { href: "/statistics", label: "Statistics" },
+  { href: "/about", label: "About" },
 ] as const;
 
 function isActive(pathname: string, href: string) {

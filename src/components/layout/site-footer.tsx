@@ -13,6 +13,7 @@ export function SiteFooter() {
           <Link href="/library" className="hover:text-foreground">Library</Link>
           <Link href="/reviews" className="hover:text-foreground">Reviews</Link>
           <Link href="/statistics" className="hover:text-foreground">Statistics</Link>
+          <Link href="/about" className="hover:text-foreground">About</Link>
           <Link href="/admin" className="hover:text-foreground">Admin</Link>
         </div>
       </div>

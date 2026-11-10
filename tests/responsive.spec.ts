@@ -6,7 +6,7 @@ async function expectNoHorizontalScroll(page: Page) {
 }
 
 test.describe("responsive layouts", () => {
-  for (const path of ["/", "/library", "/library?view=list", "/reviews", "/statistics", "/login"]) {
+  for (const path of ["/", "/library", "/library?view=list", "/reviews", "/statistics", "/about", "/login"]) {
     test(`no horizontal overflow on ${path}`, async ({ page }) => {
       await page.goto(path);
       await page.waitForLoadState("networkidle");
