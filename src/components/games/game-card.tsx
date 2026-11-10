@@ -17,7 +17,6 @@ export function GameCard({
   showStatus?: boolean;
 }) {
   const year = yearOf(game.release_date);
-  const platform = game.platforms[0]?.name;
 
   return (
     <Link
@@ -36,7 +35,7 @@ export function GameCard({
         <div className="min-w-0">
           <h3 className="truncate text-sm font-medium text-foreground">{game.title}</h3>
           <p className="mt-0.5 truncate text-xs text-subtle">
-            {[year, platform].filter(Boolean).join(" · ") || "-"}
+            {[year, game.developer].filter(Boolean).join(" · ") || "-"}
           </p>
         </div>
         <Rating value={game.rating} size="sm" />
