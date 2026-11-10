@@ -51,23 +51,31 @@ export function Columns({
   if (items.length === 0) return <p className="text-sm text-subtle">{emptyLabel}</p>;
 
   return (
-    <div className={cn("relative overflow-x-auto", className)}>
+    // Scrolls sideways only when there are too many columns for a narrow screen;
+    // never vertically (overflow-y hidden), and the scrollbar itself stays out of sight.
+    <div className={cn("relative overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", className)}>
       <ul
-        className="flex h-52 min-w-full items-end gap-2"
+        className="flex h-52 min-w-full items-stretch gap-2"
         style={{ minWidth: `${items.length * 2.25}rem` }}
       >
         {items.map((item) => (
-          <li key={item.label} className="flex h-full max-w-20 min-w-8 flex-1 flex-col justify-end gap-2 text-center">
-            <span className="text-xs tabular-nums text-muted-foreground">{item.value || ""}</span>
-            <span
-              aria-hidden
-              className={cn(
-                "w-full rounded-t-sm bg-foreground/80 transition-colors",
-                item.label === highlight && "bg-violet",
-                item.value === 0 && "bg-elevated",
-              )}
-              style={{ height: `${Math.max((item.value / top) * 100, item.value === 0 ? 2 : 4)}%` }}
-            />
+          <li key={item.label} className="flex h-full max-w-20 min-w-8 flex-1 flex-col gap-2 text-center">
+            {/* The track takes whatever height the label row leaves; its top padding is the headroom for the value above the tallest bar, so nothing can overflow. */}
+            <div className="flex min-h-0 flex-1 items-end pt-6">
+              <span
+                aria-hidden
+                className={cn(
+                  "relative w-full rounded-t-sm bg-foreground/80 transition-colors",
+                  item.label === highlight && "bg-violet",
+                  item.value === 0 && "bg-elevated",
+                )}
+                style={{ height: `${Math.max((item.value / top) * 100, item.value === 0 ? 2 : 4)}%` }}
+              >
+                <span className="absolute bottom-full left-0 mb-1.5 w-full text-xs tabular-nums text-muted-foreground">
+                  {item.value || ""}
+                </span>
+              </span>
+            </div>
             <span className="text-xs text-subtle">{item.label}</span>
             <span className="sr-only">{item.value} games</span>
           </li>

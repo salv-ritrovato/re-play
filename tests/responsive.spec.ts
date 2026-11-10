@@ -14,6 +14,20 @@ test.describe("responsive layouts", () => {
     });
   }
 
+  test("statistics charts never show a vertical scrollbar", async ({ page }) => {
+    await page.goto("/statistics");
+    await page.waitForLoadState("networkidle");
+    const scrollers = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>("main *")]
+        .filter((el) => getComputedStyle(el).overflowX === "auto" || getComputedStyle(el).overflowY === "auto")
+        .map((el) => ({ extra: el.scrollHeight - el.clientHeight, y: getComputedStyle(el).overflowY })),
+    );
+    for (const s of scrollers) {
+      expect(s.y, "chart containers must not scroll vertically").not.toBe("auto");
+      expect(s.extra).toBeLessThanOrEqual(1);
+    }
+  });
+
   test("navigation is reachable (menu on small screens, bar on large)", async ({ page, viewport }) => {
     await page.goto("/");
     if ((viewport?.width ?? 1024) < 768) {
