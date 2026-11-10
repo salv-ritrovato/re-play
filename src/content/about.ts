@@ -1,5 +1,7 @@
 import type { Lang } from "@/lib/types";
 
+export const STEAM_URL = "https://steamcommunity.com/profiles/76561198066959401/";
+
 export interface AboutContent {
   eyebrow: string;
   title: string;
@@ -9,6 +11,8 @@ export interface AboutContent {
   closing: string;
   factsTitle: string;
   facts: { label: string; value: string }[];
+  /** Link to the Steam profile, shown under the facts. */
+  steam: { label: string; cta: string };
 }
 
 /** Personal text of the About page, in both languages. Edit here. */
@@ -50,6 +54,7 @@ export const about: Record<Lang, AboutContent> = {
       { label: "Then", value: "PC gaming, aiming at competitive play" },
       { label: "Games that made my story", value: "World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege" },
     ],
+    steam: { label: "Find me on", cta: "My Steam profile" },
   },
   it: {
     eyebrow: "Chi sono",
@@ -88,5 +93,6 @@ export const about: Record<Lang, AboutContent> = {
       { label: "Poi", value: "PC gaming, con il sogno del competitivo" },
       { label: "I giochi che hanno fatto la mia storia", value: "World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege" },
     ],
+    steam: { label: "Trovami su", cta: "Il mio profilo Steam" },
   },
 };

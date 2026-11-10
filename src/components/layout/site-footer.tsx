@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { STEAM_URL } from "@/content/about";
 import { Wordmark, TAGLINE } from "./wordmark";
 
 export function SiteFooter() {
@@ -14,6 +15,10 @@ export function SiteFooter() {
           <Link href="/reviews" className="hover:text-foreground">Reviews</Link>
           <Link href="/statistics" className="hover:text-foreground">Statistics</Link>
           <Link href="/about" className="hover:text-foreground">About</Link>
+          <a href={STEAM_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
+            Steam
+            <span className="sr-only"> (opens in a new tab)</span>
+          </a>
           <Link href="/admin" className="hover:text-foreground">Admin</Link>
         </div>
       </div>

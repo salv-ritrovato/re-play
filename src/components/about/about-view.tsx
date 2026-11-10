@@ -1,7 +1,8 @@
 "use client";
 
+import { ArrowUpRight } from "lucide-react";
 import { useState } from "react";
-import type { AboutContent } from "@/content/about";
+import { STEAM_URL, type AboutContent } from "@/content/about";
 import { LANGS, LANG_LABEL, type Lang } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -86,6 +87,23 @@ export function AboutView({ content }: { content: Record<Lang, AboutContent> }) 
               </div>
             ))}
           </dl>
+
+          <div className="mt-8 space-y-1 border-t border-border pt-6">
+            <p className="eyebrow">{c.steam.label}</p>
+            <a
+              href={STEAM_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="group inline-flex items-center gap-1.5 text-base text-foreground/90 underline-offset-4 outline-none hover:text-foreground hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
+            >
+              {c.steam.cta}
+              <ArrowUpRight
+                aria-hidden
+                className="size-4 text-muted-foreground transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+              />
+              <span className="sr-only">(opens in a new tab)</span>
+            </a>
+          </div>
         </aside>
       </div>
     </div>

@@ -27,7 +27,13 @@ test.describe("public navigation", () => {
     await expect(page.getByText("World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege", { exact: true })).toBeVisible();
     await expect(page.getByText("League of Legends and Rainbow Six: Siege")).toBeVisible();
 
+    const steam = page.getByRole("complementary").getByRole("link", { name: /My Steam profile/ });
+    await expect(steam).toHaveAttribute("href", "https://steamcommunity.com/profiles/76561198066959401/");
+    await expect(steam).toHaveAttribute("target", "_blank");
+    await expect(page.getByRole("contentinfo").getByRole("link", { name: /Steam/ })).toBeVisible();
+
     await page.getByRole("tab", { name: "Italiano" }).click();
+    await expect(page.getByRole("link", { name: /Il mio profilo Steam/ })).toBeVisible();
     await expect(page.getByRole("heading", { level: 1, name: "Ciao, sono Salvatore." })).toBeVisible();
     await expect(page.getByText("mia madre, che non c'è più")).toBeVisible();
     await expect(page.getByText("League of Legends e Rainbow Six: Siege")).toBeVisible();
