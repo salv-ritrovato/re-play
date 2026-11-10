@@ -1,36 +1,42 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Re — My journey through gaming
 
-## Getting Started
+A private personal archive of every video game I've played: ratings, reviews, and a visual history.
+Public reading, owner-only writing through a built-in CMS.
 
-First, run the development server:
+**Stack:** Next.js (App Router, Cache Components) · TypeScript · Tailwind CSS v4 · shadcn/ui · Supabase (Postgres, Auth, Storage) · React Hook Form + Zod · Sonner · Playwright.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Setup
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+1. **Create a Supabase project** (the free tier is enough).
+2. **Apply the schema:** run `supabase/migrations/20261109120000_init.sql` in the SQL editor
+   (or `supabase db push` with the CLI). It creates tables, RLS policies, the `game-media` storage
+   bucket, search/statistics views and seeds common genres and platforms.
+3. **Disable public sign-ups:** Authentication → Sign In / Providers → turn off *Allow new users to sign up*.
+4. **Create the owner:** Authentication → Users → *Add user* (email + password, auto-confirm).
+   The first user ever created becomes the `owner` automatically (see `handle_new_user`).
+5. **Environment:** copy `.env.example` to `.env.local` and fill in the project URL and the
+   publishable (anon) key. The service-role key is **never** used by this app.
+6. `npm install && npm run dev`, then sign in at `/login`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Architecture notes
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+- **Public pages** read through a cookie-less anonymous client inside `'use cache'` functions tagged
+  `games` / `taxonomy`; CMS server actions call `updateTag` so changes appear immediately.
+- **Admin** (`/admin`) is gated three times: `proxy.ts` (optimistic redirect), `requireOwner()` on the
+  server, and Row Level Security (`is_owner()`) in Postgres.
+- **Images** are compressed twice: in the browser (resize + WebP) before upload, then authoritatively on
+  the server with `sharp` (EXIF rotate, metadata stripped, covers cropped to 3:4 at 900×1200, WebP) and
+  stored in the public `game-media` bucket, which only accepts `image/webp`. `next/image` then serves
+  AVIF/WebP at the right size, with a blur placeholder stored per image.
+- **Search / filters / sort / pagination** run in one SQL function, `library_search`, driven by URL params.
+- **Statistics** come from SQL views over the real tables (`stats_*`).
+- Future metadata providers (IGDB, RAWG…) can plug into the CMS form; manual entry always works.
 
-## Learn More
+## Scripts
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+| Command | |
+| --- | --- |
+| `npm run dev` | Dev server |
+| `npm run build` | Production build (needs Supabase env vars: pages prerender from the database) |
+| `npm run lint` | ESLint |
+| `npm run test:e2e` | Playwright tests |
