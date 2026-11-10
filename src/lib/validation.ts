@@ -66,7 +66,6 @@ export const gameSchema = z
     review_it: text(20000),
     pros: lines,
     cons: lines,
-    notes: text(8000),
     featured: z.boolean(),
     is_online: z.boolean(),
   })

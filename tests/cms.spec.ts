@@ -35,7 +35,7 @@ test.describe.serial("CMS end to end", () => {
     await login(page);
   });
 
-  test("create a game with cover, screenshot and both reviews", async ({ page }) => {
+  test("create a game with cover and both reviews", async ({ page }) => {
     gamesBefore = await totalGames(page);
 
     await page.goto("/admin/games/new");
@@ -71,14 +71,16 @@ test.describe.serial("CMS end to end", () => {
     await page.locator("#pros").fill("Fast\nStable");
     await page.locator("#cons").fill("Fake");
 
-    // Cover (large, so client-side compression is exercised) + one screenshot.
+    // Cover (large, so client-side compression is exercised).
     const cover = await makeImage(2400, 3200, "#4b3f8f", "jpeg");
-    await page.locator('input[type="file"]:not([multiple])').setInputFiles(cover);
+    await page.locator('input[type="file"]').setInputFiles(cover);
     await expect(page.getByAltText(`Cover preview for ${title}`)).toBeVisible();
     await expect(page.getByText(/Cover ready/)).toBeVisible();
-    const shot = await makeImage(1600, 900, "#1d3b4f", "png");
-    await page.locator('input[type="file"][multiple]').setInputFiles(shot);
-    await expect(page.getByText(/New screenshot/i)).toBeVisible();
+
+    // Personal notes and extra screenshots/artwork no longer exist.
+    await expect(page.locator("#notes")).toHaveCount(0);
+    await expect(page.getByText("Screenshots & additional artwork")).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Add images" })).toHaveCount(0);
 
     await page.getByRole("button", { name: "Add game" }).last().click();
     await expect(page).toHaveURL(/\/admin\/games$/);
@@ -95,7 +97,6 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.locator("#review_it")).toHaveValue("");
     await expect(page.getByRole("button", { name: "Adventure", exact: true })).toHaveAttribute("aria-pressed", "false");
     await expect(page.getByAltText(/Cover preview/)).toHaveCount(0);
-    await expect(page.getByText(/New screenshot/i)).toHaveCount(0);
   });
 
   test("adding a new genre keeps everything already typed in the form", async ({ page }) => {
@@ -244,7 +245,7 @@ test.describe.serial("CMS end to end", () => {
     await page.goto(`/admin/games?q=${encodeURIComponent(title)}`);
     await page.getByRole("link", { name: `Edit ${title}` }).click();
     const replacement = await makeImage(1200, 1600, "#8f3f3f", "png");
-    await page.locator('input[type="file"]:not([multiple])').setInputFiles(replacement);
+    await page.locator('input[type="file"]').setInputFiles(replacement);
     await expect(page.getByText(/Cover ready/)).toBeVisible();
     await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page).toHaveURL(/\/admin\/games$/);

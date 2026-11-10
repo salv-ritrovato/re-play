@@ -6,7 +6,6 @@ import { CompletionBadge, OnlineBadge, Rating, StatusBadge } from "@/components/
 import { GameCard } from "@/components/games/game-card";
 import { GameCover } from "@/components/games/game-cover";
 import { ReviewTabs } from "@/components/games/review-tabs";
-import { ScreenshotGallery } from "@/components/games/screenshot-gallery";
 import { Container, Section } from "@/components/layout/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getGameBySlug, getRelatedGames } from "@/lib/data/public";
@@ -43,7 +42,7 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
 
   const year = yearOf(game.release_date);
   const hasPersonal =
-    Boolean(game.review_en) || game.pros.length > 0 || game.cons.length > 0 || Boolean(game.notes);
+    Boolean(game.review_en) || game.pros.length > 0 || game.cons.length > 0;
 
   return (
     <article>
@@ -140,13 +139,6 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
           </div>
         </Section>
 
-        {/* Media ---------------------------------------------------------- */}
-        {game.images.length > 0 && (
-          <Section eyebrow="Media" title="Screenshots & artwork">
-            <ScreenshotGallery images={game.images} title={game.title} />
-          </Section>
-        )}
-
         <Suspense fallback={null}>
           <Related game={game} />
         </Suspense>
@@ -178,15 +170,6 @@ function PersonalSection({ game }: { game: GameDetail }) {
             <div className="mt-12 grid gap-8 sm:grid-cols-2">
               <ProsCons title="What worked" items={game.pros} tone="pro" />
               <ProsCons title="What didn't" items={game.cons} tone="con" />
-            </div>
-          )}
-
-          {game.notes && (
-            <div className="mt-12 border-t border-border pt-8">
-              <h3 className="eyebrow mb-3">Notes</h3>
-              <p className="max-w-2xl text-sm leading-relaxed whitespace-pre-line text-muted-foreground">
-                {game.notes}
-              </p>
             </div>
           )}
         </div>

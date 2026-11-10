@@ -43,7 +43,7 @@ export function Section({
   className?: string;
 }) {
   return (
-    <section className={cn("space-y-6", className)}>
+    <section className={cn("min-w-0 space-y-6", className)}>
       <div className="flex items-end justify-between gap-4 border-b border-border pb-3">
         <div>
           {eyebrow && <p className="eyebrow mb-1">{eyebrow}</p>}

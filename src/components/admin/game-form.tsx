@@ -51,7 +51,6 @@ function toDefaults(game?: GameDetail): GameFormInput {
     review_it: game?.review_it ?? "",
     pros: game?.pros.join("\n") ?? "",
     cons: game?.cons.join("\n") ?? "",
-    notes: game?.notes ?? "",
     featured: game?.featured ?? false,
     is_online: game?.is_online ?? false,
   };
@@ -91,9 +90,7 @@ export function GameForm({
   const hasUnsavedChanges =
     formState.isDirty ||
     media.cover !== null ||
-    media.removeCover ||
-    media.extras.length > 0 ||
-    media.removedImageIds.length > 0;
+    media.removeCover;
   useEffect(() => {
     if (!hasUnsavedChanges || isSaving) return;
     const warn = (e: BeforeUnloadEvent) => {
@@ -120,7 +117,6 @@ export function GameForm({
    */
   function resetForm({ values }: { values: boolean }) {
     if (media.cover) URL.revokeObjectURL(media.cover.previewUrl);
-    media.extras.forEach((e) => URL.revokeObjectURL(e.previewUrl));
     setMedia(emptyMedia);
     if (values) {
       form.reset(toDefaults(game));
@@ -138,10 +134,6 @@ export function GameForm({
         if (game) fd.set("id", game.id);
         if (media.cover) fd.set("cover", media.cover.file);
         if (media.removeCover) fd.set("removeCover", "true");
-        for (const e of media.extras) {
-          fd.append(e.kind === "screenshot" ? "screenshots" : "artwork", e.file);
-        }
-        fd.set("removeImageIds", JSON.stringify(media.removedImageIds));
 
         startSaving(async () => {
           const res = await saveGame(fd);
@@ -348,17 +340,13 @@ export function GameForm({
         <Field id="cons" label="Cons" error={err("cons")} hint="One per line">
           <Textarea id="cons" rows={5} {...register("cons")} {...aria("cons")} />
         </Field>
-        <Field id="notes" label="Personal notes" error={err("notes")} className="sm:col-span-2">
-          <Textarea id="notes" rows={4} {...register("notes")} {...aria("notes")} />
-        </Field>
       </FormSection>
 
       {/* Media ----------------------------------------------------------------- */}
-      <FormSection title="Media" description="Cover artwork is the visual centre of the archive.">
+      <FormSection title="Cover" description="Cover artwork is the visual centre of the archive.">
         <MediaFields
           title={title}
           existingCoverPath={game?.cover_path ?? null}
-          existingImages={game?.images ?? []}
           value={media}
           onChange={setMedia}
         />

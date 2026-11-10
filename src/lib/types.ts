@@ -48,17 +48,6 @@ export interface GameSummary {
   total_count: number;
 }
 
-export interface GameImage {
-  id: string;
-  game_id: string;
-  kind: "screenshot" | "artwork";
-  path: string;
-  blur: string | null;
-  width: number | null;
-  height: number | null;
-  position: number;
-}
-
 export interface GameDetail {
   id: string;
   slug: string;
@@ -77,7 +66,6 @@ export interface GameDetail {
   review_it: string | null;
   pros: string[];
   cons: string[];
-  notes: string | null;
   cover_path: string | null;
   cover_blur: string | null;
   featured: boolean;
@@ -87,7 +75,6 @@ export interface GameDetail {
   genres: Taxonomy[];
   platforms: Taxonomy[];
   tags: Taxonomy[];
-  images: GameImage[];
 }
 
 export interface LibraryFilters {

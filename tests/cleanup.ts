@@ -1,5 +1,5 @@
 /**
- * Removes leftover test data: "E2E Game" records (with their images) and "E2E Genre" genres.
+ * Removes leftover test data: "E2E Game" records (with their cover) and "E2E Genre" genres.
  * Uses the owner session through the public API: same permissions as the CMS, no service key.
  *
  *   node --env-file=.env.local --experimental-strip-types tests/cleanup.ts
@@ -21,18 +21,17 @@ export async function cleanupE2E(log: (message: string) => void = () => {}) {
   if (!auth.access_token) throw new Error("Could not sign in as the owner");
   const headers = { apikey: key, Authorization: `Bearer ${auth.access_token}`, "Content-Type": "application/json" };
 
-  const games: { id: string; slug: string; cover_path: string | null; game_images: { path: string }[] }[] = await fetch(
-    `${url}/rest/v1/games?select=id,slug,cover_path,game_images(path)&title=like.E2E%20Game%25`,
+  const games: { id: string; slug: string; cover_path: string | null }[] = await fetch(
+    `${url}/rest/v1/games?select=id,slug,cover_path&title=like.E2E%20Game%25`,
     { headers },
   ).then((r) => r.json());
 
   for (const g of games) {
-    const paths = [g.cover_path, ...g.game_images.map((i) => i.path)].filter(Boolean) as string[];
-    if (paths.length) {
+    if (g.cover_path) {
       await fetch(`${url}/storage/v1/object/game-media`, {
         method: "DELETE",
         headers,
-        body: JSON.stringify({ prefixes: paths }),
+        body: JSON.stringify({ prefixes: [g.cover_path] }),
       });
     }
     await fetch(`${url}/rest/v1/games?id=eq.${g.id}`, { method: "DELETE", headers });

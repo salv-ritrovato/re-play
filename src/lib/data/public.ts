@@ -84,8 +84,7 @@ const DETAIL_SELECT = `
   *,
   genres:game_genres(genre:genres(id, name, slug)),
   platforms:game_platforms(platform:platforms(id, name, slug)),
-  tags:game_tags(tag:tags(id, name, slug)),
-  images:game_images(id, game_id, kind, path, blur, width, height, position)
+  tags:game_tags(tag:tags(id, name, slug))
 `;
 
 type RawDetail = Omit<GameDetail, "genres" | "platforms" | "tags"> & {
@@ -103,7 +102,6 @@ export function normalizeDetail(raw: RawDetail): GameDetail {
     genres: raw.genres.map((g) => g.genre).sort(byName),
     platforms: raw.platforms.map((p) => p.platform).sort(byName),
     tags: raw.tags.map((t) => t.tag).sort(byName),
-    images: [...raw.images].sort((a, b) => a.position - b.position),
   };
 }
 

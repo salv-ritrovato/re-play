@@ -51,7 +51,7 @@ export function Columns({
   if (items.length === 0) return <p className="text-sm text-subtle">{emptyLabel}</p>;
 
   return (
-    <div className={cn("overflow-x-auto", className)}>
+    <div className={cn("relative overflow-x-auto", className)}>
       <ul
         className="flex h-52 min-w-full items-end gap-2"
         style={{ minWidth: `${items.length * 2.25}rem` }}

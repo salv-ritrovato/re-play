@@ -1,6 +1,5 @@
 "use server";
 
-import { randomUUID } from "node:crypto";
 import { updateTag } from "next/cache";
 import { assertOwner } from "@/lib/auth";
 import { TAGS } from "@/lib/data/public";
@@ -13,8 +12,6 @@ import { gameSchema, taxonomyNameSchema } from "@/lib/validation";
 export type ActionResult<T = object> =
   | ({ ok: true } & T)
   | { ok: false; error: string; fieldErrors?: Record<string, string> };
-
-const MAX_SCREENSHOTS_PER_SAVE = 12;
 
 function files(formData: FormData, key: string): File[] {
   return formData
@@ -59,25 +56,10 @@ export async function saveGame(
 
   // 2. Validate + optimize media BEFORE touching the database.
   const coverFile = files(formData, "cover")[0];
-  const screenshotFiles = files(formData, "screenshots");
-  const artworkFiles = files(formData, "artwork");
-  if (screenshotFiles.length + artworkFiles.length > MAX_SCREENSHOTS_PER_SAVE) {
-    return {
-      ok: false,
-      error: `Upload at most ${MAX_SCREENSHOTS_PER_SAVE} extra images at a time.`,
-    };
-  }
 
   let cover: Awaited<ReturnType<typeof processImage>> | undefined;
-  const extras: { kind: "screenshot" | "artwork"; img: Awaited<ReturnType<typeof processImage>> }[] = [];
   try {
-    if (coverFile) cover = await processImage(coverFile, "cover");
-    for (const f of screenshotFiles) {
-      extras.push({ kind: "screenshot", img: await processImage(f, "screenshot") });
-    }
-    for (const f of artworkFiles) {
-      extras.push({ kind: "artwork", img: await processImage(f, "screenshot") });
-    }
+    if (coverFile) cover = await processImage(coverFile);
   } catch (e) {
     if (e instanceof ImageError) return { ok: false, error: e.message };
     console.error("[saveGame] image processing failed", e);
@@ -114,7 +96,6 @@ export async function saveGame(
     review_it: v.review_it,
     pros: v.pros,
     cons: v.cons,
-    notes: v.notes,
     featured: v.featured,
     is_online: v.is_online,
   };
@@ -164,48 +145,6 @@ export async function saveGame(
       await removeObjects(supabase, [previous.cover_path]);
     }
 
-    // 7. Removed images.
-    const removedIds = JSON.parse(String(formData.get("removeImageIds") ?? "[]")) as string[];
-    if (isEdit && removedIds.length > 0) {
-      const { data: doomed } = await supabase
-        .from("game_images")
-        .select("id, path")
-        .eq("game_id", gameId)
-        .in("id", removedIds);
-      if (doomed?.length) {
-        await supabase.from("game_images").delete().in("id", doomed.map((d) => d.id));
-        await removeObjects(supabase, doomed.map((d) => d.path as string));
-      }
-    }
-
-    // 8. New images.
-    if (extras.length > 0) {
-      const { data: last } = await supabase
-        .from("game_images")
-        .select("position")
-        .eq("game_id", gameId)
-        .order("position", { ascending: false })
-        .limit(1)
-        .maybeSingle();
-      let position = (last?.position ?? -1) + 1;
-      const rows = [];
-      for (const { kind, img } of extras) {
-        const path = `${gameId}/${kind}-${randomUUID()}.webp`;
-        await upload(supabase, path, img.buffer);
-        uploaded.push(path);
-        rows.push({
-          game_id: gameId,
-          kind,
-          path,
-          blur: img.blur,
-          width: img.width,
-          height: img.height,
-          position: position++,
-        });
-      }
-      const { error } = await supabase.from("game_images").insert(rows);
-      if (error) throw error;
-    }
   } catch (e) {
     console.error("[saveGame] post-write step failed", e);
     if (!isEdit) {
@@ -229,7 +168,7 @@ export async function deleteGame(id: string): Promise<ActionResult> {
 
   const { data: game } = await supabase
     .from("games")
-    .select("slug, cover_path, game_images(path)")
+    .select("slug, cover_path")
     .eq("id", id)
     .maybeSingle();
   if (!game) return { ok: false, error: "Game not found." };
@@ -240,11 +179,7 @@ export async function deleteGame(id: string): Promise<ActionResult> {
     return { ok: false, error: "Could not delete the game." };
   }
 
-  const paths = [
-    game.cover_path as string | null,
-    ...((game.game_images as { path: string }[] | null) ?? []).map((i) => i.path),
-  ].filter((p): p is string => Boolean(p));
-  await removeObjects(supabase, paths);
+  if (game.cover_path) await removeObjects(supabase, [game.cover_path as string]);
 
   invalidate(game.slug as string);
   return { ok: true };
