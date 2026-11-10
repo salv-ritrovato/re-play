@@ -26,6 +26,12 @@ test.describe("public navigation", () => {
 
     await page.goto("/games/definitely-not-a-real-game");
     await expect(page.getByRole("heading", { name: /isn't in the archive/ })).toBeVisible();
+
+    // The 404 page keeps the site chrome and offers a way out.
+    await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
+    await expect(page.getByRole("contentinfo")).toBeVisible();
+    await expect(page.getByRole("link", { name: "Browse the library" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Back to the overview" })).toBeVisible();
   });
 
   test("library filters live in the URL and can be combined and cleared", async ({ page }) => {

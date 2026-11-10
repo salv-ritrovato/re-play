@@ -1,4 +1,5 @@
 import { expect, test, type Page } from "@playwright/test";
+import { cleanupE2E } from "./cleanup";
 import { login, makeImage, owner, uniqueTitle } from "./helpers";
 
 test.skip(!owner.username || !owner.password, "E2E_USERNAME / E2E_PASSWORD not set");
@@ -25,6 +26,11 @@ test.describe.serial("CMS end to end", () => {
     await page.getByRole("option", { name: option, exact: true }).click();
   }
 
+  // Whatever happens above, leave no test genres or games behind.
+  test.afterAll(async () => {
+    await cleanupE2E();
+  });
+
   test.beforeEach(async ({ page }) => {
     await login(page);
   });
@@ -34,6 +40,10 @@ test.describe.serial("CMS end to end", () => {
 
     await page.goto("/admin/games/new");
     await page.locator("#title").fill(title);
+    // Start date and review date no longer exist; the completion date is optional.
+    await expect(page.locator("#started_on")).toHaveCount(0);
+    await expect(page.locator("#reviewed_on")).toHaveCount(0);
+    await expect(page.locator("#completed_on")).toHaveCount(1);
     slug = await page.locator("#slug").inputValue();
     expect(slug).toMatch(/^e2e-game-[a-z0-9]+$/); // auto-generated from the title
 
@@ -51,9 +61,7 @@ test.describe.serial("CMS end to end", () => {
     await page.locator("#playtime_hours").fill("12");
     await chooseOption(page, "#play_status", "Completed");
     await chooseOption(page, "#completion_status", "Main story");
-    await page.locator("#started_on").fill("2021-07-01");
     await page.locator("#completed_on").fill("2021-07-20");
-    await page.locator("#reviewed_on").fill("2021-07-21");
 
     // Server + client validation: a review needs both languages.
     await page.locator("#review_en").fill("An English review written by the test suite.");
@@ -88,6 +96,54 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByRole("button", { name: "Adventure", exact: true })).toHaveAttribute("aria-pressed", "false");
     await expect(page.getByAltText(/Cover preview/)).toHaveCount(0);
     await expect(page.getByText(/New screenshot/i)).toHaveCount(0);
+  });
+
+  test("adding a new genre keeps everything already typed in the form", async ({ page }) => {
+    await page.goto("/admin/games/new");
+    await page.locator("#title").fill("Typed before adding a genre");
+    await page.locator("#developer").fill("Some studio");
+    await page.locator("#review_en").fill("A long review that must survive.");
+    await page.getByRole("button", { name: "Adventure", exact: true }).click();
+    // A full page reload would wipe this marker; a re-mounted form would wipe the values.
+    await page.evaluate(() => ((window as unknown as { __marker: number }).__marker = 1));
+
+    const genre = `E2E Genre ${Date.now().toString(36)}`;
+    await page.getByRole("textbox", { name: "New genre name" }).fill(genre);
+    await page.getByRole("textbox", { name: "New genre name" }).press("Enter");
+    await expect(page.getByText(`Added “${genre}”`)).toBeVisible();
+    await expect(page.getByRole("button", { name: genre, exact: true })).toHaveAttribute("aria-pressed", "true");
+
+    // Give any refresh triggered by the action time to land, then check nothing was lost.
+    await page.waitForLoadState("networkidle");
+    await page.waitForTimeout(1500);
+    expect(await page.evaluate(() => (window as unknown as { __marker?: number }).__marker)).toBe(1);
+    await expect(page.locator("#title")).toHaveValue("Typed before adding a genre");
+    await expect(page.locator("#developer")).toHaveValue("Some studio");
+    await expect(page.locator("#review_en")).toHaveValue("A long review that must survive.");
+    await expect(page.getByRole("button", { name: "Adventure", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("button", { name: genre, exact: true })).toHaveAttribute("aria-pressed", "true");
+  });
+
+  test("a form with unsaved changes warns before the page is reloaded", async ({ page }) => {
+    // The browser asks before leaving only if the page cancels the beforeunload event.
+    const wouldWarn = () =>
+      page.evaluate(() => {
+        const event = new Event("beforeunload", { cancelable: true });
+        window.dispatchEvent(event);
+        return event.defaultPrevented;
+      });
+
+    await page.goto("/admin/games/new");
+    expect(await wouldWarn()).toBe(false); // pristine form: leaving is silent
+
+    await page.locator("#title").fill("Unsaved work");
+    await expect.poll(wouldWarn).toBe(true); // dirty form: the browser must ask first
+
+    // Cancelling discards the draft, so there is nothing left to warn about.
+    await page.getByRole("link", { name: "Cancel" }).click();
+    await expect(page).toHaveURL(/\/admin\/games$/);
+    await page.getByRole("link", { name: "Add game" }).first().click();
+    expect(await wouldWarn()).toBe(false);
   });
 
   test("cancelling a half-typed form leaves no draft behind", async ({ page }) => {
@@ -154,7 +210,7 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByText("An English review written by the test suite.")).toBeVisible();
     await page.getByRole("button", { name: "Leggi le recensioni in italiano" }).click();
     await expect(page.getByText("Una recensione italiana scritta dalla suite di test.")).toBeVisible();
-    await expect(page.getByText(/Recensito il/)).toBeVisible();
+    await expect(page.getByText("Leggi la recensione completa")).toBeVisible();
   });
 
   test("statistics are computed from the database", async ({ page }) => {
@@ -220,5 +276,20 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByRole("heading", { name: /isn't in the archive/ })).toBeVisible();
     expect(res?.status()).toBeLessThan(500);
     expect(await totalGames(page)).toBe(gamesBefore);
+  });
+});
+
+test.describe("admin 404", () => {
+  test.skip(!owner.username || !owner.password, "E2E_USERNAME / E2E_PASSWORD not set");
+
+  test("a missing record shows the 404 inside the admin shell", async ({ page }) => {
+    await login(page);
+    await page.goto("/admin/games/00000000-0000-0000-0000-000000000000/edit");
+    await expect(page.getByRole("heading", { name: "This record doesn't exist." })).toBeVisible();
+    // Admin chrome stays, and the public site header is not duplicated on top of it.
+    await expect(page.getByRole("navigation", { name: "Admin" })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Primary" })).toHaveCount(0);
+    await page.getByRole("link", { name: "Back to games" }).click();
+    await expect(page).toHaveURL(/\/admin\/games$/);
   });
 });

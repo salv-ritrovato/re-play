@@ -3,7 +3,7 @@
 import { zodResolver } from "@hookform/resolvers/zod";
 import { ExternalLink, Loader2, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
 import { toast } from "sonner";
 import { saveGame } from "@/app/admin/actions";
@@ -46,9 +46,7 @@ function toDefaults(game?: GameDetail): GameFormInput {
     completion_status: game?.completion_status ?? "none",
     playtime_hours:
       game?.playtime_hours === null || game?.playtime_hours === undefined ? "" : String(game.playtime_hours),
-    started_on: game?.started_on ?? "",
     completed_on: game?.completed_on ?? "",
-    reviewed_on: game?.reviewed_on ?? "",
     review_en: game?.review_en ?? "",
     review_it: game?.review_it ?? "",
     pros: game?.pros.join("\n") ?? "",
@@ -87,6 +85,24 @@ export function GameForm({
   const { register, control, setValue, formState } = form;
   const errors = formState.errors;
   const title = useWatch({ control, name: "title" });
+
+  // Warn before a full page reload / tab close would throw away unsaved work (this also catches
+  // reloads the browser performs on its own, e.g. after a new deployment).
+  const hasUnsavedChanges =
+    formState.isDirty ||
+    media.cover !== null ||
+    media.removeCover ||
+    media.extras.length > 0 ||
+    media.removedImageIds.length > 0;
+  useEffect(() => {
+    if (!hasUnsavedChanges || isSaving) return;
+    const warn = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = "";
+    };
+    window.addEventListener("beforeunload", warn);
+    return () => window.removeEventListener("beforeunload", warn);
+  }, [hasUnsavedChanges, isSaving]);
 
   function err(name: keyof GameFormInput) {
     const e = errors[name];
@@ -300,14 +316,8 @@ export function GameForm({
             )}
           />
         </Field>
-        <Field id="started_on" label="Start date" error={err("started_on")}>
-          <Input id="started_on" type="date" {...register("started_on")} {...aria("started_on")} />
-        </Field>
-        <Field id="completed_on" label="Completion date" error={err("completed_on")}>
+        <Field id="completed_on" label="Completion date" error={err("completed_on")} hint="Optional. Leave it empty if you don't remember.">
           <Input id="completed_on" type="date" {...register("completed_on")} {...aria("completed_on")} />
-        </Field>
-        <Field id="reviewed_on" label="Review date" error={err("reviewed_on")}>
-          <Input id="reviewed_on" type="date" {...register("reviewed_on")} {...aria("reviewed_on")} />
         </Field>
         <div className="flex items-center justify-between gap-4 rounded-md border border-border p-4 sm:self-end">
           <div>

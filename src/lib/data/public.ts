@@ -167,7 +167,7 @@ export async function getHomeData() {
   const [totals, added, reviewed, top, featured, currently] = await Promise.all([
     supabase.from("stats_totals").select("*").maybeSingle(),
     search("added"),
-    search("reviewed", { p_reviewed_only: true }),
+    search("added", { p_reviewed_only: true }),
     search("rating_desc", { p_min_rating: 0 }),
     supabase
       .from("games")

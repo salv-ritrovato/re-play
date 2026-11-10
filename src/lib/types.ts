@@ -39,11 +39,9 @@ export interface GameSummary {
   playtime_hours: number | null;
   review_en: string | null;
   review_it: string | null;
-  reviewed_on: string | null;
   cover_path: string | null;
   cover_blur: string | null;
   created_at: string;
-  last_played_on: string | null;
   is_online: boolean;
   genres: Taxonomy[];
   platforms: Taxonomy[];
@@ -74,9 +72,7 @@ export interface GameDetail {
   play_status: PlayStatus;
   completion_status: CompletionStatus;
   playtime_hours: number | null;
-  started_on: string | null;
   completed_on: string | null;
-  reviewed_on: string | null;
   review_en: string | null;
   review_it: string | null;
   pros: string[];
@@ -125,7 +121,7 @@ export const SORT_OPTIONS = [
 export type SortKey = (typeof SORT_OPTIONS)[number]["value"];
 
 export const REVIEW_SORT_OPTIONS = [
-  { value: "reviewed", label: "Review date" },
+  { value: "added", label: "Recently added" },
   { value: "rating_desc", label: "Highest rated" },
   { value: "rating_asc", label: "Lowest rated" },
   { value: "title", label: "Alphabetical" },

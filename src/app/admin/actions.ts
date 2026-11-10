@@ -109,9 +109,7 @@ export async function saveGame(
     play_status: v.play_status,
     completion_status: v.completion_status,
     playtime_hours: v.playtime_hours,
-    started_on: v.started_on,
     completed_on: v.completed_on,
-    reviewed_on: v.reviewed_on,
     review_en: v.review_en,
     review_it: v.review_it,
     pros: v.pros,
@@ -277,7 +275,9 @@ export async function createTaxonomy(
     console.error("[createTaxonomy]", error);
     return { ok: false, error: "Could not create it." };
   }
-  updateTag(TAGS.taxonomy);
+  // Deliberately NO cache invalidation here: it would make Next re-render the page under the
+  // form while the owner is still typing. The public caches are refreshed when the game is
+  // saved (saveGame invalidates the taxonomy tag), which is when the new genre becomes visible.
   return { ok: true, item: data };
 }
 

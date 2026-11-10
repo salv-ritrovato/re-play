@@ -77,7 +77,7 @@ export function LibraryToolbar({
   }, [urlQuery]);
 
   const sortOptions = (mode === "reviews" ? REVIEW_SORT_OPTIONS : SORT_OPTIONS) as readonly Option[];
-  const defaultSort = mode === "reviews" ? "reviewed" : "added";
+  const defaultSort = "added";
   const sort = searchParams.get("sort") ?? defaultSort;
   const view = searchParams.get("view") === "list" ? "list" : "grid";
 

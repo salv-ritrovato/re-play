@@ -86,7 +86,7 @@ async function HomeContent() {
             />
             {recentlyReviewed.length > 0 && (
               <Shelf
-                title="Recently reviewed"
+                title="Latest reviews"
                 eyebrow="Reviews"
                 games={recentlyReviewed.slice(0, 6)}
                 href="/reviews"

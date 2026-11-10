@@ -60,9 +60,7 @@ export const gameSchema = z
     play_status: z.enum(PLAY_STATUSES),
     completion_status: z.enum(COMPLETION_STATUSES),
     playtime_hours: numberString(0, 99999, "Playtime"),
-    started_on: dateString,
     completed_on: dateString,
-    reviewed_on: dateString,
 
     review_en: text(20000),
     review_it: text(20000),
@@ -71,10 +69,6 @@ export const gameSchema = z
     notes: text(8000),
     featured: z.boolean(),
     is_online: z.boolean(),
-  })
-  .refine((v) => !v.started_on || !v.completed_on || v.completed_on >= v.started_on, {
-    path: ["completed_on"],
-    message: "Completion date can't be before the start date",
   })
   // A review always exists in both languages, or not at all.
   .refine((v) => !v.review_en || v.review_it, {

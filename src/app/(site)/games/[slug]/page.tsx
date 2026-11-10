@@ -157,9 +157,7 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
 
 // ---------------------------------------------------------------------------
 function PersonalSection({ game }: { game: GameDetail }) {
-  const started = formatDate(game.started_on);
   const completed = formatDate(game.completed_on);
-  const reviewed = formatDate(game.reviewed_on);
 
   return (
     <section aria-labelledby="my-take" className="rounded-md border border-border bg-card/50">
@@ -171,7 +169,6 @@ function PersonalSection({ game }: { game: GameDetail }) {
           {game.review_en && game.review_it ? (
             <div className="mt-6">
               <ReviewTabs en={game.review_en} it={game.review_it} title={game.title} />
-              {reviewed && <p className="mt-8 text-sm text-subtle">Reviewed on {reviewed}</p>}
             </div>
           ) : (
             <p className="mt-6 text-muted-foreground">No written review yet.</p>
@@ -195,7 +192,6 @@ function PersonalSection({ game }: { game: GameDetail }) {
         </div>
 
         <aside aria-label="Play history" className="space-y-5 text-sm lg:border-l lg:border-border lg:pl-8">
-          <Detail label="Started" value={started} />
           <Detail label="Completed" value={completed} />
           <Detail label="Playtime" value={formatPlaytime(game.playtime_hours)} />
         </aside>

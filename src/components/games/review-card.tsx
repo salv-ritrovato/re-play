@@ -1,11 +1,10 @@
 import Link from "next/link";
-import { excerpt, formatDate, yearOf } from "@/lib/format";
+import { excerpt, yearOf } from "@/lib/format";
 import { reviewFor, type GameSummary, type Lang } from "@/lib/types";
 import { OnlineBadge, Rating } from "./badges";
 import { GameCover } from "./game-cover";
 
 export function ReviewCard({ game, lang }: { game: GameSummary; lang: Lang }) {
-  const reviewed = formatDate(game.reviewed_on, true);
   const year = yearOf(game.release_date);
 
   return (
@@ -43,7 +42,7 @@ export function ReviewCard({ game, lang }: { game: GameSummary; lang: Lang }) {
         </p>
 
         <p className="mt-auto pt-4 text-xs text-subtle">
-          {reviewed ? `${lang === "it" ? "Recensito il" : "Reviewed"} ${reviewed}` : "Review"}
+          {lang === "it" ? "Leggi la recensione completa" : "Read the full review"}
         </p>
       </div>
     </article>

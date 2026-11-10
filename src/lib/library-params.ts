@@ -30,7 +30,7 @@ export function parseLibraryParams(
   const sortOptions = mode === "reviews" ? REVIEW_SORT_OPTIONS : SORT_OPTIONS;
   const sortParam = first(raw.sort);
   const sort = (sortOptions.find((o) => o.value === sortParam)?.value ??
-    (mode === "reviews" ? "reviewed" : "added")) as SortKey;
+    "added") as SortKey;
 
   const page = Math.max(1, Math.floor(num(first(raw.page)) ?? 1));
 
