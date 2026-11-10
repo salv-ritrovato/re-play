@@ -28,6 +28,13 @@ Comportamenti da conoscere:
 - **Reset dopo il salvataggio e su "Cancel"**: `resetForm({ values })`. Senza, Next riutilizzerebbe lo stato
   del gioco precedente (le pagine visitate restano in memoria).
 - **Protezione dalle perdite di dati**: `beforeunload` avvisa se ci sono modifiche non salvate.
+- **Aggiungi e aggiungine un altro** (solo su "Nuovo gioco"): il pulsante "Add and add another" salva il gioco,
+  mostra un avviso e riapre il form **vuoto** con il cursore sul titolo, senza tornare all'elenco. Non porta
+  con sé nulla del gioco appena salvato (per i dati in comune si usa il punto successivo).
+- **Parti da un gioco esistente** (solo su "Nuovo gioco", componente `copy-from-game.tsx`): in cima al form
+  si cerca per titolo o sviluppatore, oppure si sceglie tra gli ultimi giochi toccati. Copia **sviluppatore,
+  publisher, generi, piattaforme, tag e flag online**; mai titolo, voto, recensioni, copertina o date.
+  Dopo la copia si può modificare tutto. Utile per serie, sequel e giochi dello stesso studio.
 - **Creazione al volo** di generi, piattaforme e tag (`taxonomy-picker`, `tag-input`).
 - **Copertina** (`media-fields`): anteprima, sostituzione, rimozione; compressa nel browser prima dell'invio.
 
@@ -37,6 +44,7 @@ Comportamenti da conoscere:
 | --- | --- |
 | `saveGame` | Valida → elabora la copertina → upsert del gioco → aggiorna relazioni e tag → carica la copertina → invalida la cache. |
 | `deleteGame` | Elimina il gioco e il relativo file di copertina. Il pulsante chiede conferma (`delete-game-button`). |
+| `searchGameTemplates` | Cerca fino a 8 giochi (per titolo/sviluppatore, o gli ultimi modificati se la ricerca è vuota) e restituisce solo i dati copiabili. Usata da "Parti da un gioco esistente". |
 | `createTaxonomy` | Crea un genere/piattaforma/tag. Non invalida la cache, di proposito, per non ricaricare la pagina durante la modifica di un form. |
 
 Ogni action verifica il proprietario con `assertOwner()` e restituisce un `ActionResult` (successo o errore)

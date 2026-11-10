@@ -225,6 +225,44 @@ test.describe.serial("CMS end to end", () => {
     expect(await totalGames(page)).toBe(gamesBefore + 1);
   });
 
+  test("start from an existing game, then add and add another", async ({ page }) => {
+    const second = uniqueTitle();
+    await page.goto("/admin/games/new");
+
+    // Copy the shared details (studio, genres, platforms, online flag) from the first game.
+    await page.getByRole("searchbox", { name: "Search a game to copy from" }).fill(title);
+    await page.getByRole("button", { name: new RegExp(title) }).click();
+    await expect(page.getByText(`Copied from ${title}`)).toBeVisible();
+    await expect(page.locator("#developer")).toHaveValue("E2E Studio");
+    await expect(page.locator("#publisher")).toHaveValue("E2E Publishing");
+    await expect(page.getByRole("button", { name: "Adventure", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("button", { name: "PC", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("switch", { name: "Online / competitive game" })).toBeChecked();
+    // Nothing personal is copied.
+    for (const field of ["#title", "#slug", "#rating", "#review_en", "#review_it", "#release_date"]) {
+      await expect(page.locator(field)).toHaveValue("");
+    }
+
+    await page.locator("#title").fill(second);
+    await page.getByRole("button", { name: "Add and add another" }).click();
+    await expect(page.getByText(`${second} added. Ready for the next one.`)).toBeVisible();
+
+    // Still on the form, which is blank again (nothing leaks from the game just saved).
+    await expect(page).toHaveURL(/\/admin\/games\/new$/);
+    await expect(page.locator("#title")).toHaveValue("");
+    await expect(page.locator("#title")).toBeFocused();
+    await expect(page.locator("#developer")).toHaveValue("");
+    await expect(page.getByRole("switch", { name: "Online / competitive game" })).not.toBeChecked();
+    await expect(page.getByText(/^Copied from/)).toHaveCount(0);
+
+    // The game was saved: remove it again so the rest of the run counts one game.
+    await page.goto(`/admin/games?q=${encodeURIComponent(second)}`);
+    await expect(page.getByRole("link", { name: second, exact: true })).toBeVisible();
+    await page.getByRole("button", { name: `Delete ${second}` }).click();
+    await page.getByRole("button", { name: "Delete permanently" }).click();
+    await expect(page.getByText(`“${second}” was deleted`)).toBeVisible();
+  });
+
   test("edit rating and review, then see it reflected everywhere", async ({ page }) => {
     await page.goto(`/admin/games?q=${encodeURIComponent(title)}`);
     await page.getByRole("link", { name: `Edit ${title}` }).click();

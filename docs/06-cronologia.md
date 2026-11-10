@@ -41,6 +41,10 @@ Cosa è stato fatto, nell'ordine, e i problemi incontrati con le relative soluzi
 | Niente scrollbar nei grafici delle statistiche | Vedi sotto. |
 | Oltre a "Main story", anche "Main story + side quests" | Nuovo valore dell'enum `completion_status` (migrazione `main_story_side_quests`), presente nel form, nei filtri della libreria e nelle schede. |
 
+Dopo la valutazione di un import da Steam, Salvatore ha scelto di **inserire tutto a mano** (nessuna integrazione
+con Steam). Per rendere l'inserimento più rapido sono stati aggiunti, nel form "Nuovo gioco", **"Add and add
+another"** e **"Parti da un gioco esistente"** (vedi [04-cms-admin.md](04-cms-admin.md)).
+
 ## 4. Problemi incontrati e soluzioni
 
 - **Errori di prerender con `Date.now()` / `new Date()` / `usePathname`**: `connection()` in

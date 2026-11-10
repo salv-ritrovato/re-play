@@ -7,6 +7,7 @@ import { slugify } from "@/lib/format";
 import { ImageError, processImage } from "@/lib/images";
 import { MEDIA_BUCKET } from "@/lib/media";
 import { createClient } from "@/lib/supabase/server";
+import type { GameTemplate } from "@/lib/types";
 import { gameSchema, taxonomyNameSchema } from "@/lib/validation";
 
 export type ActionResult<T = object> =
@@ -214,6 +215,59 @@ export async function createTaxonomy(
   // form while the owner is still typing. The public caches are refreshed when the game is
   // saved (saveGame invalidates the taxonomy tag), which is when the new genre becomes visible.
   return { ok: true, item: data };
+}
+
+// ---------------------------------------------------------------------------
+// "Start from an existing game": search the archive for something to copy from
+// ---------------------------------------------------------------------------
+export async function searchGameTemplates(
+  query: string,
+): Promise<ActionResult<{ games: GameTemplate[] }>> {
+  await assertOwner();
+  const supabase = await createClient();
+
+  let q = supabase
+    .from("games")
+    .select(
+      "id, title, release_date, developer, publisher, is_online, genres:game_genres(genre_id), platforms:game_platforms(platform_id), tags:game_tags(tag:tags(name))",
+    )
+    .limit(8);
+
+  // Strip characters that would break PostgREST's `or` filter syntax.
+  const safe = String(query ?? "").replace(/[,()%*\\]/g, " ").trim().slice(0, 80);
+  q = safe
+    ? q.or(`title.ilike.%${safe}%,developer.ilike.%${safe}%`).order("title")
+    : q.order("updated_at", { ascending: false }); // nothing typed yet: the latest touched games
+
+  const { data, error } = await q;
+  if (error) {
+    console.error("[searchGameTemplates]", error);
+    return { ok: false, error: "Could not search the archive." };
+  }
+
+  type Row = {
+    id: string;
+    title: string;
+    release_date: string | null;
+    developer: string | null;
+    publisher: string | null;
+    is_online: boolean;
+    genres: { genre_id: string }[];
+    platforms: { platform_id: string }[];
+    tags: { tag: { name: string } | null }[];
+  };
+  const games = ((data ?? []) as unknown as Row[]).map<GameTemplate>((g) => ({
+    id: g.id,
+    title: g.title,
+    release_year: g.release_date ? Number(g.release_date.slice(0, 4)) : null,
+    developer: g.developer,
+    publisher: g.publisher,
+    is_online: g.is_online,
+    genre_ids: g.genres.map((x) => x.genre_id),
+    platform_ids: g.platforms.map((x) => x.platform_id),
+    tags: g.tags.flatMap((x) => (x.tag ? [x.tag.name] : [])),
+  }));
+  return { ok: true, games };
 }
 
 // ---------------------------------------------------------------------------

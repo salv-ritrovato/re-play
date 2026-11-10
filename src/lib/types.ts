@@ -25,6 +25,19 @@ export interface Taxonomy {
   slug: string;
 }
 
+/** What the CMS can copy from an existing game when starting a new one (series, sequels, same studio). */
+export interface GameTemplate {
+  id: string;
+  title: string;
+  release_year: number | null;
+  developer: string | null;
+  publisher: string | null;
+  is_online: boolean;
+  genre_ids: string[];
+  platform_ids: string[];
+  tags: string[];
+}
+
 /** Row shape returned by the `library_search` RPC. */
 export interface GameSummary {
   id: string;

@@ -1,7 +1,7 @@
 "use client";
 
 import { zodResolver } from "@hookform/resolvers/zod";
-import { ExternalLink, Loader2, Save } from "lucide-react";
+import { ExternalLink, Loader2, Plus, Save } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { Controller, useForm, useWatch } from "react-hook-form";
@@ -20,9 +20,11 @@ import {
   PLAY_STATUSES,
   PLAY_STATUS_LABEL,
   type GameDetail,
+  type GameTemplate,
   type Taxonomy,
 } from "@/lib/types";
 import { gameSchema, type GameFormInput, type GameFormValues } from "@/lib/validation";
+import { CopyFromGame } from "./copy-from-game";
 import { DeleteGameButton } from "./delete-game-button";
 import { Field, FormSection } from "./field";
 import { emptyMedia, MediaFields, type MediaState } from "./media-fields";
@@ -73,6 +75,8 @@ export function GameForm({
   const [genres, setGenres] = useState(initialGenres);
   const [platforms, setPlatforms] = useState(initialPlatforms);
   const [media, setMedia] = useState<MediaState>(emptyMedia);
+  // Bumped whenever the form is emptied, so the "start from an existing game" box starts fresh too.
+  const [epoch, setEpoch] = useState(0);
   // Auto-generate the slug from the title until the user edits it by hand.
   const [slugTouched, setSlugTouched] = useState(isEdit);
 
@@ -121,10 +125,24 @@ export function GameForm({
     if (values) {
       form.reset(toDefaults(game));
       setSlugTouched(isEdit);
+      setEpoch((n) => n + 1);
     }
   }
 
-  function submit() {
+  /** Copies what a series / studio shares from another game; never anything personal. */
+  function applyTemplate(t: GameTemplate) {
+    const opts = { shouldDirty: true } as const;
+    setValue("developer", t.developer ?? "", opts);
+    setValue("publisher", t.publisher ?? "", opts);
+    setValue("genre_ids", t.genre_ids, opts);
+    setValue("platform_ids", t.platform_ids, opts);
+    setValue("tags", t.tags, opts);
+    setValue("is_online", t.is_online, opts);
+    toast.success(`Copied details from ${t.title}`);
+  }
+
+  /** "list": save and go back to the list. "another": save and start a fresh blank form. */
+  function submit(after: "list" | "another" = "list") {
     // Validate with the shared schema, but send the raw field values: the server
     // re-validates and normalizes them with the very same schema.
     form.handleSubmit(
@@ -144,9 +162,19 @@ export function GameForm({
             }
             return;
           }
-          toast.success(isEdit ? "Changes saved" : "Game added to the archive");
+          const savedTitle = form.getValues("title");
           // A new game starts from a blank form next time; an edited one keeps its (saved) values.
           resetForm({ values: !isEdit });
+          if (after === "another") {
+            toast.success(`${savedTitle} added. Ready for the next one.`);
+            router.refresh();
+            requestAnimationFrame(() => {
+              window.scrollTo({ top: 0, behavior: "smooth" });
+              document.getElementById("title")?.focus({ preventScroll: true });
+            });
+            return;
+          }
+          toast.success(isEdit ? "Changes saved" : "Game added to the archive");
           router.push("/admin/games");
           router.refresh();
         });
@@ -168,6 +196,8 @@ export function GameForm({
       noValidate
       className="space-y-10"
     >
+      {!isEdit && <CopyFromGame key={epoch} onCopy={applyTemplate} />}
+
       {/* Basic information --------------------------------------------------- */}
       <FormSection title="Basic information" description="What the game officially is.">
         <Field id="title" label="Title" required error={err("title")} className="sm:col-span-2">
@@ -368,10 +398,15 @@ export function GameForm({
             </>
           )}
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex w-full flex-wrap items-center justify-end gap-2 sm:w-auto">
           <ButtonLink variant="ghost" href="/admin/games" onClick={() => resetForm({ values: true })}>
             Cancel
           </ButtonLink>
+          {!isEdit && (
+            <Button type="button" variant="outline" disabled={isSaving} onClick={() => submit("another")} className="gap-2">
+              <Plus /> Add and add another
+            </Button>
+          )}
           <Button type="submit" disabled={isSaving} className="min-w-32 gap-2">
             {isSaving ? <Loader2 className="animate-spin" /> : <Save />}
             {isEdit ? "Save changes" : "Add game"}

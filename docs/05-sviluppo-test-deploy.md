@@ -48,7 +48,8 @@ Cosa coprono:
   proprietario, scritture anonime respinte dalla RLS.
 - **cms**: creazione con copertina e recensioni, nuovo genere senza perdere i dati del form, avviso per
   modifiche non salvate, annullamento senza bozze residue, slug duplicati, presenza del gioco in libreria,
-  ricerca e scheda, recensioni nelle due lingue, statistiche, modifica, sostituzione/rimozione della
+  ricerca e scheda, recensioni nelle due lingue, statistiche, "Parti da un gioco esistente" e "Add and add
+  another" (con eliminazione del gioco creato), modifica, sostituzione/rimozione della
   copertina, eliminazione con conferma, 404 dentro l'admin.
 - **public**: navigazione tra le sezioni, pagina About (EN/IT e link Steam), 404, filtri nell'URL,
   parametri non validi ignorati.
