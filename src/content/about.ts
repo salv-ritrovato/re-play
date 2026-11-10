@@ -36,7 +36,7 @@ export const about: Record<Lang, AboutContent> = {
         heading: "From consoles to the PC",
         paragraphs: [
           "Over the years I've owned every Nintendo console and every PlayStation up to the 3. After the PS3 I went all-in on PC gaming, with the dream of becoming a competitive player.",
-          "I've played many competitive titles and I've always been in the high ranks. Among my favourites, the ones that made my “story”, are definitely World of Warcraft, Hearthstone and League of Legends.",
+          "I've played many competitive titles and I've always been in the high ranks. Among my favourites, the ones that made my “story”, are definitely World of Warcraft, Hearthstone, League of Legends and Rainbow Six: Siege.",
         ],
       },
     ],
@@ -48,7 +48,7 @@ export const about: Record<Lang, AboutContent> = {
       { label: "Childhood favourite", value: "Jurassic War (MS-DOS)" },
       { label: "Consoles owned", value: "Every Nintendo, every PlayStation up to the 3" },
       { label: "Then", value: "PC gaming, aiming at competitive play" },
-      { label: "Games that made my story", value: "World of Warcraft, Hearthstone, League of Legends" },
+      { label: "Games that made my story", value: "World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege" },
     ],
   },
   it: {
@@ -74,7 +74,7 @@ export const about: Record<Lang, AboutContent> = {
         heading: "Dalle console al PC",
         paragraphs: [
           "Nella mia vita sono stato possessore di tutte le console Nintendo e di tutte le PlayStation fino alla 3. Dopo la 3 mi sono dedicato completamente al PC gaming, con il sogno di diventare un giocatore competitivo.",
-          "Ho giocato a molti titoli competitivi, nei quali sono sempre stato nei ranghi alti. Fra i miei preferiti, quelli che hanno fatto la mia “storia”, ci sono sicuramente World of Warcraft, Hearthstone e League of Legends.",
+          "Ho giocato a molti titoli competitivi, nei quali sono sempre stato nei ranghi alti. Fra i miei preferiti, quelli che hanno fatto la mia “storia”, ci sono sicuramente World of Warcraft, Hearthstone, League of Legends e Rainbow Six: Siege.",
         ],
       },
     ],
@@ -86,7 +86,7 @@ export const about: Record<Lang, AboutContent> = {
       { label: "Il preferito dell'infanzia", value: "Jurassic War (MS-DOS)" },
       { label: "Console possedute", value: "Tutte le Nintendo, tutte le PlayStation fino alla 3" },
       { label: "Poi", value: "PC gaming, con il sogno del competitivo" },
-      { label: "I giochi che hanno fatto la mia storia", value: "World of Warcraft, Hearthstone, League of Legends" },
+      { label: "I giochi che hanno fatto la mia storia", value: "World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege" },
     ],
   },
 };

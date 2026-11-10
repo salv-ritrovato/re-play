@@ -24,11 +24,13 @@ test.describe("public navigation", () => {
     await page.goto("/about");
     await expect(page.getByRole("heading", { level: 1, name: "Hi, I'm Salvatore." })).toBeVisible();
     await expect(page.getByText("Jurassic War").first()).toBeVisible();
-    await expect(page.getByText("World of Warcraft, Hearthstone, League of Legends")).toBeVisible();
+    await expect(page.getByText("World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege", { exact: true })).toBeVisible();
+    await expect(page.getByText("League of Legends and Rainbow Six: Siege")).toBeVisible();
 
     await page.getByRole("tab", { name: "Italiano" }).click();
     await expect(page.getByRole("heading", { level: 1, name: "Ciao, sono Salvatore." })).toBeVisible();
     await expect(page.getByText("mia madre, che non c'è più")).toBeVisible();
+    await expect(page.getByText("League of Legends e Rainbow Six: Siege")).toBeVisible();
     await expect(page.locator("div[lang=it]")).toBeVisible();
 
     await page.getByRole("tab", { name: "English" }).click();
