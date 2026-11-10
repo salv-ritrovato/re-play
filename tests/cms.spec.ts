@@ -60,7 +60,7 @@ test.describe.serial("CMS end to end", () => {
     await page.locator("#rating").fill("7.5");
     await page.locator("#playtime_hours").fill("12");
     await chooseOption(page, "#play_status", "Completed");
-    await chooseOption(page, "#completion_status", "Main story");
+    await chooseOption(page, "#completion_status", "Main story + side quests");
     await page.locator("#completed_on").fill("2021-07-20");
 
     // Server + client validation: a review needs both languages.
@@ -178,6 +178,12 @@ test.describe.serial("CMS end to end", () => {
     await page.goto(`/library?q=${encodeURIComponent(title)}&status=dropped`);
     await expect(page.getByText("No games match these filters")).toBeVisible();
 
+    // "Main story + side quests" is its own completion level, distinct from plain "Main story".
+    await page.goto(`/library?q=${encodeURIComponent(title)}&completion=main_story_side_quests`);
+    await expect(page.getByRole("link", { name: new RegExp(title) })).toBeVisible();
+    await page.goto(`/library?q=${encodeURIComponent(title)}&completion=main_story`);
+    await expect(page.getByText("No games match these filters")).toBeVisible();
+
     // Online / competitive games stay in the library, flagged and filterable.
     await page.goto(`/library?q=${encodeURIComponent(title)}`);
     await expect(page.getByText("Online", { exact: true })).toBeVisible();
@@ -193,6 +199,7 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByRole("listitem").filter({ hasText: "Fast" }).first()).toContainText("+");
     await expect(page.getByRole("listitem").filter({ hasText: "Fake" }).first()).toContainText("-");
     await expect(page.getByText("E2E Studio").first()).toBeVisible();
+    await expect(page.getByText("Main story + side quests")).toBeVisible();
     await expect(page.getByText("7.5").first()).toBeVisible();
 
     // Both languages are available, English first.

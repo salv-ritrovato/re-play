@@ -13,7 +13,8 @@ Le migrazioni sono in `supabase/migrations/` e vanno applicate **in ordine** (SQ
 | `game_genres`, `game_platforms`, `game_tags` | Tabelle ponte molti-a-molti. |
 
 Tipi enumerati: `play_status` (`backlog`, `playing`, `completed`, `on_hold`, `dropped`) e
-`completion_status` (`none`, `main_story`, `completionist`).
+`completion_status` (`none`, `main_story`, `main_story_side_quests`, `completionist`; in interfaccia:
+"Not completed", "Main story", "Main story + side quests", "100%").
 
 Vincoli notevoli: titolo non vuoto, formato dello `slug`, voto tra 0 e 10, ore di gioco non negative,
 recensioni "entrambe o nessuna". Il trigger `set_updated_at` aggiorna `updated_at`. Indici su data di
@@ -47,6 +48,7 @@ indici trigram (`pg_trgm`) su titolo, sviluppatore e publisher per la ricerca te
 | `20261110130000_online_games.sql` | Aggiunge `is_online` e il parametro `p_online` a `library_search`. |
 | `20261110150000_remove_start_and_review_dates.sql` | Rimuove `started_on`, `reviewed_on`, `last_played_on`; ricrea `stats_games_by_year` (da `completed_on`) e `library_search`. |
 | `20261110170000_remove_notes_and_extra_images.sql` | Rimuove `game_images`, il tipo `image_kind` e `games.notes`. |
+| `20261111090000_main_story_side_quests.sql` | Aggiunge il livello di completamento `main_story_side_quests` tra `main_story` e `completionist`. |
 
 Le migrazioni sono già applicate al progetto Supabase in uso. Per un progetto nuovo vanno eseguite tutte, in
 ordine.

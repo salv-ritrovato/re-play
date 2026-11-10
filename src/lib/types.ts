@@ -1,7 +1,7 @@
 export const PLAY_STATUSES = ["backlog", "playing", "completed", "on_hold", "dropped"] as const;
 export type PlayStatus = (typeof PLAY_STATUSES)[number];
 
-export const COMPLETION_STATUSES = ["none", "main_story", "completionist"] as const;
+export const COMPLETION_STATUSES = ["none", "main_story", "main_story_side_quests", "completionist"] as const;
 export type CompletionStatus = (typeof COMPLETION_STATUSES)[number];
 
 export const PLAY_STATUS_LABEL: Record<PlayStatus, string> = {
@@ -15,6 +15,7 @@ export const PLAY_STATUS_LABEL: Record<PlayStatus, string> = {
 export const COMPLETION_LABEL: Record<CompletionStatus, string> = {
   none: "Not completed",
   main_story: "Main story",
+  main_story_side_quests: "Main story + side quests",
   completionist: "100%",
 };
 

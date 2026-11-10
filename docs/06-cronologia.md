@@ -39,6 +39,7 @@ Cosa è stato fatto, nell'ordine, e i problemi incontrati con le relative soluzi
 | Aggiungere Rainbow Six: Siege ai giochi che hanno fatto la sua storia | Aggiunto al paragrafo e al riquadro, in entrambe le lingue. |
 | Link al profilo Steam | Nella pagina About e nel footer; aperto in una nuova scheda. |
 | Niente scrollbar nei grafici delle statistiche | Vedi sotto. |
+| Oltre a "Main story", anche "Main story + side quests" | Nuovo valore dell'enum `completion_status` (migrazione `main_story_side_quests`), presente nel form, nei filtri della libreria e nelle schede. |
 
 ## 4. Problemi incontrati e soluzioni
 
