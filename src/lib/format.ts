@@ -26,7 +26,7 @@ export function yearOf(value: string | null | undefined): number | null {
 }
 
 export function formatRating(value: number | null | undefined): string {
-  if (value === null || value === undefined) return "—";
+  if (value === null || value === undefined) return "-";
   return Number(value).toFixed(1);
 }
 

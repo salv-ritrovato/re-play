@@ -54,7 +54,7 @@
   --radius-4xl: 1rem;
 }
 
-/* Re:Play — dark-only, monochrome palette with a restrained violet accent */
+/* Re:Play - dark-only, monochrome palette with a restrained violet accent */
 :root {
   color-scheme: dark;
   --background: #09090b;

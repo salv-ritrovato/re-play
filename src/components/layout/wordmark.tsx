@@ -55,7 +55,7 @@ export function Wordmark({
 
   if (!asLink) return mark;
   return (
-    <Link href="/" aria-label="Re:Play — home" className="rounded-sm outline-offset-4">
+    <Link href="/" aria-label="Re:Play - home" className="rounded-sm outline-offset-4">
       {mark}
     </Link>
   );

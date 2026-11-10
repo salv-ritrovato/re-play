@@ -1,4 +1,4 @@
-# Re:Play — My journey through gaming
+# Re:Play - My journey through gaming
 
 A private personal archive of every video game I've played: ratings, reviews, and a visual history.
 Public reading, owner-only writing through a built-in CMS.

@@ -39,9 +39,9 @@ async function StatsContent() {
     );
   }
 
-  // Fill gaps so the distribution always shows 0–10.
+  // Fill gaps so the distribution always shows 0-10.
   const ratingBuckets = Array.from({ length: 10 }, (_, i) => ({
-    label: `${i}–${i + 1}`,
+    label: `${i}-${i + 1}`,
     value: ratings.find((r) => r.bucket === i)?.games ?? 0,
   }));
 

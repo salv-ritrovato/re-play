@@ -132,9 +132,9 @@ test.describe.serial("CMS end to end", () => {
     await page.goto(`/games/${slug}`);
     await expect(page.getByText("Online / competitive")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
-    // Pros get a green "+", cons a red "−".
-    await expect(page.getByText("+", { exact: true }).first()).toBeVisible();
-    await expect(page.getByText("−", { exact: true }).first()).toBeVisible();
+    // Pros get a green "+", cons a red "-".
+    await expect(page.getByRole("listitem").filter({ hasText: "Fast" }).first()).toContainText("+");
+    await expect(page.getByRole("listitem").filter({ hasText: "Fake" }).first()).toContainText("-");
     await expect(page.getByText("E2E Studio").first()).toBeVisible();
     await expect(page.getByText("7.5").first()).toBeVisible();
 
@@ -181,7 +181,7 @@ test.describe.serial("CMS end to end", () => {
 
     // Rating distribution reflects the change (8-9 bucket → 9-10 bucket).
     await page.goto("/statistics");
-    await expect(page.getByText("9–10")).toBeVisible();
+    await expect(page.getByText("9-10")).toBeVisible();
   });
 
   test("replace and remove the cover", async ({ page }) => {

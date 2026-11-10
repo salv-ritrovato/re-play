@@ -61,7 +61,7 @@ export function ScreenshotGallery({ images, title }: { images: GameImage[]; titl
 
       <Dialog open={active !== null} onOpenChange={(o) => !o && setActive(null)}>
         <DialogContent className="max-w-[min(96vw,1200px)] gap-0 border-none bg-transparent p-0 shadow-none ring-0 sm:max-w-[min(96vw,1200px)]">
-          <DialogTitle className="sr-only">{title} — image gallery</DialogTitle>
+          <DialogTitle className="sr-only">{title} - image gallery</DialogTitle>
           <DialogDescription className="sr-only">
             Use the arrow keys to move between images.
           </DialogDescription>

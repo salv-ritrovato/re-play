@@ -1,4 +1,4 @@
--- Re — initial schema
+-- Re - initial schema
 -- Single-owner private archive with public read access.
 -- Writes are restricted to the owner through Row Level Security.
 

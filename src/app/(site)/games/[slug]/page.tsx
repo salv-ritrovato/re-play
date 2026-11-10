@@ -100,7 +100,7 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
                 <CompletionBadge status={game.completion_status} />
               </Fact>
               <Fact label="Playtime">
-                <span className="text-sm">{formatPlaytime(game.playtime_hours) ?? "—"}</span>
+                <span className="text-sm">{formatPlaytime(game.playtime_hours) ?? "-"}</span>
               </Fact>
             </dl>
 
@@ -212,12 +212,12 @@ function ProsCons({ title, items, tone }: { title: string; items: string[]; tone
       <ul className="space-y-2.5">
         {items.map((item, i) => (
           <li key={i} className="flex gap-3 text-sm leading-relaxed text-foreground/90">
-            {/* "+" answers "−": the glyph carries the meaning visually, the heading does for screen readers */}
+            {/* "+" answers "-": the glyph carries the meaning visually, the heading does for screen readers */}
             <span
               aria-hidden
               className={`w-3 shrink-0 text-center font-semibold select-none ${tone === "pro" ? "text-positive" : "text-destructive"}`}
             >
-              {tone === "pro" ? "+" : "−"}
+              {tone === "pro" ? "+" : "-"}
             </span>
             {item}
           </li>
@@ -240,7 +240,7 @@ function Detail({ label, value }: { label: string; value: string | null }) {
   return (
     <div className="space-y-1">
       <dt className="eyebrow">{label}</dt>
-      <dd className="text-foreground/90">{value ?? <span className="text-subtle">—</span>}</dd>
+      <dd className="text-foreground/90">{value ?? <span className="text-subtle">-</span>}</dd>
     </div>
   );
 }

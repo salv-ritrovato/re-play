@@ -54,7 +54,7 @@ export function GameCover({
       ) : (
         <div
           role="img"
-          aria-label={`${title} — no cover artwork`}
+          aria-label={`${title} - no cover artwork`}
           className="flex h-full w-full flex-col items-start justify-end gap-2 bg-gradient-to-b from-card to-surface p-4"
         >
           <span className="text-4xl font-semibold tracking-tighter text-elevated">

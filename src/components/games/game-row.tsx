@@ -28,7 +28,7 @@ export function GameRow({ game }: { game: GameSummary }) {
             {game.is_online && <OnlineBadge className="shrink-0" />}
           </div>
           <p className="mt-0.5 truncate text-xs text-subtle">
-            {[year, game.developer].filter(Boolean).join(" · ") || "—"}
+            {[year, game.developer].filter(Boolean).join(" · ") || "-"}
           </p>
           <p className="mt-1 truncate text-xs text-muted-foreground sm:hidden">
             {game.platforms.map((p) => p.name).join(", ")}
@@ -36,10 +36,10 @@ export function GameRow({ game }: { game: GameSummary }) {
         </div>
         <div className="hidden min-w-0 sm:block">
           <p className="truncate text-xs text-muted-foreground">
-            {game.genres.map((g) => g.name).join(", ") || "—"}
+            {game.genres.map((g) => g.name).join(", ") || "-"}
           </p>
           <p className="mt-1 truncate text-xs text-subtle">
-            {game.platforms.map((p) => p.name).join(", ") || "—"}
+            {game.platforms.map((p) => p.name).join(", ") || "-"}
           </p>
         </div>
         <div className="hidden flex-col gap-1 sm:flex">
