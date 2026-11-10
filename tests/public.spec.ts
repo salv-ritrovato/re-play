@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 test.describe("public navigation", () => {
   test("navigates between every main section", async ({ page }) => {
     await page.goto("/");
-    await expect(page.getByLabel("Re", { exact: true }).first()).toBeVisible();
+    await expect(page.getByRole("img", { name: "re:play" }).first()).toBeVisible();
     await expect(page.getByText("My journey through gaming").first()).toBeVisible();
 
     const nav = page.getByRole("navigation", { name: "Primary" });
