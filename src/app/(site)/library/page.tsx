@@ -21,7 +21,7 @@ export default function LibraryPage({ searchParams }: PageProps<"/library">) {
     <Container className="space-y-10 pt-12 sm:pt-16">
       <PageHeader
         eyebrow="Library"
-        title="Every game, in one place."
+        title="My collection of games"
         description="Browse the full collection by genre, platform, year, rating or status."
       />
       <Suspense fallback={<LibrarySkeleton />}>

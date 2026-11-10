@@ -8,7 +8,7 @@ test.describe("public navigation", () => {
 
     const nav = page.getByRole("navigation", { name: "Primary" });
     for (const [label, url, heading] of [
-      ["Library", /\/library$/, "Every game, in one place."],
+      ["Library", /\/library$/, "My collection of games"],
       ["Reviews", /\/reviews$/, "What I thought."],
       ["Statistics", /\/statistics$/, "The journey in numbers."],
       ["About", /\/about$/, "Hi, I'm Salvatore."],
@@ -73,6 +73,6 @@ test.describe("public navigation", () => {
   test("invalid query params are ignored instead of crashing", async ({ page }) => {
     const res = await page.goto("/library?genre=not-a-uuid&min=abc&sort=hack&page=-4&status=nope");
     expect(res?.status()).toBe(200);
-    await expect(page.getByRole("heading", { name: "Every game, in one place." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "My collection of games" })).toBeVisible();
   });
 });
