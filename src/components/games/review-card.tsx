@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { excerpt, formatDate, yearOf } from "@/lib/format";
 import { reviewFor, type GameSummary, type Lang } from "@/lib/types";
-import { Rating } from "./badges";
+import { OnlineBadge, Rating } from "./badges";
 import { GameCover } from "./game-cover";
 
 export function ReviewCard({ game, lang }: { game: GameSummary; lang: Lang }) {
@@ -27,8 +27,9 @@ export function ReviewCard({ game, lang }: { game: GameSummary; lang: Lang }) {
                 {game.title}
               </Link>
             </h2>
-            <p className="mt-1 text-sm text-subtle">
-              {[year, game.genres.map((g) => g.name).join(", ")].filter(Boolean).join(" · ")}
+            <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-subtle">
+              {game.is_online && <OnlineBadge />}
+              <span>{[year, game.genres.map((g) => g.name).join(", ")].filter(Boolean).join(" · ")}</span>
             </p>
           </div>
           <Rating value={game.rating} size="lg" className="shrink-0" />

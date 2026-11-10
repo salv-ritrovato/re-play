@@ -44,6 +44,7 @@ export async function searchGames(
     p_sort: filters.sort,
     p_limit: pageSize,
     p_offset: (Math.max(filters.page, 1) - 1) * pageSize,
+    p_online: filters.online ?? null,
   });
   if (error) fail("searchGames", error);
 

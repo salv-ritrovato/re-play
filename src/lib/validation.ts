@@ -70,6 +70,7 @@ export const gameSchema = z
     cons: lines,
     notes: text(8000),
     featured: z.boolean(),
+    is_online: z.boolean(),
   })
   .refine((v) => !v.started_on || !v.completed_on || v.completed_on >= v.started_on, {
     path: ["completed_on"],

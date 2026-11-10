@@ -118,6 +118,7 @@ export async function saveGame(
     cons: v.cons,
     notes: v.notes,
     featured: v.featured,
+    is_online: v.is_online,
   };
 
   const write = isEdit

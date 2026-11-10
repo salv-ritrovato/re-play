@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { CompletionBadge, Rating, StatusBadge } from "@/components/games/badges";
+import { CompletionBadge, OnlineBadge, Rating, StatusBadge } from "@/components/games/badges";
 import { GameCard } from "@/components/games/game-card";
 import { GameCover } from "@/components/games/game-cover";
 import { ReviewTabs } from "@/components/games/review-tabs";
@@ -69,8 +69,13 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
               <span className="text-muted-foreground">{game.title}</span>
             </nav>
 
-            {game.genres.length > 0 && (
-              <p className="eyebrow mb-3">{game.genres.map((g) => g.name).join(" · ")}</p>
+            {(game.is_online || game.genres.length > 0) && (
+              <div className="mb-3 flex flex-wrap items-center gap-3">
+                {game.is_online && <OnlineBadge label="Online / competitive" />}
+                {game.genres.length > 0 && (
+                  <p className="eyebrow">{game.genres.map((g) => g.name).join(" · ")}</p>
+                )}
+              </div>
             )}
             <h1 className="text-5xl leading-[1.02] font-semibold tracking-tight text-balance sm:text-6xl lg:text-7xl">
               {game.title}
@@ -207,10 +212,13 @@ function ProsCons({ title, items, tone }: { title: string; items: string[]; tone
       <ul className="space-y-2.5">
         {items.map((item, i) => (
           <li key={i} className="flex gap-3 text-sm leading-relaxed text-foreground/90">
+            {/* "+" answers "−": the glyph carries the meaning visually, the heading does for screen readers */}
             <span
               aria-hidden
-              className={`mt-2 h-px w-3 shrink-0 ${tone === "pro" ? "bg-foreground" : "bg-destructive"}`}
-            />
+              className={`w-3 shrink-0 text-center font-semibold select-none ${tone === "pro" ? "text-positive" : "text-destructive"}`}
+            >
+              {tone === "pro" ? "+" : "−"}
+            </span>
             {item}
           </li>
         ))}

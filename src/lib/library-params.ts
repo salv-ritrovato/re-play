@@ -52,6 +52,7 @@ export function parseLibraryParams(
     developer: first(raw.developer)?.slice(0, 120) || undefined,
     publisher: first(raw.publisher)?.slice(0, 120) || undefined,
     reviewedOnly: mode === "reviews",
+    online: first(raw.type) === "online" ? true : first(raw.type) === "solo" ? false : undefined,
     sort,
     page,
     view: first(raw.view) === "list" ? "list" : "grid",
@@ -74,6 +75,7 @@ export function countActiveFilters(f: LibraryFilters): number {
     (f.minRating !== undefined ? 1 : 0) +
     (f.maxRating !== undefined ? 1 : 0) +
     (f.developer ? 1 : 0) +
-    (f.publisher ? 1 : 0)
+    (f.publisher ? 1 : 0) +
+    (f.online !== undefined ? 1 : 0)
   );
 }

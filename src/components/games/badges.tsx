@@ -19,6 +19,21 @@ export function StatusBadge({ status, className }: { status: PlayStatus; classNa
   );
 }
 
+/** Marks online / competitive games, which live in the library but target a different audience. */
+export function OnlineBadge({ className, label = "Online" }: { className?: string; label?: string }) {
+  return (
+    <span
+      className={cn(
+        "inline-flex items-center gap-1.5 rounded border border-violet/50 bg-background/80 px-1.5 py-0.5 text-[0.625rem] font-medium tracking-[0.12em] text-violet uppercase backdrop-blur-sm",
+        className,
+      )}
+    >
+      <span aria-hidden className="size-1 rounded-full bg-violet" />
+      {label}
+    </span>
+  );
+}
+
 export function CompletionBadge({ status }: { status: CompletionStatus }) {
   return <span className="text-xs text-muted-foreground">{COMPLETION_LABEL[status]}</span>;
 }

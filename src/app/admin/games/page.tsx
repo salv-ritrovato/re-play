@@ -96,6 +96,7 @@ async function GamesTable({ searchParams }: { searchParams: PageProps<"/admin/ga
                   <div className="mt-1 flex gap-3 text-xs text-subtle">
                     {!g.cover_path && <span>No cover</span>}
                     {!g.review_en && <span>No review</span>}
+                    {g.is_online && <span className="text-violet">Online</span>}
                   </div>
                 </TableCell>
                 <TableCell className="hidden sm:table-cell"><StatusBadge status={g.play_status} /></TableCell>

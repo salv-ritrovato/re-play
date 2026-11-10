@@ -55,6 +55,7 @@ function toDefaults(game?: GameDetail): GameFormInput {
     cons: game?.cons.join("\n") ?? "",
     notes: game?.notes ?? "",
     featured: game?.featured ?? false,
+    is_online: game?.is_online ?? false,
   };
 }
 
@@ -237,6 +238,21 @@ export function GameForm({
             />
           )}
         />
+        <div className="flex items-center justify-between gap-4 rounded-md border border-border p-4 sm:col-span-2">
+          <div>
+            <label htmlFor="is_online" className="text-sm font-medium">Online / competitive game</label>
+            <p className="text-xs text-subtle">
+              Stays in the library with its own &ldquo;Online&rdquo; label, and can be filtered in or out.
+            </p>
+          </div>
+          <Controller
+            control={control}
+            name="is_online"
+            render={({ field }) => (
+              <Switch id="is_online" checked={field.value} onCheckedChange={field.onChange} />
+            )}
+          />
+        </div>
         <Field id="tags" label="Personal tags" className="sm:col-span-2" hint="Your own labels, e.g. “comfort game”, “co-op”, “replayable”.">
           <Controller
             control={control}

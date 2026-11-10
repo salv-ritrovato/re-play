@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { formatPlaytime, yearOf } from "@/lib/format";
 import type { GameSummary } from "@/lib/types";
-import { CompletionBadge, Rating, StatusBadge } from "./badges";
+import { CompletionBadge, OnlineBadge, Rating, StatusBadge } from "./badges";
 import { GameCover } from "./game-cover";
 
 export function GameRow({ game }: { game: GameSummary }) {
@@ -23,7 +23,10 @@ export function GameRow({ game }: { game: GameSummary }) {
           className="rounded-sm"
         />
         <div className="min-w-0">
-          <h3 className="truncate text-sm font-medium">{game.title}</h3>
+          <div className="flex min-w-0 items-center gap-2">
+            <h3 className="truncate text-sm font-medium">{game.title}</h3>
+            {game.is_online && <OnlineBadge className="shrink-0" />}
+          </div>
           <p className="mt-0.5 truncate text-xs text-subtle">
             {[year, game.developer].filter(Boolean).join(" · ") || "—"}
           </p>

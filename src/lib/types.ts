@@ -44,6 +44,7 @@ export interface GameSummary {
   cover_blur: string | null;
   created_at: string;
   last_played_on: string | null;
+  is_online: boolean;
   genres: Taxonomy[];
   platforms: Taxonomy[];
   total_count: number;
@@ -84,6 +85,7 @@ export interface GameDetail {
   cover_path: string | null;
   cover_blur: string | null;
   featured: boolean;
+  is_online: boolean;
   created_at: string;
   updated_at: string;
   genres: Taxonomy[];
@@ -104,6 +106,8 @@ export interface LibraryFilters {
   developer?: string;
   publisher?: string;
   reviewedOnly?: boolean;
+  /** undefined = everything, true = online/competitive only, false = single-player only */
+  online?: boolean;
   sort: SortKey;
   page: number;
   view: "grid" | "list";

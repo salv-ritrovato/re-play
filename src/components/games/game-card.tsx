@@ -2,7 +2,7 @@ import Link from "next/link";
 import { yearOf } from "@/lib/format";
 import type { GameSummary } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { Rating, StatusBadge } from "./badges";
+import { OnlineBadge, Rating, StatusBadge } from "./badges";
 import { GameCover } from "./game-cover";
 
 export function GameCard({
@@ -29,6 +29,7 @@ export function GameCard({
         path={game.cover_path}
         blur={game.cover_blur}
         priority={priority}
+        badge={game.is_online ? <OnlineBadge /> : undefined}
         className="transition-colors group-hover:border-muted-foreground/40"
       />
       <div className="mt-3 flex items-start justify-between gap-3">

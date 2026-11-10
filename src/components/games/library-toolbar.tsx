@@ -37,7 +37,7 @@ export interface FilterOptions {
 }
 
 const FILTER_KEYS = [
-  "genre", "platform", "year", "status", "completion", "min", "max", "developer", "publisher",
+  "genre", "platform", "year", "status", "completion", "min", "max", "developer", "publisher", "type",
 ];
 
 const ANY = "__any";
@@ -256,6 +256,23 @@ function FilterSheet({
         </SheetHeader>
 
         <div className="flex-1 space-y-7 p-4">
+          <FilterGroup label="Type">
+            {(
+              [
+                ["solo", "Single-player"],
+                ["online", "Online / competitive"],
+              ] as const
+            ).map(([value, label]) => (
+              <Chip
+                key={value}
+                pressed={searchParams.get("type") === value}
+                onClick={() => update({ type: searchParams.get("type") === value ? null : value })}
+              >
+                {label}
+              </Chip>
+            ))}
+          </FilterGroup>
+
           <FilterGroup label="Playing status">
             {PLAY_STATUSES.map((s) => (
               <Chip key={s} pressed={getList("status").includes(s)} onClick={() => toggle("status", s)}>
@@ -402,6 +419,14 @@ function ActiveFilters({
   const max = searchParams.get("max");
   if (min) chips.push({ key: "min", label: `Rating ≥ ${min}`, remove: () => update({ min: null }) });
   if (max) chips.push({ key: "max", label: `Rating ≤ ${max}`, remove: () => update({ max: null }) });
+  const type = searchParams.get("type");
+  if (type === "online" || type === "solo") {
+    chips.push({
+      key: "type",
+      label: type === "online" ? "Online / competitive" : "Single-player",
+      remove: () => update({ type: null }),
+    });
+  }
   const dev = searchParams.get("developer");
   if (dev) chips.push({ key: "developer", label: dev, remove: () => update({ developer: null }) });
   const pub = searchParams.get("publisher");

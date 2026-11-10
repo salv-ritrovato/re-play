@@ -45,6 +45,7 @@ test.describe.serial("CMS end to end", () => {
     await page.getByRole("button", { name: "PC", exact: true }).click();
     await page.locator("#tags").fill("e2e-tag");
     await page.locator("#tags").press("Enter");
+    await page.getByRole("switch", { name: "Online / competitive game" }).click(); // flag as online / competitive
 
     await page.locator("#rating").fill("7.5");
     await page.locator("#playtime_hours").fill("12");
@@ -120,8 +121,20 @@ test.describe.serial("CMS end to end", () => {
     await page.goto(`/library?q=${encodeURIComponent(title)}&status=dropped`);
     await expect(page.getByText("No games match these filters")).toBeVisible();
 
+    // Online / competitive games stay in the library, flagged and filterable.
+    await page.goto(`/library?q=${encodeURIComponent(title)}`);
+    await expect(page.getByText("Online", { exact: true })).toBeVisible();
+    await page.goto(`/library?q=${encodeURIComponent(title)}&type=online`);
+    await expect(page.getByRole("link", { name: new RegExp(title) })).toBeVisible();
+    await page.goto(`/library?q=${encodeURIComponent(title)}&type=solo`);
+    await expect(page.getByText("No games match these filters")).toBeVisible();
+
     await page.goto(`/games/${slug}`);
+    await expect(page.getByText("Online / competitive")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
+    // Pros get a green "+", cons a red "−".
+    await expect(page.getByText("+", { exact: true }).first()).toBeVisible();
+    await expect(page.getByText("−", { exact: true }).first()).toBeVisible();
     await expect(page.getByText("E2E Studio").first()).toBeVisible();
     await expect(page.getByText("7.5").first()).toBeVisible();
 

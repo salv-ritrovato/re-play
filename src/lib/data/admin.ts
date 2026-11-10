@@ -14,6 +14,7 @@ export interface AdminGameRow {
   cover_path: string | null;
   cover_blur: string | null;
   review_en: string | null;
+  is_online: boolean;
   release_date: string | null;
   created_at: string;
   updated_at: string;
@@ -65,7 +66,7 @@ export async function listAdminGames(params: {
   let query = supabase
     .from("games")
     .select(
-      "id, slug, title, rating, play_status, cover_path, cover_blur, review_en, release_date, created_at, updated_at",
+      "id, slug, title, rating, play_status, cover_path, cover_blur, review_en, release_date, is_online, created_at, updated_at",
       { count: "exact" },
     )
     .order("updated_at", { ascending: false })

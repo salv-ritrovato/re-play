@@ -11,6 +11,8 @@ interface GameCoverProps {
   priority?: boolean;
   /** Scale the artwork slightly on hover (parent needs the `group` class). */
   zoom?: boolean;
+  /** Small label pinned to the top-left corner of the artwork. */
+  badge?: React.ReactNode;
 }
 
 /** 3:4 cover with blur placeholder; falls back to a typographic plate when there is no artwork. */
@@ -22,6 +24,7 @@ export function GameCover({
   sizes = "(min-width: 1280px) 16vw, (min-width: 768px) 25vw, 45vw",
   priority,
   zoom = true,
+  badge,
 }: GameCoverProps) {
   const src = mediaUrl(path);
 
@@ -32,6 +35,7 @@ export function GameCover({
         className,
       )}
     >
+      {badge && <div className="absolute top-2 left-2 z-10">{badge}</div>}
       {src ? (
         <Image
           src={src}
