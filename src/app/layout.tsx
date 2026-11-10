@@ -17,11 +17,11 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000"),
   title: {
-    default: "Re — My journey through gaming",
-    template: "%s · Re",
+    default: "Re:Play — My journey through gaming",
+    template: "%s · Re:Play",
   },
   description:
-    "Re is a personal archive of every video game I've played: ratings, reviews and a visual history of my journey through gaming.",
+    "Re:Play is a personal archive of every video game I've played: ratings, reviews and a visual history of my journey through gaming.",
 };
 
 export const viewport: Viewport = {

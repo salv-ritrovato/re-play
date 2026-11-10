@@ -11,7 +11,7 @@ import { requireOwner } from "@/lib/auth";
 import { logout } from "../login/actions";
 
 export const metadata: Metadata = {
-  title: { default: "Admin", template: "%s · Admin · Re" },
+  title: { default: "Admin", template: "%s · Admin · Re:Play" },
   robots: { index: false, follow: false },
 };
 
