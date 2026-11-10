@@ -6,7 +6,7 @@ export default function AdminNotFound() {
     <div className="max-w-xl space-y-5 py-10">
       <p className="eyebrow">Admin · 404</p>
       <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-        This record doesn&apos;t exist.
+        This record doesn&apos;t exist
       </h1>
       <p className="text-base text-pretty text-muted-foreground">
         It may have been deleted, or the address is wrong. Nothing was changed.

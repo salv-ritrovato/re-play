@@ -21,7 +21,7 @@ export default function ReviewsPage({ searchParams }: PageProps<"/reviews">) {
     <Container className="space-y-10 pt-12 sm:pt-16">
       <PageHeader
         eyebrow="Reviews"
-        title="What I thought."
+        title="What I thought"
         description="Honest, personal write-ups of the games I've finished, dropped or can't stop thinking about."
       />
       <Suspense fallback={<ReviewsSkeleton />}>

@@ -24,7 +24,7 @@ function SetupRequired() {
   return (
     <div className="mx-auto w-full max-w-3xl space-y-4 px-5 py-24 sm:px-8">
       <p className="eyebrow">Setup required</p>
-      <h1 className="text-4xl font-semibold tracking-tight">Connect Supabase to start.</h1>
+      <h1 className="text-4xl font-semibold tracking-tight">Connect Supabase to start</h1>
       <p className="text-muted-foreground">
         Copy <code className="rounded bg-elevated px-1.5 py-0.5 text-sm">.env.example</code> to{" "}
         <code className="rounded bg-elevated px-1.5 py-0.5 text-sm">.env.local</code>, fill in{" "}

@@ -12,7 +12,7 @@ test.describe.serial("CMS end to end", () => {
 
   async function totalGames(page: Page) {
     await page.goto("/statistics");
-    await expect(page.getByRole("heading", { name: "The journey in numbers." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "The journey in numbers" })).toBeVisible();
     const figure = page.locator("dt", { hasText: "Games played" }).locator("xpath=following-sibling::dd");
     // With an empty archive the page shows an empty state instead of the figures.
     const empty = page.getByText("No data to chart yet");
@@ -331,7 +331,7 @@ test.describe("admin 404", () => {
   test("a missing record shows the 404 inside the admin shell", async ({ page }) => {
     await login(page);
     await page.goto("/admin/games/00000000-0000-0000-0000-000000000000/edit");
-    await expect(page.getByRole("heading", { name: "This record doesn't exist." })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "This record doesn't exist" })).toBeVisible();
     // Admin chrome stays, and the public site header is not duplicated on top of it.
     await expect(page.getByRole("navigation", { name: "Admin" })).toBeVisible();
     await expect(page.getByRole("navigation", { name: "Primary" })).toHaveCount(0);

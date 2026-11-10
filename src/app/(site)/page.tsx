@@ -38,7 +38,7 @@ async function HomeContent() {
             </div>
             <h1 className="max-w-2xl text-3xl leading-tight font-medium tracking-tight text-balance text-foreground/90 sm:text-4xl">
               A quiet record of every world I&apos;ve wandered through - what I played, what stayed
-              with me, and what I thought of it.
+              with me, and what I thought of it
             </h1>
             <div className="flex flex-wrap gap-3">
               <ButtonLink size="lg" href="/library">

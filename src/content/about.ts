@@ -19,7 +19,7 @@ export interface AboutContent {
 export const about: Record<Lang, AboutContent> = {
   en: {
     eyebrow: "About",
-    title: "Hi, I'm Salvatore.",
+    title: "Hi, I'm Salvatore",
     intro:
       "I'm a die-hard gamer, and I've loved nerd culture since I was a kid.",
     sections: [
@@ -58,7 +58,7 @@ export const about: Record<Lang, AboutContent> = {
   },
   it: {
     eyebrow: "Chi sono",
-    title: "Ciao, sono Salvatore.",
+    title: "Ciao, sono Salvatore",
     intro:
       "Sono un gamer incallito e un amante della cultura nerd sin da quando ero bambino.",
     sections: [

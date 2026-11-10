@@ -14,7 +14,7 @@ export function NotFoundView() {
       <div className="max-w-xl space-y-5">
         <p className="eyebrow">Page not found</p>
         <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-          This page isn&apos;t in the archive.
+          This page isn&apos;t in the archive
         </h1>
         <p className="text-base text-pretty text-muted-foreground">
           The game or page you&apos;re looking for doesn&apos;t exist, or it was removed from the

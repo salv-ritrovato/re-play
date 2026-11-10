@@ -18,7 +18,7 @@ export default function GlobalError({
     <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col items-start justify-center gap-6 px-5 py-24 sm:px-8">
       <p className="eyebrow">Something went wrong</p>
       <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
-        The archive hit an unexpected error.
+        The archive hit an unexpected error
       </h1>
       <p className="max-w-md text-muted-foreground">
         Nothing was lost. Try again, and if it keeps happening check that the Supabase environment

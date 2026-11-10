@@ -17,7 +17,7 @@ export default function StatisticsPage() {
     <Container className="space-y-14 pt-12 sm:pt-16">
       <PageHeader
         eyebrow="Statistics"
-        title="The journey in numbers."
+        title="The journey in numbers"
         description="Everything here is calculated live from the collection."
       />
       <Suspense fallback={<Skeleton className="h-96 w-full" />}>
