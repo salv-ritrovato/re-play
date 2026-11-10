@@ -74,6 +74,31 @@ test.describe.serial("CMS end to end", () => {
     await page.getByRole("button", { name: "Add game" }).last().click();
     await expect(page).toHaveURL(/\/admin\/games$/);
     await expect(page.getByRole("link", { name: title, exact: true })).toBeVisible();
+
+    // Same session, client-side navigation: the next new game must NOT be pre-filled with this one.
+    await page.getByRole("link", { name: "Add game" }).first().click();
+    await expect(page).toHaveURL(/\/admin\/games\/new$/);
+    await expect(page.locator("#title")).toHaveValue("");
+    await expect(page.locator("#slug")).toHaveValue("");
+    await expect(page.locator("#developer")).toHaveValue("");
+    await expect(page.locator("#rating")).toHaveValue("");
+    await expect(page.locator("#review_en")).toHaveValue("");
+    await expect(page.locator("#review_it")).toHaveValue("");
+    await expect(page.getByRole("button", { name: "Adventure", exact: true })).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByAltText(/Cover preview/)).toHaveCount(0);
+    await expect(page.getByText(/New screenshot/i)).toHaveCount(0);
+  });
+
+  test("cancelling a half-typed form leaves no draft behind", async ({ page }) => {
+    await page.goto("/admin/games");
+    await page.getByRole("link", { name: "Add game" }).first().click();
+    await page.locator("#title").fill("Half-typed draft");
+    await page.locator("#developer").fill("Draft studio");
+    await page.getByRole("link", { name: "Cancel" }).click();
+    await expect(page).toHaveURL(/\/admin\/games$/);
+    await page.getByRole("link", { name: "Add game" }).first().click();
+    await expect(page.locator("#title")).toHaveValue("");
+    await expect(page.locator("#developer")).toHaveValue("");
   });
 
   test("duplicate slugs are rejected with a clear message", async ({ page }) => {

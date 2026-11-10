@@ -96,6 +96,21 @@ export function GameForm({
     "aria-describedby": errors[name] ? `${name}-error` : undefined,
   });
 
+  /**
+   * Next keeps the state of pages you have already visited (so "back" is instant), which means
+   * a finished or cancelled form would reappear pre-filled the next time it is opened.
+   * Reset explicitly when the work is done or abandoned.
+   */
+  function resetForm({ values }: { values: boolean }) {
+    if (media.cover) URL.revokeObjectURL(media.cover.previewUrl);
+    media.extras.forEach((e) => URL.revokeObjectURL(e.previewUrl));
+    setMedia(emptyMedia);
+    if (values) {
+      form.reset(toDefaults(game));
+      setSlugTouched(isEdit);
+    }
+  }
+
   function submit() {
     // Validate with the shared schema, but send the raw field values: the server
     // re-validates and normalizes them with the very same schema.
@@ -121,6 +136,8 @@ export function GameForm({
             return;
           }
           toast.success(isEdit ? "Changes saved" : "Game added to the archive");
+          // A new game starts from a blank form next time; an edited one keeps its (saved) values.
+          resetForm({ values: !isEdit });
           router.push("/admin/games");
           router.refresh();
         });
@@ -338,7 +355,7 @@ export function GameForm({
           )}
         </div>
         <div className="flex items-center gap-2">
-          <ButtonLink type="button" variant="ghost" href="/admin/games">
+          <ButtonLink variant="ghost" href="/admin/games" onClick={() => resetForm({ values: true })}>
             Cancel
           </ButtonLink>
           <Button type="submit" disabled={isSaving} className="min-w-32 gap-2">

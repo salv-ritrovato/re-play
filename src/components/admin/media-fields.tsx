@@ -56,13 +56,8 @@ export function MediaFields({
     latest.current = value;
   });
 
-  useEffect(() => {
-    return () => {
-      const v = latest.current;
-      if (v.cover) URL.revokeObjectURL(v.cover.previewUrl);
-      v.extras.forEach((e) => URL.revokeObjectURL(e.previewUrl));
-    };
-  }, []);
+  // Preview URLs are revoked when an image is replaced, discarded or the form is reset (see
+  // GameForm.resetForm). Not on unmount: Next keeps visited pages alive, so unmount != gone.
 
   async function pickCover(files: FileList | null) {
     const file = files?.[0];
