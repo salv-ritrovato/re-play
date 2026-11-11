@@ -1,3 +1,16 @@
+import {
+  Building2,
+  Calendar,
+  CalendarCheck,
+  Clock,
+  Flag,
+  Layers,
+  Monitor,
+  Star,
+  Store,
+  Trophy,
+  type LucideIcon,
+} from "lucide-react";
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -8,6 +21,7 @@ import { GameCard } from "@/components/games/game-card";
 import { GameCover } from "@/components/games/game-cover";
 import { ReviewTabs } from "@/components/games/review-tabs";
 import { Container, Section } from "@/components/layout/page-header";
+import { IconLabel } from "@/components/ui/icon-label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getGameBySlug, getRelatedGames } from "@/lib/data/public";
 import { excerpt, formatDate, formatPlaytime, yearOf } from "@/lib/format";
@@ -92,16 +106,16 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
             )}
 
             <dl className="mt-10 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-border pt-8 sm:grid-cols-4">
-              <Fact label="My rating">
+              <Fact icon={Star} label="My rating">
                 <Rating value={game.rating} size="lg" />
               </Fact>
-              <Fact label="Status">
+              <Fact icon={Flag} label="Status">
                 <StatusBadge status={game.play_status} className="text-sm text-foreground" />
               </Fact>
-              <Fact label="Completion">
+              <Fact icon={Trophy} label="Completion">
                 <CompletionBadge status={game.completion_status} />
               </Fact>
-              <Fact label="Playtime">
+              <Fact icon={Clock} label="Playtime">
                 <span className="text-sm">{formatPlaytime(game.playtime_hours) ?? "-"}</span>
               </Fact>
             </dl>
@@ -133,14 +147,15 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
               {game.description ?? "No description has been added for this game yet."}
             </div>
             <dl className="space-y-5 text-sm">
-              <Detail label="Release date" value={formatDate(game.release_date)} />
+              <Detail icon={Calendar} label="Release date" value={formatDate(game.release_date)} />
               <Detail
+                icon={Building2}
                 label="Developer"
                 value={game.developer ? <DeveloperLinks value={game.developer} /> : null}
               />
-              <Detail label="Publisher" value={game.publisher} />
-              <Detail label="Genres" value={game.genres.map((g) => g.name).join(", ") || null} />
-              <Detail label="Platforms" value={game.platforms.map((p) => p.name).join(", ") || null} />
+              <Detail icon={Store} label="Publisher" value={game.publisher} />
+              <Detail icon={Layers} label="Genres" value={game.genres.map((g) => g.name).join(", ") || null} />
+              <Detail icon={Monitor} label="Platforms" value={game.platforms.map((p) => p.name).join(", ") || null} />
             </dl>
           </div>
         </Section>
@@ -181,8 +196,8 @@ function PersonalSection({ game }: { game: GameDetail }) {
         </div>
 
         <aside aria-label="Play history" className="space-y-5 text-sm lg:border-l lg:border-border lg:pl-8">
-          <Detail label="Completed" value={completed} />
-          <Detail label="Playtime" value={formatPlaytime(game.playtime_hours)} />
+          <Detail icon={CalendarCheck} label="Completed" value={completed} />
+          <Detail icon={Clock} label="Playtime" value={formatPlaytime(game.playtime_hours)} />
         </aside>
       </div>
     </section>
@@ -212,19 +227,23 @@ function ProsCons({ title, items, tone }: { title: string; items: string[]; tone
   );
 }
 
-function Fact({ label, children }: { label: string; children: React.ReactNode }) {
+function Fact({ icon, label, children }: { icon: LucideIcon; label: string; children: React.ReactNode }) {
   return (
     <div className="space-y-1.5">
-      <dt className="eyebrow">{label}</dt>
+      <dt className="eyebrow">
+        <IconLabel icon={icon}>{label}</IconLabel>
+      </dt>
       <dd>{children}</dd>
     </div>
   );
 }
 
-function Detail({ label, value }: { label: string; value: React.ReactNode }) {
+function Detail({ icon, label, value }: { icon: LucideIcon; label: string; value: React.ReactNode }) {
   return (
     <div className="space-y-1">
-      <dt className="eyebrow">{label}</dt>
+      <dt className="eyebrow">
+        <IconLabel icon={icon}>{label}</IconLabel>
+      </dt>
       <dd className="text-foreground/90">{value ?? <span className="text-subtle">-</span>}</dd>
     </div>
   );

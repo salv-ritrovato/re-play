@@ -2,6 +2,9 @@ import type { Lang } from "@/lib/types";
 
 export const STEAM_URL = "https://steamcommunity.com/profiles/76561198066959401/";
 
+/** Which icon goes in front of each fact (the page maps these names to icons). */
+export type FactIcon = "games" | "heart" | "console" | "pc" | "story";
+
 export interface AboutContent {
   eyebrow: string;
   title: string;
@@ -10,7 +13,7 @@ export interface AboutContent {
   /** Closing paragraph, set apart from the rest. */
   closing: string;
   factsTitle: string;
-  facts: { label: string; value: string }[];
+  facts: { icon: FactIcon; label: string; value: string }[];
   /** Link to the Steam profile, shown under the facts. */
   steam: { label: string; cta: string };
 }
@@ -48,11 +51,11 @@ export const about: Record<Lang, AboutContent> = {
       "Today, gaming is my escape from the harsh reality of “adults” (:D), and it's also a sweet memory of my mother, who is no longer with us. Going back to the games that made my childhood takes me back to when I was a kid, having fun with her.",
     factsTitle: "At a glance",
     facts: [
-      { label: "Games played", value: "1,500+" },
-      { label: "Childhood favourite", value: "Jurassic War (MS-DOS)" },
-      { label: "Consoles owned", value: "Every Nintendo, every PlayStation up to the 3" },
-      { label: "Then", value: "PC gaming, aiming at competitive play" },
-      { label: "Games that made my story", value: "World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege" },
+      { icon: "games", label: "Games played", value: "1,500+" },
+      { icon: "heart", label: "Childhood favourite", value: "Jurassic War (MS-DOS)" },
+      { icon: "console", label: "Consoles owned", value: "Every Nintendo, every PlayStation up to the 3" },
+      { icon: "pc", label: "Then", value: "PC gaming, aiming at competitive play" },
+      { icon: "story", label: "Games that made my story", value: "World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege" },
     ],
     steam: { label: "Find me on", cta: "My Steam profile" },
   },
@@ -87,11 +90,11 @@ export const about: Record<Lang, AboutContent> = {
       "Oggi il gaming è la mia via di fuga dalla dura realtà degli “adulti” (:D) ed è anche un dolce ricordo di mia madre, che non c'è più. Tornare su quei titoli che hanno fatto la mia infanzia mi riporta a quando ero bambino e mi divertivo con lei.",
     factsTitle: "In breve",
     facts: [
-      { label: "Giochi giocati", value: "Più di 1500" },
-      { label: "Il preferito dell'infanzia", value: "Jurassic War (MS-DOS)" },
-      { label: "Console possedute", value: "Tutte le Nintendo, tutte le PlayStation fino alla 3" },
-      { label: "Poi", value: "PC gaming, con il sogno del competitivo" },
-      { label: "I giochi che hanno fatto la mia storia", value: "World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege" },
+      { icon: "games", label: "Giochi giocati", value: "Più di 1500" },
+      { icon: "heart", label: "Il preferito dell'infanzia", value: "Jurassic War (MS-DOS)" },
+      { icon: "console", label: "Console possedute", value: "Tutte le Nintendo, tutte le PlayStation fino alla 3" },
+      { icon: "pc", label: "Poi", value: "PC gaming, con il sogno del competitivo" },
+      { icon: "story", label: "I giochi che hanno fatto la mia storia", value: "World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege" },
     ],
     steam: { label: "Trovami su", cta: "Il mio profilo Steam" },
   },

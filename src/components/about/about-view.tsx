@@ -1,10 +1,19 @@
 "use client";
 
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, Gamepad2, Heart, Joystick, Monitor, Trophy, type LucideIcon } from "lucide-react";
 import { useState } from "react";
-import { STEAM_URL, type AboutContent } from "@/content/about";
+import { IconLabel } from "@/components/ui/icon-label";
+import { STEAM_URL, type AboutContent, type FactIcon } from "@/content/about";
 import { LANGS, LANG_LABEL, type Lang } from "@/lib/types";
 import { cn } from "@/lib/utils";
+
+const FACT_ICONS: Record<FactIcon, LucideIcon> = {
+  games: Gamepad2,
+  heart: Heart,
+  console: Joystick,
+  pc: Monitor,
+  story: Trophy,
+};
 
 /** About page body with an English / Italian switch (both versions ship with the page). */
 export function AboutView({ content }: { content: Record<Lang, AboutContent> }) {
@@ -82,7 +91,9 @@ export function AboutView({ content }: { content: Record<Lang, AboutContent> }) 
           <dl className="space-y-6">
             {c.facts.map((fact) => (
               <div key={fact.label} className="space-y-1">
-                <dt className="eyebrow">{fact.label}</dt>
+                <dt className="eyebrow">
+                  <IconLabel icon={FACT_ICONS[fact.icon]}>{fact.label}</IconLabel>
+                </dt>
                 <dd className="text-base text-foreground/90">{fact.value}</dd>
               </div>
             ))}

@@ -1,5 +1,7 @@
+import { Compass } from "lucide-react";
 import { Container } from "@/components/layout/page-header";
 import { ButtonLink } from "@/components/ui/button-link";
+import { IconLabel } from "@/components/ui/icon-label";
 
 /** Content of the public 404 page (without header/footer, which the surrounding layout provides). */
 export function NotFoundView() {
@@ -12,7 +14,9 @@ export function NotFoundView() {
         404
       </p>
       <div className="max-w-xl space-y-5">
-        <p className="eyebrow">Page not found</p>
+        <p className="eyebrow">
+          <IconLabel icon={Compass}>Page not found</IconLabel>
+        </p>
         <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
           This page isn&apos;t in the archive
         </h1>

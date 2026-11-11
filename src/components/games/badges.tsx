@@ -1,3 +1,4 @@
+import { Wifi } from "lucide-react";
 import { COMPLETION_LABEL, PLAY_STATUS_LABEL, type CompletionStatus, type PlayStatus } from "@/lib/types";
 import { formatRating } from "@/lib/format";
 import { cn } from "@/lib/utils";
@@ -28,7 +29,7 @@ export function OnlineBadge({ className, label = "Online" }: { className?: strin
         className,
       )}
     >
-      <span aria-hidden className="size-1 rounded-full bg-violet" />
+      <Wifi aria-hidden className="size-3" />
       {label}
     </span>
   );

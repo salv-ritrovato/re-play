@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Pencil, Plus } from "lucide-react";
+import { Gamepad2, Pencil, Plus } from "lucide-react";
 import { Suspense } from "react";
 import { AdminGamesFilters } from "@/components/admin/admin-games-filters";
 import { DeleteGameButton } from "@/components/admin/delete-game-button";
@@ -55,6 +55,7 @@ async function GamesTable({ searchParams }: { searchParams: PageProps<"/admin/ga
   if (rows.length === 0) {
     return (
       <EmptyState
+        icon={Gamepad2}
         title={total === 0 && !raw.q && !raw.status && !raw.missing ? "No games yet" : "No games match"}
         description="Add a game or adjust your search and filters."
         action={

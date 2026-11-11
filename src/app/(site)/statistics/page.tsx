@@ -1,5 +1,7 @@
+import { ChartColumn, Clock, Gamepad2, Star, type LucideIcon } from "lucide-react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
+import { IconLabel } from "@/components/ui/icon-label";
 import { BarList, Columns } from "@/components/stats/charts";
 import { EmptyState } from "@/components/layout/empty-state";
 import { Container, PageHeader, Section } from "@/components/layout/page-header";
@@ -33,6 +35,7 @@ async function StatsContent() {
   if (!totals || totals.total_games === 0) {
     return (
       <EmptyState
+        icon={ChartColumn}
         title="No data to chart yet"
         description="Statistics appear as soon as games are added to the archive."
       />
@@ -58,9 +61,9 @@ async function StatsContent() {
   return (
     <div className="space-y-20">
       <dl className="grid grid-cols-2 gap-x-8 gap-y-10 border-y border-border py-10 sm:grid-cols-3">
-        <Figure label="Games played" value={totals.total_games} />
-        <Figure label="Average rating" value={formatRating(totals.average_rating)} />
-        <Figure label="Hours played" value={Number(totals.total_playtime_hours.toFixed(1))} />
+        <Figure icon={Gamepad2} label="Games played" value={totals.total_games} />
+        <Figure icon={Star} label="Average rating" value={formatRating(totals.average_rating)} />
+        <Figure icon={Clock} label="Hours played" value={Number(totals.total_playtime_hours.toFixed(1))} />
       </dl>
 
       <div className="grid gap-16 lg:grid-cols-2">
@@ -87,10 +90,12 @@ async function StatsContent() {
   );
 }
 
-function Figure({ label, value }: { label: string; value: string | number }) {
+function Figure({ icon, label, value }: { icon: LucideIcon; label: string; value: string | number }) {
   return (
     <div className="space-y-2">
-      <dt className="eyebrow">{label}</dt>
+      <dt className="eyebrow">
+        <IconLabel icon={icon}>{label}</IconLabel>
+      </dt>
       <dd className="text-4xl font-semibold tracking-tight tabular-nums">{value}</dd>
     </div>
   );

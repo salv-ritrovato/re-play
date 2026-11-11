@@ -1,10 +1,14 @@
+import { Compass } from "lucide-react";
 import { ButtonLink } from "@/components/ui/button-link";
+import { IconLabel } from "@/components/ui/icon-label";
 
 /** Shown inside the admin shell when a record (e.g. a game being edited) doesn't exist. */
 export default function AdminNotFound() {
   return (
     <div className="max-w-xl space-y-5 py-10">
-      <p className="eyebrow">Admin · 404</p>
+      <p className="eyebrow">
+        <IconLabel icon={Compass}>Admin · 404</IconLabel>
+      </p>
       <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
         This record doesn&apos;t exist
       </h1>

@@ -1,3 +1,4 @@
+import { Library, SearchX } from "lucide-react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { GameCard } from "@/components/games/game-card";
@@ -52,6 +53,7 @@ async function LibraryContent({ searchParams }: { searchParams: PageProps<"/libr
       {items.length === 0 ? (
         hasRefinement ? (
           <EmptyState
+            icon={SearchX}
             title="No games match these filters"
             description="Try removing a filter or searching for something else."
             action={
@@ -62,6 +64,7 @@ async function LibraryContent({ searchParams }: { searchParams: PageProps<"/libr
           />
         ) : (
           <EmptyState
+            icon={Library}
             title="The library is empty"
             description="Games added from the admin area will show up here."
             action={

@@ -1,7 +1,9 @@
 "use client";
 
+import { TriangleAlert } from "lucide-react";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
+import { IconLabel } from "@/components/ui/icon-label";
 
 export default function GlobalError({
   error,
@@ -16,7 +18,9 @@ export default function GlobalError({
 
   return (
     <main className="mx-auto flex w-full max-w-7xl flex-1 flex-col items-start justify-center gap-6 px-5 py-24 sm:px-8">
-      <p className="eyebrow">Something went wrong</p>
+      <p className="eyebrow">
+        <IconLabel icon={TriangleAlert}>Something went wrong</IconLabel>
+      </p>
       <h1 className="text-4xl font-semibold tracking-tight text-balance sm:text-6xl">
         The archive hit an unexpected error
       </h1>

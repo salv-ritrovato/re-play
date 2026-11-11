@@ -92,6 +92,12 @@ profilo Steam è la costante `STEAM_URL`.
 
 ## UI
 
+- **Icone** (`lucide-react`): piccole e sobrie, mai più di una per riga. `IconLabel`
+  (`src/components/ui/icon-label.tsx`) mette un'icona decorativa (`aria-hidden`) davanti a un'etichetta e ne
+  eredita il colore. Sono usate nei numeri di home e Statistics, nei dettagli e nei dati principali della
+  scheda del gioco, nel badge "Online" (Wifi), negli stati vuoti (`EmptyState` accetta `icon`), nelle pagine
+  di errore e 404 e nel riquadro "In breve" di About (ogni voce ha una chiave `icon` in `about.ts`, tradotta
+  in icona da `about-view.tsx`). Menu principale e footer restano senza icone, di proposito.
 - Componenti shadcn in `src/components/ui`; `ButtonLink` rende un link con l'aspetto di un bottone (così
   il ruolo ARIA resta `link`).
 - Il toast (Sonner, solo tema scuro) è in alto a destra per non coprire il pulsante "Add game" fisso.

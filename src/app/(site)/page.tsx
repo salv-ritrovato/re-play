@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Clock, Gamepad2, Star, Trophy, type LucideIcon } from "lucide-react";
 import { Rating } from "@/components/games/badges";
 import { DeveloperLinks } from "@/components/games/developer-links";
 import { GameCard } from "@/components/games/game-card";
@@ -8,6 +8,7 @@ import { EmptyState } from "@/components/layout/empty-state";
 import { Container, Section } from "@/components/layout/page-header";
 import { TAGLINE, Wordmark } from "@/components/layout/wordmark";
 import { ButtonLink } from "@/components/ui/button-link";
+import { IconLabel } from "@/components/ui/icon-label";
 import { getHomeData } from "@/lib/data/public";
 import { excerpt, formatRating, yearOf } from "@/lib/format";
 import type { GameSummary } from "@/lib/types";
@@ -51,10 +52,10 @@ async function HomeContent() {
           </div>
 
           <dl className="grid grid-cols-2 gap-x-12 gap-y-8 border-t border-border pt-8 lg:min-w-96 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-12">
-            <Stat label="Games" value={totals?.total_games ?? 0} />
-            <Stat label="Hours played" value={Number((totals?.total_playtime_hours ?? 0).toFixed(1))} />
-            <Stat label="Average rating" value={formatRating(totals?.average_rating ?? null)} />
-            <Stat label="Highest rating" value={formatRating(topRated[0]?.rating ?? null)} />
+            <Stat icon={Gamepad2} label="Games" value={totals?.total_games ?? 0} />
+            <Stat icon={Clock} label="Hours played" value={Number((totals?.total_playtime_hours ?? 0).toFixed(1))} />
+            <Stat icon={Star} label="Average rating" value={formatRating(totals?.average_rating ?? null)} />
+            <Stat icon={Trophy} label="Highest rating" value={formatRating(topRated[0]?.rating ?? null)} />
           </dl>
         </Container>
       </section>
@@ -62,6 +63,7 @@ async function HomeContent() {
       <Container className="space-y-24 pt-16">
         {isEmpty ? (
           <EmptyState
+            icon={Gamepad2}
             title="Nothing here yet"
             description="Your archive is empty. Add your first game from the admin area and it will appear here."
             action={
@@ -106,10 +108,12 @@ async function HomeContent() {
   );
 }
 
-function Stat({ label, value }: { label: string; value: string | number }) {
+function Stat({ icon, label, value }: { icon: LucideIcon; label: string; value: string | number }) {
   return (
     <div className="space-y-1.5">
-      <dt className="eyebrow">{label}</dt>
+      <dt className="eyebrow">
+        <IconLabel icon={icon}>{label}</IconLabel>
+      </dt>
       <dd className="text-4xl font-semibold tracking-tight tabular-nums">{value}</dd>
     </div>
   );

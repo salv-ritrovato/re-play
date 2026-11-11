@@ -1,3 +1,4 @@
+import { PenLine } from "lucide-react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { LibraryToolbar } from "@/components/games/library-toolbar";
@@ -50,6 +51,7 @@ async function ReviewsContent({ searchParams }: { searchParams: PageProps<"/revi
 
       {items.length === 0 ? (
         <EmptyState
+          icon={PenLine}
           title="No reviews yet"
           description={
             filters.q
