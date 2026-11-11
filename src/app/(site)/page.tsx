@@ -22,8 +22,7 @@ export default function HomePage() {
 }
 
 async function HomeContent() {
-  const { totals, recentlyAdded, recentlyReviewed, topRated, currentlyPlaying, featured } =
-    await getHomeData();
+  const { totals, recentlyAdded, recentlyReviewed, topRated, featured } = await getHomeData();
   const isEmpty = !totals || totals.total_games === 0;
 
   return (
@@ -53,7 +52,7 @@ async function HomeContent() {
           <dl className="grid grid-cols-2 gap-x-12 gap-y-8 border-t border-border pt-8 lg:min-w-96 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-12">
             <Stat label="Games" value={totals?.total_games ?? 0} />
             <Stat label="Completed" value={totals?.completed ?? 0} />
-            <Stat label="Playing now" value={totals?.playing ?? 0} />
+            <Stat label="Reviewed" value={totals?.reviewed ?? 0} />
             <Stat label="Average rating" value={formatRating(totals?.average_rating ?? null)} />
           </dl>
         </Container>
@@ -74,9 +73,6 @@ async function HomeContent() {
           <>
             <Featured game={featured} fallback={topRated[0]} />
 
-            {currentlyPlaying.length > 0 && (
-              <Shelf title="Currently playing" eyebrow="Now" games={currentlyPlaying.slice(0, 6)} />
-            )}
             <Shelf
               title="Recently added"
               eyebrow="Latest"

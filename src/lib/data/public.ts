@@ -162,7 +162,7 @@ export async function getHomeData() {
   const search = (sort: string, extra: Record<string, unknown> = {}, limit = 8) =>
     supabase.rpc("library_search", { p_sort: sort, p_limit: limit, p_offset: 0, ...extra });
 
-  const [totals, added, reviewed, top, featured, currently] = await Promise.all([
+  const [totals, added, reviewed, top, featured] = await Promise.all([
     supabase.from("stats_totals").select("*").maybeSingle(),
     search("added"),
     search("added", { p_reviewed_only: true }),
@@ -174,9 +174,8 @@ export async function getHomeData() {
       .order("updated_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
-    search("played", { p_play_status: ["playing"] }, 6),
   ]);
-  for (const r of [totals, added, reviewed, top, featured, currently]) {
+  for (const r of [totals, added, reviewed, top, featured]) {
     if (r.error) fail("getHomeData", r.error);
   }
 
@@ -187,7 +186,6 @@ export async function getHomeData() {
     recentlyAdded: (added.data ?? []) as GameSummary[],
     recentlyReviewed: (reviewed.data ?? []) as GameSummary[],
     topRated: rated.slice(0, 6),
-    currentlyPlaying: (currently.data ?? []) as GameSummary[],
     featured: featured.data
       ? normalizeDetail(featured.data as unknown as RawDetail)
       : null,

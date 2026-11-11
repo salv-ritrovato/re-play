@@ -26,8 +26,9 @@ integrato sotto `/admin`.
 
 ### Parte pubblica
 
-- **Overview** (`/`): numeri chiave (giochi, completati, in corso, voto medio), gioco in evidenza e scaffali
-  "Currently playing", "Recently added", "Latest reviews" e "Highest rated".
+- **Overview** (`/`): numeri chiave (giochi, completati, recensiti, voto medio), gioco in evidenza e scaffali
+  "Recently added", "Latest reviews" e "Highest rated". Non c'è più "Playing now": i giochi si aggiungono
+  quando sono finiti.
 - **Library** (`/library`): tutti i giochi in vista griglia o lista, con ricerca, filtri combinabili
   (genere, piattaforma, anno, stato, completamento, voto, tipo solo/online), ordinamenti e paginazione.
   Filtri e ordinamento vivono nell'URL, quindi ogni vista è condivisibile.
