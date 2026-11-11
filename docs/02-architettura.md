@@ -56,6 +56,16 @@ verso Supabase). Le server action accettano body fino a 12 MB (`serverActions.bo
   aggiornamenti in caso di click ravvicinati sui filtri.
 - La pagina Reviews usa gli stessi parametri con opzioni di ordinamento dedicate (`REVIEW_SORT_OPTIONS`).
 
+## Home
+
+`getHomeData()` (`src/lib/data/public.ts`, in cache) prepara tutto in una volta: numeri, gioco in evidenza,
+scaffali e i dati dei nuovi blocchi. I generi per "Browse by genre" arrivano da `genres` con il conteggio
+delle righe di `game_genres`; "Lowest rated" usa `library_search` con ordinamento `rating_asc` ed esclude i
+giochi già in "Highest rated". "Surprise me" punta a `src/app/(site)/random/route.ts`: un route handler che,
+con `connection()` per non essere prerenderizzato, sceglie uno slug a caso da `getAllSlugs()` e risponde con un
+redirect 307 (verso la libreria se l'archivio è vuoto). Il pulsante non usa il prefetch, perché aprirebbe un
+gioco a caso già in anticipo.
+
 ## Pagine degli sviluppatori
 
 - Il campo `developer` è testo libero e spesso elenca più studi separati da virgola o punto e virgola.
@@ -105,6 +115,12 @@ profilo Steam è la costante `STEAM_URL`.
   reader), per esteso nei dettagli (etichetta pubblica "Played via"; nel form e nei filtri resta "Launcher", più chiaro quando
   si sceglie), e come filtro "Launcher" in libreria (`?launcher=steam,ea-app`). I giochi
   Nintendo e console restano gestiti dalle piattaforme e non hanno launcher.
+- **Footer** (`site-footer.tsx`): due gruppi separati. In alto i link del sito (Library, Reviews, Statistics,
+  About, Admin); sotto, in una riga a parte "Find me elsewhere", i profili esterni come icone (Steam,
+  Instagram, AniList, inLumine). Gli indirizzi e le descrizioni stanno in `src/content/links.ts`
+  (`SOCIAL_LINKS`); le icone in `src/components/ui/social-icon.tsx`. Instagram e AniList vengono da Simple
+  Icons (CC0); il logo di inLumine è una versione monocromatica del quadrato nel quadrato dell'icona del loro
+  sito. Il link ad AniList punta alla home del sito: per mostrare il profilo basta cambiare l'indirizzo.
 - **Loghi dei marchi** (`src/components/ui/launcher-icon.tsx`): `lucide-react` non ha icone di marchi, quindi i
   tracciati SVG vengono da Simple Icons (licenza CC0). `SteamIcon` è usata anche davanti al link al profilo
   Steam in About e nel footer.

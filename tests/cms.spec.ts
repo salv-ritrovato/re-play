@@ -186,7 +186,7 @@ test.describe.serial("CMS end to end", () => {
     await page.goto(`/library?q=${encodeURIComponent(title)}&launcher=battle-net`);
     await expect(page.getByText("No games match these filters")).toBeVisible();
     await page.goto(`/library?q=${encodeURIComponent(title)}`);
-    await expect(page.getByTitle("Steam")).toBeVisible(); // the brand icon on the card
+    await expect(page.getByTitle("Steam", { exact: true })).toBeVisible(); // the brand icon on the card
 
     // "Main story + side quests" is its own completion level, distinct from plain "Main story".
     await page.goto(`/library?q=${encodeURIComponent(title)}&completion=main_story_side_quests`);
@@ -230,6 +230,12 @@ test.describe.serial("CMS end to end", () => {
     const img = page.getByAltText(`${title} cover`);
     await expect(img).toBeVisible();
     await expect(img).toHaveAttribute("src", /\/_next\/image\?url=/);
+  });
+
+  test("a game added just now is on the home page under Recently added", async ({ page }) => {
+    await page.goto("/");
+    const shelf = page.locator("section").filter({ has: page.getByRole("heading", { name: "Recently added" }) });
+    await expect(shelf.getByRole("link", { name: new RegExp(title) })).toBeVisible();
   });
 
   test("clicking a developer opens a page with all their games", async ({ page }) => {

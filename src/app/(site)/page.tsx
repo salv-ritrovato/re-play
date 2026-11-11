@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Clock, Gamepad2, Star, Trophy, type LucideIcon } from "lucide-react";
+import { ArrowRight, Clock, Gamepad2, Shuffle, Star, Trophy, type LucideIcon } from "lucide-react";
 import { Rating } from "@/components/games/badges";
 import { DeveloperLinks } from "@/components/games/developer-links";
 import { GameCard } from "@/components/games/game-card";
@@ -24,7 +24,7 @@ export default function HomePage() {
 }
 
 async function HomeContent() {
-  const { totals, recentlyAdded, recentlyReviewed, topRated, featured } = await getHomeData();
+  const { totals, recentlyAdded, recentlyReviewed, topRated, lowestRated, genreTiles, featured } = await getHomeData();
   const isEmpty = !totals || totals.total_games === 0;
 
   return (
@@ -47,6 +47,10 @@ async function HomeContent() {
               </ButtonLink>
               <ButtonLink size="lg" variant="outline" href="/reviews">
                 Read the reviews
+              </ButtonLink>
+              {/* Not prefetched: opening it picks a random game. */}
+              <ButtonLink size="lg" variant="ghost" href="/random" prefetch={false} className="gap-2">
+                <Shuffle aria-hidden /> Surprise me
               </ButtonLink>
             </div>
           </div>
@@ -76,13 +80,46 @@ async function HomeContent() {
           <>
             <Featured game={featured} fallback={topRated[0]} />
 
-            <Shelf
-              title="Recently added"
-              eyebrow="Latest"
-              games={recentlyAdded.slice(0, 6)}
-              href="/library"
-              hrefLabel="Open library"
-            />
+            {recentlyAdded.length > 0 && (
+              <Shelf
+                title="Recently added"
+                eyebrow="Latest"
+                games={recentlyAdded.slice(0, 6)}
+                href="/library"
+                hrefLabel="Open library"
+              />
+            )}
+            {genreTiles.length > 0 && (
+              <Section
+                eyebrow="Explore"
+                title="Browse by genre"
+                action={
+                  <Link
+                    href="/library"
+                    className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    All games <ArrowRight className="size-3.5" />
+                  </Link>
+                }
+              >
+                <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
+                  {genreTiles.map((g) => (
+                    <li key={g.id}>
+                      <Link
+                        href={`/library?genre=${g.id}`}
+                        className="flex items-baseline justify-between gap-3 rounded-md border border-border px-4 py-3 transition-colors outline-none hover:border-muted-foreground/50 hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50"
+                      >
+                        <span className="truncate text-sm font-medium">{g.name}</span>
+                        <span className="text-xs tabular-nums text-subtle">
+                          {g.games}
+                          <span className="sr-only"> {g.games === 1 ? "game" : "games"}</span>
+                        </span>
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </Section>
+            )}
             {recentlyReviewed.length > 0 && (
               <Shelf
                 title="Latest reviews"
@@ -101,8 +138,37 @@ async function HomeContent() {
                 hrefLabel="Ranking"
               />
             )}
+            {lowestRated.length >= 3 && (
+              <Shelf
+                title="Lowest rated"
+                eyebrow="The blunt truth"
+                games={lowestRated}
+                href="/library?sort=rating_asc"
+                hrefLabel="Ranking"
+              />
+            )}
           </>
         )}
+
+        {/* Who is behind the reviews --------------------------------------- */}
+        <section
+          aria-labelledby="home-about"
+          className="grid gap-6 rounded-md border border-border bg-surface p-8 sm:p-12 lg:grid-cols-[1fr_auto] lg:items-center"
+        >
+          <div className="max-w-2xl space-y-3">
+            <p className="eyebrow">About me</p>
+            <h2 id="home-about" className="text-2xl font-medium tracking-tight text-balance sm:text-3xl">
+              Who&apos;s behind the reviews
+            </h2>
+            <p className="text-base leading-relaxed text-pretty text-muted-foreground">
+              I&apos;m Salvatore, a die-hard gamer. As a kid I dreamed of becoming a game reviewer, and this is my
+              take on the games I play: honest, personal and free of any influence.
+            </p>
+          </div>
+          <ButtonLink href="/about" variant="outline" size="lg" className="gap-2">
+            More about me <ArrowRight aria-hidden />
+          </ButtonLink>
+        </section>
       </Container>
     </>
   );

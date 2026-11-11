@@ -223,6 +223,9 @@ export async function getDeveloperGames(
 // ---------------------------------------------------------------------------
 // Home
 // ---------------------------------------------------------------------------
+/** The home page "Recently added" shelf only shows games added within this many days. */
+export const RECENT_DAYS = 7;
+
 export async function getHomeData() {
   "use cache";
   cacheLife("minutes");
@@ -232,7 +235,7 @@ export async function getHomeData() {
   const search = (sort: string, extra: Record<string, unknown> = {}, limit = 8) =>
     supabase.rpc("library_search", { p_sort: sort, p_limit: limit, p_offset: 0, ...extra });
 
-  const [totals, added, reviewed, top, featured] = await Promise.all([
+  const [totals, added, reviewed, top, featured, lowest, genreCounts] = await Promise.all([
     supabase.from("stats_totals").select("*").maybeSingle(),
     search("added"),
     search("added", { p_reviewed_only: true }),
@@ -244,18 +247,38 @@ export async function getHomeData() {
       .order("updated_at", { ascending: false })
       .limit(1)
       .maybeSingle(),
+    search("rating_asc", { p_min_rating: 0 }),
+    supabase.from("genres").select("id, name, game_genres(count)"),
   ]);
-  for (const r of [totals, added, reviewed, top, featured]) {
+  for (const r of [totals, added, reviewed, top, featured, lowest, genreCounts]) {
     if (r.error) fail("getHomeData", r.error);
   }
 
   const rated = ((top.data ?? []) as GameSummary[]).filter((g) => g.rating !== null);
+  // "The blunt truth": the lowest rated games, never the same ones as the highest rated shelf.
+  const topIds = new Set(rated.slice(0, 6).map((g) => g.id));
+  const lowestRated = ((lowest.data ?? []) as GameSummary[])
+    .filter((g) => g.rating !== null && !topIds.has(g.id))
+    .slice(0, 6);
+
+  // Genres with at least one game, biggest first, for the "Browse by genre" tiles.
+  type GenreRow = { id: string; name: string; game_genres: { count: number }[] };
+  const genreTiles = ((genreCounts.data ?? []) as unknown as GenreRow[])
+    .map((g) => ({ id: g.id, name: g.name, games: Number(g.game_genres?.[0]?.count ?? 0) }))
+    .filter((g) => g.games > 0)
+    .sort((a, b) => b.games - a.games || a.name.localeCompare(b.name))
+    .slice(0, 10);
+
+  const recentSince = Date.now() - RECENT_DAYS * 24 * 60 * 60 * 1000;
+  const recent = ((added.data ?? []) as GameSummary[]).filter((g) => new Date(g.created_at).getTime() >= recentSince);
 
   return {
     totals: totals.data as StatsTotals | null,
-    recentlyAdded: (added.data ?? []) as GameSummary[],
+    recentlyAdded: recent,
     recentlyReviewed: (reviewed.data ?? []) as GameSummary[],
     topRated: rated.slice(0, 6),
+    lowestRated,
+    genreTiles,
     featured: featured.data
       ? normalizeDetail(featured.data as unknown as RawDetail)
       : null,

@@ -26,6 +26,11 @@ test.describe("public navigation", () => {
     await expect(page.getByText("Jurassic War").first()).toBeVisible();
     await expect(page.getByText("World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege", { exact: true })).toBeVisible();
     await expect(page.getByText("League of Legends and Rainbow Six: Siege")).toBeVisible();
+    await expect(page.getByText("as a kid I dreamed of becoming a game reviewer, a critic")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Beyond the games" })).toBeVisible();
+    await expect(page.getByText("anime, manga, comics, TV series, fantasy books")).toBeVisible();
+    await expect(page.getByText("AI-Assisted Software Developer")).toBeVisible();
+    await expect(page.getByText("bodybuilding in particular")).toBeVisible();
 
     const steam = page.getByRole("complementary").getByRole("link", { name: /My Steam profile/ });
     await expect(steam).toHaveAttribute("href", "https://steamcommunity.com/profiles/76561198066959401/");
@@ -37,6 +42,9 @@ test.describe("public navigation", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Ciao, sono Salvatore" })).toBeVisible();
     await expect(page.getByText("mia madre, che non c'è più")).toBeVisible();
     await expect(page.getByText("League of Legends e Rainbow Six: Siege")).toBeVisible();
+    await expect(page.getByText("da ragazzino avevo il sogno di fare il recensore, il critico")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Oltre i videogiochi" })).toBeVisible();
+    await expect(page.getByText("anime, manga, fumetti, serie TV, libri fantasy")).toBeVisible();
     await expect(page.locator("div[lang=it]")).toBeVisible();
 
     await page.getByRole("tab", { name: "English" }).click();
@@ -56,6 +64,62 @@ test.describe("public navigation", () => {
     await expect(page.getByRole("contentinfo")).toBeVisible();
     await expect(page.getByRole("link", { name: "Browse the library" })).toBeVisible();
     await expect(page.getByRole("link", { name: "Back to the overview" })).toBeVisible();
+  });
+
+  test("the home page invites to explore: genres, a random game, who is behind it", async ({ page, request }) => {
+    await page.goto("/");
+    test.skip(await page.getByText("Nothing here yet").isVisible(), "needs at least one game in the archive");
+
+    // Genre tiles open the library already filtered.
+    const genres = page.locator("section").filter({ has: page.getByRole("heading", { name: "Browse by genre" }) });
+    const tiles = genres.getByRole("list").getByRole("link"); // (the section header has its own "All games" link)
+    await expect(tiles.first()).toBeVisible();
+    await tiles.first().click();
+    await expect(page).toHaveURL(/\/library\?genre=[0-9a-f-]{36}$/);
+
+    // "The blunt truth" never repeats the highest rated shelf.
+    await page.goto("/");
+    const titlesIn = async (heading: string) => {
+      const shelf = page.locator("section").filter({ has: page.getByRole("heading", { name: heading, exact: true }) });
+      return (await shelf.locator("h3").allInnerTexts()).map((t) => t.trim());
+    };
+    const lowest = await titlesIn("Lowest rated");
+    const highest = await titlesIn("Highest rated");
+    expect(lowest.filter((t) => highest.includes(t))).toEqual([]);
+
+    // "Surprise me" lands on a game page, and the route itself is a redirect.
+    await page.getByRole("link", { name: /Surprise me/ }).click();
+    await expect(page).toHaveURL(/\/games\/[a-z0-9-]+$/);
+    const res = await request.get("/random", { maxRedirects: 0 });
+    expect(res.status()).toBe(307);
+    expect(res.headers()["location"]).toMatch(/\/(games\/[a-z0-9-]+|library)$/);
+
+    // A short word about the owner, with the way to the About page.
+    await page.goto("/");
+    await expect(page.getByRole("heading", { name: "Who's behind the reviews" })).toBeVisible();
+    await page.getByRole("link", { name: /More about me/ }).click();
+    await expect(page).toHaveURL(/\/about$/);
+  });
+
+  test("the footer keeps the owner's profiles apart from the site links", async ({ page }) => {
+    await page.goto("/");
+    const social = page.getByRole("list", { name: "Social links" });
+    const expected = {
+      Steam: "https://steamcommunity.com/profiles/76561198066959401/",
+      Instagram: "https://www.instagram.com/salv.ritrovato/",
+      AniList: "https://anilist.co/home",
+      inLumine: "https://www.inlumine.it/",
+    };
+    for (const [name, href] of Object.entries(expected)) {
+      const link = social.getByRole("link", { name: new RegExp(name) });
+      await expect(link).toHaveAttribute("href", href);
+      await expect(link).toHaveAttribute("target", "_blank");
+      await expect(link).toHaveAttribute("rel", /noopener/);
+    }
+    // The site links stay a separate group, without the outside profiles.
+    const siteLinks = page.getByRole("navigation", { name: "Footer" });
+    await expect(siteLinks.getByRole("link", { name: "Library" })).toBeVisible();
+    await expect(siteLinks.getByRole("link", { name: /Steam|Instagram|AniList|inLumine/ })).toHaveCount(0);
   });
 
   test("an unknown developer renders the not-found page", async ({ page }) => {

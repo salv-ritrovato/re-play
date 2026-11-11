@@ -36,6 +36,7 @@ export const about: Record<Lang, AboutContent> = {
       {
         heading: "Why this place exists",
         paragraphs: [
+          "Given my passion for the world of video games, as a kid I dreamed of becoming a game reviewer, a critic.",
           "Today I love practically every video game there is. Having played more than 1,500 titles in my life, I decided to open this personal space where I give my take and tell the blunt truth about every single title, free of any influence.",
         ],
       },
@@ -46,9 +47,17 @@ export const about: Record<Lang, AboutContent> = {
           "I've played many competitive titles and I've always been in the high ranks. Among my favourites, the ones that made my “story”, are definitely World of Warcraft, Hearthstone, League of Legends and Rainbow Six: Siege.",
         ],
       },
+      {
+        heading: "Beyond the games",
+        paragraphs: [
+          "My interests are wide, and most of them live in the nerd world: anime, manga, comics, TV series, fantasy books and, of course, video games.",
+          "By trade I'm an AI-Assisted Software Developer, so I love every modern technology, especially anything that touches the world of electronics.",
+          "For years I've also loved fitness, bodybuilding in particular, which I mostly use as an outlet.",
+        ],
+      },
     ],
     closing:
-      "Today, gaming is my escape from the harsh reality of “adults” (:D), and it's also a sweet memory of my mother, who is no longer with us. Going back to the games that made my childhood takes me back to when I was a kid, having fun with her.",
+      "Today, gaming is my escape from the harsh reality of “adults”, and it's also a sweet memory of my mother, who is no longer with us. Going back to the games that made my childhood takes me back to when I was a kid, having fun with her.",
     factsTitle: "At a glance",
     facts: [
       { icon: "games", label: "Games played", value: "1,500+" },
@@ -75,6 +84,7 @@ export const about: Record<Lang, AboutContent> = {
       {
         heading: "Perché esiste questo spazio",
         paragraphs: [
+          "Data la mia passione per il mondo videoludico, da ragazzino avevo il sogno di fare il recensore, il critico.",
           "Oggi sono un amante di praticamente tutti i videogiochi esistenti. Avendo giocato più di 1500 titoli in tutta la mia vita, ho pensato di aprire questo spazio personale dove dico la mia e racconto la cruda verità su ogni singolo titolo, senza alcuna influenza.",
         ],
       },
@@ -85,9 +95,17 @@ export const about: Record<Lang, AboutContent> = {
           "Ho giocato a molti titoli competitivi, nei quali sono sempre stato nei ranghi alti. Fra i miei preferiti, quelli che hanno fatto la mia “storia”, ci sono sicuramente World of Warcraft, Hearthstone, League of Legends e Rainbow Six: Siege.",
         ],
       },
+      {
+        heading: "Oltre i videogiochi",
+        paragraphs: [
+          "I miei interessi sono molto ampi e per la maggior parte vivono nel mondo nerd: anime, manga, fumetti, serie TV, libri fantasy e, naturalmente, i videogiochi.",
+          "Per lavoro sono un AI-Assisted Software Developer, quindi sono un amante di tutte le tecnologie moderne legate al mondo dell'elettronica.",
+          "Da anni sono anche un amante del fitness, in particolare del bodybuilding, che uso soprattutto come valvola di sfogo.",
+        ],
+      },
     ],
     closing:
-      "Oggi il gaming è la mia via di fuga dalla dura realtà degli “adulti” (:D) ed è anche un dolce ricordo di mia madre, che non c'è più. Tornare su quei titoli che hanno fatto la mia infanzia mi riporta a quando ero bambino e mi divertivo con lei.",
+      "Oggi il gaming è la mia via di fuga dalla dura realtà degli “adulti” ed è anche un dolce ricordo di mia madre, che non c'è più. Tornare su quei titoli che hanno fatto la mia infanzia mi riporta a quando ero bambino e mi divertivo con lei.",
     factsTitle: "In breve",
     facts: [
       { icon: "games", label: "Giochi giocati", value: "Più di 1500" },
