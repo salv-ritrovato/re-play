@@ -54,7 +54,6 @@ export const gameSchema = z
 
     genre_ids: z.array(z.uuid()),
     platform_ids: z.array(z.uuid()),
-    tags: z.array(z.string().trim().min(1).max(40)).max(30),
     launchers: z.array(z.enum(LAUNCHER_IDS)).max(LAUNCHER_IDS.length),
 
     rating: numberString(0, 10, "Rating"),

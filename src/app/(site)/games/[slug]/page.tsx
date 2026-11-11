@@ -10,7 +10,6 @@ import {
   Rocket,
   Star,
   Store,
-  Tag,
   Trophy,
   type LucideIcon,
 } from "lucide-react";
@@ -175,7 +174,7 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
 function PersonalSection({ game }: { game: GameDetail }) {
   const completed = formatDate(game.completed_on);
   // Rating, completion level and playtime are already in the block at the top of the page.
-  const hasAside = Boolean(completed) || game.launchers.length > 0 || game.tags.length > 0;
+  const hasAside = Boolean(completed) || game.launchers.length > 0;
 
   return (
     <section aria-labelledby="my-take" className="rounded-md border border-border bg-card/50">
@@ -206,21 +205,6 @@ function PersonalSection({ game }: { game: GameDetail }) {
             <dl className="space-y-6 text-sm lg:sticky lg:top-24">
               {completed && <Detail icon={CalendarCheck} label="Completed" value={completed} />}
               <PlayedVia game={game} />
-              {game.tags.length > 0 && (
-                <Detail
-                  icon={Tag}
-                  label="Tags"
-                  value={
-                    <ul className="flex flex-wrap gap-1.5">
-                      {game.tags.map((t) => (
-                        <li key={t.id} className="rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground">
-                          {t.name}
-                        </li>
-                      ))}
-                    </ul>
-                  }
-                />
-              )}
             </dl>
           </aside>
         )}

@@ -86,14 +86,12 @@ export async function getFilterOptions() {
 const DETAIL_SELECT = `
   *,
   genres:game_genres(genre:genres(id, name, slug)),
-  platforms:game_platforms(platform:platforms(id, name, slug)),
-  tags:game_tags(tag:tags(id, name, slug))
+  platforms:game_platforms(platform:platforms(id, name, slug))
 `;
 
-type RawDetail = Omit<GameDetail, "genres" | "platforms" | "tags"> & {
+type RawDetail = Omit<GameDetail, "genres" | "platforms"> & {
   genres: { genre: Taxonomy }[];
   platforms: { platform: Taxonomy }[];
-  tags: { tag: Taxonomy }[];
 };
 
 export function normalizeDetail(raw: RawDetail): GameDetail {
@@ -104,7 +102,6 @@ export function normalizeDetail(raw: RawDetail): GameDetail {
     playtime_hours: raw.playtime_hours === null ? null : Number(raw.playtime_hours),
     genres: raw.genres.map((g) => g.genre).sort(byName),
     platforms: raw.platforms.map((p) => p.platform).sort(byName),
-    tags: raw.tags.map((t) => t.tag).sort(byName),
   };
 }
 

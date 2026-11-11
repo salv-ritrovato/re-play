@@ -9,7 +9,7 @@ import type { GameTemplate } from "@/lib/types";
 
 /**
  * "Start from an existing game": search the archive and copy the details a series or a studio
- * tends to share (developer, publisher, genres, platforms, tags, online flag). Nothing personal
+ * tends to share (developer, publisher, genres, platforms, launchers, online flag). Nothing personal
  * (title, rating, review, cover, dates) is ever copied.
  */
 /** One line of what was copied, e.g. { label: "Developer", value: "Treyarch" }. */
@@ -59,7 +59,7 @@ export function CopyFromGame({ onCopy }: { onCopy: (game: GameTemplate) => Copie
           <Copy className="size-4 text-muted-foreground" aria-hidden /> Start from an existing game
         </h2>
         <p className="text-xs text-subtle">
-          Copies developer, publisher, genres, platforms, launchers, tags and the online flag. Handy for series,
+          Copies developer, publisher, genres, platforms, launchers and the online flag. Handy for series,
           sequels and games from the same studio. Title, rating, review and cover are never copied.
         </p>
       </div>

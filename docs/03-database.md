@@ -11,8 +11,8 @@ Le migrazioni sono in `supabase/migrations/` e vanno applicate **in ordine** (SQ
 | `games` | Il gioco: `slug`, `title`, descrizioni, `release_date`, `developer`, `publisher`, `rating` (0-10), `play_status`, `completion_status`, `playtime_hours`, `completed_on`, `review_en`, `review_it`, `pros[]`, `cons[]`, `cover_path`, `cover_blur`, `featured`, `is_online`, timestamp. |
 | `games.launchers` | Colonna `text[]` con i launcher su cui il gioco è posseduto (`steam`, `ubisoft-connect`, `ea-app`, `battle-net`). Vuota per i giochi console, già coperti dalle piattaforme. I valori ammessi sono validati nell'app (`LAUNCHERS` in `src/lib/types.ts`), quindi aggiungere un launcher non richiede una migrazione. Indice GIN `games_launchers_idx`. |
 | `games.rank` | Testo libero, solo per i giochi online: il rank raggiunto ("Diamond", "Legend"...) oppure "None" se il gioco non ha classifica. Vuoto negli altri casi. Vincoli: non vuoto, al massimo 40 caratteri, ammesso solo se `is_online`. |
-| `genres`, `platforms`, `tags` | Tassonomie con nome univoco (case-insensitive) e `slug`. Generi e piattaforme sono precaricati. |
-| `game_genres`, `game_platforms`, `game_tags` | Tabelle ponte molti-a-molti. |
+| `genres`, `platforms` | Tassonomie con nome univoco (case-insensitive) e `slug`, precaricate. |
+| `game_genres`, `game_platforms` | Tabelle ponte molti-a-molti. |
 
 Tipi enumerati: `play_status` (`backlog`, `playing`, `completed`, `on_hold`, `dropped`) e
 `completion_status` (`none`, `main_story`, `main_story_side_quests`, `completionist`; in interfaccia:
@@ -51,6 +51,7 @@ indici trigram (`pg_trgm`) su titolo, sviluppatore e publisher per la ricerca te
 | `20261110150000_remove_start_and_review_dates.sql` | Rimuove `started_on`, `reviewed_on`, `last_played_on`; ricrea `stats_games_by_year` (da `completed_on`) e `library_search`. |
 | `20261110170000_remove_notes_and_extra_images.sql` | Rimuove `game_images`, il tipo `image_kind` e `games.notes`. |
 | `20261111090000_main_story_side_quests.sql` | Aggiunge il livello di completamento `main_story_side_quests` tra `main_story` e `completionist`. |
+| `20261114090000_remove_tags.sql` | Elimina `game_tags` e `tags`: i tag personali non esistono più (nessun gioco ne aveva). Va applicata dopo che il codice senza tag è online. |
 | `20261113090000_online_rank.sql` | Aggiunge `games.rank` (testo, solo per i giochi online) con i vincoli di lunghezza e "solo online". |
 | `20261112090000_launchers.sql` | Aggiunge `games.launchers` (tutti i giochi esistenti partono con `steam`, perché finora vengono tutti da Steam), l'indice GIN e ricrea `library_search` con il parametro `p_launchers` e la colonna `launchers` nel risultato. |
 

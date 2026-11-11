@@ -61,7 +61,6 @@ export interface GameTemplate {
   launchers: LauncherId[];
   genre_ids: string[];
   platform_ids: string[];
-  tags: string[];
 }
 
 /** Row shape returned by the `library_search` RPC. */
@@ -118,7 +117,6 @@ export interface GameDetail {
   updated_at: string;
   genres: Taxonomy[];
   platforms: Taxonomy[];
-  tags: Taxonomy[];
 }
 
 export interface LibraryFilters {

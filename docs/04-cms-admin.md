@@ -19,7 +19,7 @@ Basato su React Hook Form + Zod (`gameSchema` in `src/lib/validation.ts`).
 
 Campi: titolo e slug, descrizione breve e completa, data di uscita, sviluppatore, publisher, generi,
 piattaforme, **launcher** (Steam, Ubisoft Connect, EA app, Battle.net, scelta multipla; vuoto per i giochi console),
-tag, voto, stato di gioco, stato di completamento, ore di gioco, data di completamento
+voto, stato di gioco, stato di completamento, ore di gioco, data di completamento
 (opzionale), recensione in inglese e in italiano, pro e contro, "in evidenza", interruttore **Online**,
 copertina.
 
@@ -45,11 +45,11 @@ Comportamenti da conoscere:
   con sé nulla del gioco appena salvato (per i dati in comune si usa il punto successivo).
 - **Parti da un gioco esistente** (solo su "Nuovo gioco", componente `copy-from-game.tsx`): in cima al form
   si cerca per titolo o sviluppatore, oppure si sceglie tra gli ultimi giochi toccati. Copia **sviluppatore,
-  publisher, generi, piattaforme, launcher, tag e flag online**; mai titolo, voto, recensioni, copertina o date.
+  publisher, generi, piattaforme, launcher e flag online**; mai titolo, voto, recensioni, copertina o date.
   Dopo la copia il box elenca esattamente cosa è stato copiato (sviluppatore, publisher, generi, piattaforme,
-  launcher, tag, online), con il pulsante "Show me" che porta ai campi compilati, più in basso nella pagina.
+  launcher, online), con il pulsante "Show me" che porta ai campi compilati, più in basso nella pagina.
   Si può modificare tutto. Utile per serie, sequel e giochi dello stesso studio.
-- **Creazione al volo** di generi, piattaforme e tag (`taxonomy-picker`, `tag-input`).
+- **Creazione al volo** di generi e piattaforme (`taxonomy-picker`).
 - **Copertina** (`media-fields`): anteprima, sostituzione, rimozione; compressa nel browser prima dell'invio.
 
 ## Server actions (`src/app/admin/actions.ts`)

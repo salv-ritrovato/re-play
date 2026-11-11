@@ -32,7 +32,6 @@ import { DeleteGameButton } from "./delete-game-button";
 import { Field, FormSection } from "./field";
 import { LauncherPicker } from "./launcher-picker";
 import { emptyMedia, MediaFields, type MediaState } from "./media-fields";
-import { TagInput } from "./tag-input";
 import { TaxonomyPicker } from "./taxonomy-picker";
 
 /** Online / competitive games have no ending, so only these statuses make sense for them. */
@@ -50,7 +49,6 @@ function toDefaults(game?: GameDetail): GameFormInput {
     genre_ids: game?.genres.map((g) => g.id) ?? [],
     platform_ids: game?.platforms.map((p) => p.id) ?? [],
     launchers: game?.launchers ?? [],
-    tags: game?.tags.map((t) => t.name) ?? [],
     rating: game?.rating === null || game?.rating === undefined ? "" : String(game.rating),
     // An online game has no ending: it can be played, paused or dropped, never completed.
     play_status:
@@ -73,12 +71,10 @@ export function GameForm({
   game,
   genres: initialGenres,
   platforms: initialPlatforms,
-  tagSuggestions,
 }: {
   game?: GameDetail;
   genres: Taxonomy[];
   platforms: Taxonomy[];
-  tagSuggestions: string[];
 }) {
   const router = useRouter();
   const isEdit = Boolean(game);
@@ -164,7 +160,6 @@ export function GameForm({
     setValue("genre_ids", t.genre_ids, opts);
     setValue("platform_ids", t.platform_ids, opts);
     setValue("launchers", t.launchers, opts);
-    setValue("tags", t.tags, opts);
     changeOnline(t.is_online);
     toast.success(`Copied details from ${t.title}`);
 
@@ -177,7 +172,6 @@ export function GameForm({
       t.genre_ids.length ? { label: "Genres", value: names(t.genre_ids, genres) } : null,
       t.platform_ids.length ? { label: "Platforms", value: names(t.platform_ids, platforms) } : null,
       t.launchers.length ? { label: "Launchers", value: t.launchers.map((l) => LAUNCHER_NAME[l]).join(", ") } : null,
-      t.tags.length ? { label: "Tags", value: t.tags.join(", ") } : null,
       t.is_online ? { label: "Online", value: "Online / competitive" } : null,
     ];
     return items.filter((i): i is CopiedItem => i !== null);
@@ -338,15 +332,6 @@ export function GameForm({
             )}
           />
         </div>
-        <Field id="tags" label="Personal tags" className="sm:col-span-2" hint="Your own labels, e.g. “comfort game”, “co-op”, “replayable”.">
-          <Controller
-            control={control}
-            name="tags"
-            render={({ field }) => (
-              <TagInput id="tags" value={field.value} onChange={field.onChange} suggestions={tagSuggestions} />
-            )}
-          />
-        </Field>
       </FormSection>
 
       {/* Personal ------------------------------------------------------------ */}

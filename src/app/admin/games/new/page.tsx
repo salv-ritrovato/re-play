@@ -19,6 +19,6 @@ export default function NewGamePage() {
 }
 
 async function NewGameForm() {
-  const { genres, platforms, tags } = await getTaxonomies();
-  return <GameForm genres={genres} platforms={platforms} tagSuggestions={tags.map((t) => t.name)} />;
+  const { genres, platforms } = await getTaxonomies();
+  return <GameForm genres={genres} platforms={platforms} />;
 }

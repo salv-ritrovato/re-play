@@ -41,7 +41,7 @@ integrato sotto `/admin`.
 - **Gioco** (`/games/[slug]`): scheda con copertina, metadati, voto, pro e contro e recensione in inglese e
   italiano (tab EN/IT). In alto un colpo d'occhio con voto, stato, completamento e ore. Accanto alla
   recensione c'è la scheda **"My playthrough"** (resta in vista mentre si scorre) con ciò che in alto non c'è:
-  data di completamento, launcher ("Played via") e tag personali. Niente è ripetuto due volte. Le piattaforme
+  data di completamento e launcher ("Played via"). Niente è ripetuto due volte. Le piattaforme
   restano tra i dettagli del gioco, perché indicano dove il gioco *esce*, non dove è stato giocato.
 - **Sviluppatore** (`/developers/[slug]`): cliccando il nome di uno sviluppatore (su card, righe della lista,
   gioco in evidenza e scheda del gioco) si apre la pagina con tutti i suoi giochi, dal più recente, con
@@ -56,7 +56,7 @@ integrato sotto `/admin`.
 ### Parte privata (`/admin`)
 
 Accesso con username e password su `/login`. Elenco giochi con ricerca e filtri, creazione, modifica ed
-eliminazione, upload della copertina, creazione al volo di generi, piattaforme e tag. Dettagli in
+eliminazione, upload della copertina, creazione al volo di generi e piattaforme. Dettagli in
 [04-cms-admin.md](04-cms-admin.md).
 
 ## Scelte di prodotto principali

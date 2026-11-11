@@ -99,19 +99,17 @@ export async function getGameForEdit(id: string): Promise<GameDetail | null> {
   return data ? normalizeDetail(data as any) : null;
 }
 
-export async function getTaxonomies(): Promise<{ genres: Taxonomy[]; platforms: Taxonomy[]; tags: Taxonomy[] }> {
+export async function getTaxonomies(): Promise<{ genres: Taxonomy[]; platforms: Taxonomy[] }> {
   const supabase = await createClient();
-  const [genres, platforms, tags] = await Promise.all([
+  const [genres, platforms] = await Promise.all([
     supabase.from("genres").select("id, name, slug").order("name"),
     supabase.from("platforms").select("id, name, slug").order("name"),
-    supabase.from("tags").select("id, name, slug").order("name"),
   ]);
-  for (const r of [genres, platforms, tags]) {
+  for (const r of [genres, platforms]) {
     if (r.error) throw new Error(`[getTaxonomies] ${r.error.message}`);
   }
   return {
     genres: (genres.data ?? []) as Taxonomy[],
     platforms: (platforms.data ?? []) as Taxonomy[],
-    tags: (tags.data ?? []) as Taxonomy[],
   };
 }

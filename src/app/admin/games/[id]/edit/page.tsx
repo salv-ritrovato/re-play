@@ -18,7 +18,7 @@ export default function EditGamePage({ params }: PageProps<"/admin/games/[id]/ed
 
 async function EditGame({ params }: { params: PageProps<"/admin/games/[id]/edit">["params"] }) {
   const { id } = await params;
-  const [game, { genres, platforms, tags }] = await Promise.all([getGameForEdit(id), getTaxonomies()]);
+  const [game, { genres, platforms }] = await Promise.all([getGameForEdit(id), getTaxonomies()]);
   if (!game) notFound();
 
   return (
@@ -29,7 +29,6 @@ async function EditGame({ params }: { params: PageProps<"/admin/games/[id]/edit"
         game={game}
         genres={genres}
         platforms={platforms}
-        tagSuggestions={tags.map((t) => t.name)}
       />
     </div>
   );

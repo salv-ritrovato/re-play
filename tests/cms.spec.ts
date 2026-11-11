@@ -55,8 +55,6 @@ test.describe.serial("CMS end to end", () => {
     await page.getByRole("button", { name: "PC", exact: true }).click();
     await page.getByRole("button", { name: "Steam", exact: true }).click();
     await page.getByRole("button", { name: "Ubisoft Connect", exact: true }).click();
-    await page.locator("#tags").fill("e2e-tag");
-    await page.locator("#tags").press("Enter");
 
     await page.locator("#rating").fill("7.5");
     await page.locator("#playtime_hours").fill("12");
@@ -214,7 +212,6 @@ test.describe.serial("CMS end to end", () => {
     // The side card next to the review adds what the top block does not say, and repeats nothing.
     const side = page.getByRole("complementary", { name: "My playthrough" });
     await expect(side).toContainText("Played via");
-    await expect(side).toContainText("e2e-tag");
     await expect(side).toContainText("20 July 2021"); // completion date
     for (const repeated of ["My rating", "Completion", "Playtime"]) {
       await expect(side).not.toContainText(repeated);
@@ -288,7 +285,7 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByText(`Copied from ${title}`)).toBeVisible();
     // The box lists exactly what landed in the form, so nothing has to be hunted down below.
     const summary = page.getByRole("status").filter({ hasText: "Copied from" });
-    for (const copied of ["E2E Studio", "E2E Publishing", "Adventure", "PC", "Steam", "Ubisoft Connect", "e2e-tag"]) {
+    for (const copied of ["E2E Studio", "E2E Publishing", "Adventure", "PC", "Steam", "Ubisoft Connect"]) {
       await expect(summary).toContainText(copied);
     }
     await expect(page.locator("#developer")).toHaveValue("E2E Studio");

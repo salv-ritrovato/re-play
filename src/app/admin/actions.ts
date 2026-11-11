@@ -125,7 +125,6 @@ export async function saveGame(
     // 5. Relations.
     await replaceLinks(supabase, "game_genres", "genre_id", gameId, v.genre_ids);
     await replaceLinks(supabase, "game_platforms", "platform_id", gameId, v.platform_ids);
-    await syncTags(supabase, gameId, v.tags);
 
     // 6. Cover.
     const removeCover = formData.get("removeCover") === "true";
@@ -231,7 +230,7 @@ export async function searchGameTemplates(
   let q = supabase
     .from("games")
     .select(
-      "id, title, release_date, developer, publisher, is_online, launchers, genres:game_genres(genre_id), platforms:game_platforms(platform_id), tags:game_tags(tag:tags(name))",
+      "id, title, release_date, developer, publisher, is_online, launchers, genres:game_genres(genre_id), platforms:game_platforms(platform_id)",
     )
     .limit(8);
 
@@ -257,7 +256,6 @@ export async function searchGameTemplates(
     launchers: GameTemplate["launchers"];
     genres: { genre_id: string }[];
     platforms: { platform_id: string }[];
-    tags: { tag: { name: string } | null }[];
   };
   const games = ((data ?? []) as unknown as Row[]).map<GameTemplate>((g) => ({
     id: g.id,
@@ -269,7 +267,6 @@ export async function searchGameTemplates(
     launchers: g.launchers ?? [],
     genre_ids: g.genres.map((x) => x.genre_id),
     platform_ids: g.platforms.map((x) => x.platform_id),
-    tags: g.tags.flatMap((x) => (x.tag ? [x.tag.name] : [])),
   }));
   return { ok: true, games };
 }
@@ -307,30 +304,5 @@ async function replaceLinks(
   const ins = await supabase
     .from(table)
     .insert([...new Set(ids)].map((id) => ({ game_id: gameId, [column]: id })));
-  if (ins.error) throw ins.error;
-}
-
-async function syncTags(supabase: Client, gameId: string, names: string[]) {
-  const del = await supabase.from("game_tags").delete().eq("game_id", gameId);
-  if (del.error) throw del.error;
-  if (names.length === 0) return;
-
-  const unique = new Map<string, string>();
-  for (const n of names) {
-    const slug = slugify(n);
-    if (slug) unique.set(slug, n);
-  }
-  const { data, error } = await supabase
-    .from("tags")
-    .upsert(
-      [...unique].map(([slug, name]) => ({ slug, name })),
-      { onConflict: "slug", ignoreDuplicates: false },
-    )
-    .select("id");
-  if (error) throw error;
-
-  const ins = await supabase
-    .from("game_tags")
-    .insert((data ?? []).map((t) => ({ game_id: gameId, tag_id: t.id })));
   if (ins.error) throw ins.error;
 }
