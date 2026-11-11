@@ -9,6 +9,7 @@ Le migrazioni sono in `supabase/migrations/` e vanno applicate **in ordine** (SQ
 | --- | --- |
 | `profiles` | Un record per utente auth, con `role` (`owner`). Il primo utente creato diventa `owner`. |
 | `games` | Il gioco: `slug`, `title`, descrizioni, `release_date`, `developer`, `publisher`, `rating` (0-10), `play_status`, `completion_status`, `playtime_hours`, `completed_on`, `review_en`, `review_it`, `pros[]`, `cons[]`, `cover_path`, `cover_blur`, `featured`, `is_online`, timestamp. |
+| `games.launchers` | Colonna `text[]` con i launcher su cui il gioco è posseduto (`steam`, `ubisoft-connect`, `ea-app`, `battle-net`). Vuota per i giochi console, già coperti dalle piattaforme. I valori ammessi sono validati nell'app (`LAUNCHERS` in `src/lib/types.ts`), quindi aggiungere un launcher non richiede una migrazione. Indice GIN `games_launchers_idx`. |
 | `genres`, `platforms`, `tags` | Tassonomie con nome univoco (case-insensitive) e `slug`. Generi e piattaforme sono precaricati. |
 | `game_genres`, `game_platforms`, `game_tags` | Tabelle ponte molti-a-molti. |
 
@@ -32,7 +33,7 @@ indici trigram (`pg_trgm`) su titolo, sviluppatore e publisher per la ricerca te
 ## Funzioni e viste
 
 - **`library_search(...)`**: ricerca, filtri (testo, generi, piattaforme, anni, voto min/max, stato,
-  completamento, sviluppatore, publisher, solo recensiti, online sì/no), ordinamento e paginazione in una sola
+  completamento, sviluppatore, publisher, solo recensiti, online sì/no, launcher), ordinamento e paginazione in una sola
   chiamata; restituisce anche il totale.
 - **`stats_totals`, `stats_genres`, `stats_platforms`, `stats_rating_distribution`, `stats_games_by_year`**:
   alimentano la pagina Statistics (l'anno deriva da `completed_on`).
@@ -49,6 +50,7 @@ indici trigram (`pg_trgm`) su titolo, sviluppatore e publisher per la ricerca te
 | `20261110150000_remove_start_and_review_dates.sql` | Rimuove `started_on`, `reviewed_on`, `last_played_on`; ricrea `stats_games_by_year` (da `completed_on`) e `library_search`. |
 | `20261110170000_remove_notes_and_extra_images.sql` | Rimuove `game_images`, il tipo `image_kind` e `games.notes`. |
 | `20261111090000_main_story_side_quests.sql` | Aggiunge il livello di completamento `main_story_side_quests` tra `main_story` e `completionist`. |
+| `20261112090000_launchers.sql` | Aggiunge `games.launchers` (tutti i giochi esistenti partono con `steam`, perché finora vengono tutti da Steam), l'indice GIN e ricrea `library_search` con il parametro `p_launchers` e la colonna `launchers` nel risultato. |
 
 Le migrazioni sono già applicate al progetto Supabase in uso. Per un progetto nuovo vanno eseguite tutte, in
 ordine.

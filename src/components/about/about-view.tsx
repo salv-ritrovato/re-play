@@ -3,6 +3,7 @@
 import { ArrowUpRight, Gamepad2, Heart, Joystick, Monitor, Trophy, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { IconLabel } from "@/components/ui/icon-label";
+import { SteamIcon } from "@/components/ui/launcher-icon";
 import { STEAM_URL, type AboutContent, type FactIcon } from "@/content/about";
 import { LANGS, LANG_LABEL, type Lang } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -107,6 +108,7 @@ export function AboutView({ content }: { content: Record<Lang, AboutContent> }) 
               rel="noopener noreferrer"
               className="group inline-flex items-center gap-1.5 text-base text-foreground/90 underline-offset-4 outline-none hover:text-foreground hover:underline focus-visible:ring-3 focus-visible:ring-ring/50"
             >
+              <SteamIcon className="text-muted-foreground transition-colors group-hover:text-foreground" />
               {c.steam.cta}
               <ArrowUpRight
                 aria-hidden

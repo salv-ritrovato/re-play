@@ -2,7 +2,7 @@ import Link from "next/link";
 import { yearOf } from "@/lib/format";
 import type { GameSummary } from "@/lib/types";
 import { cn } from "@/lib/utils";
-import { OnlineBadge, Rating, StatusBadge } from "./badges";
+import { LauncherIcons, OnlineBadge, Rating, StatusBadge } from "./badges";
 import { DeveloperLinks } from "./developer-links";
 import { GameCover } from "./game-cover";
 
@@ -52,7 +52,12 @@ export function GameCard({
         </div>
         <Rating value={game.rating} size="sm" />
       </div>
-      {showStatus && <StatusBadge status={game.play_status} className="mt-1.5" />}
+      {(showStatus || game.launchers.length > 0) && (
+        <div className="relative z-10 mt-1.5 flex items-center justify-between gap-2">
+          {showStatus ? <StatusBadge status={game.play_status} /> : <span />}
+          <LauncherIcons launchers={game.launchers} />
+        </div>
+      )}
     </div>
   );
 }

@@ -54,7 +54,7 @@ export function CopyFromGame({ onCopy }: { onCopy: (game: GameTemplate) => void 
           <Copy className="size-4 text-muted-foreground" aria-hidden /> Start from an existing game
         </h2>
         <p className="text-xs text-subtle">
-          Copies developer, publisher, genres, platforms, tags and the online flag. Handy for series,
+          Copies developer, publisher, genres, platforms, launchers, tags and the online flag. Handy for series,
           sequels and the same studio. Title, rating, review and cover are never copied.
         </p>
       </div>

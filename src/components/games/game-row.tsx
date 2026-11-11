@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { formatPlaytime, yearOf } from "@/lib/format";
 import type { GameSummary } from "@/lib/types";
-import { CompletionBadge, OnlineBadge, Rating, StatusBadge } from "./badges";
+import { CompletionBadge, LauncherIcons, OnlineBadge, Rating, StatusBadge } from "./badges";
 import { DeveloperLinks } from "./developer-links";
 import { GameCover } from "./game-cover";
 
@@ -32,6 +32,7 @@ export function GameRow({ game }: { game: GameSummary }) {
               </Link>
             </h3>
             {game.is_online && <OnlineBadge className="shrink-0" />}
+            <LauncherIcons launchers={game.launchers} className="shrink-0" />
           </div>
           <p className="relative z-10 mt-0.5 truncate text-xs text-subtle">
             {year}

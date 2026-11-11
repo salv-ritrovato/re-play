@@ -53,6 +53,8 @@ test.describe.serial("CMS end to end", () => {
     await page.locator("#publisher").fill("E2E Publishing");
     await page.getByRole("button", { name: "Adventure", exact: true }).click();
     await page.getByRole("button", { name: "PC", exact: true }).click();
+    await page.getByRole("button", { name: "Steam", exact: true }).click();
+    await page.getByRole("button", { name: "Ubisoft Connect", exact: true }).click();
     await page.locator("#tags").fill("e2e-tag");
     await page.locator("#tags").press("Enter");
     await page.getByRole("switch", { name: "Online / competitive game" }).click(); // flag as online / competitive
@@ -96,6 +98,7 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.locator("#review_en")).toHaveValue("");
     await expect(page.locator("#review_it")).toHaveValue("");
     await expect(page.getByRole("button", { name: "Adventure", exact: true })).toHaveAttribute("aria-pressed", "false");
+    await expect(page.getByRole("button", { name: "Steam", exact: true })).toHaveAttribute("aria-pressed", "false");
     await expect(page.getByAltText(/Cover preview/)).toHaveCount(0);
   });
 
@@ -178,6 +181,14 @@ test.describe.serial("CMS end to end", () => {
     await page.goto(`/library?q=${encodeURIComponent(title)}&status=dropped`);
     await expect(page.getByText("No games match these filters")).toBeVisible();
 
+    // Launchers filter the library: the game is on Steam and Ubisoft Connect, not on Battle.net.
+    await page.goto(`/library?q=${encodeURIComponent(title)}&launcher=ubisoft-connect`);
+    await expect(page.getByRole("link", { name: new RegExp(title) })).toBeVisible();
+    await page.goto(`/library?q=${encodeURIComponent(title)}&launcher=battle-net`);
+    await expect(page.getByText("No games match these filters")).toBeVisible();
+    await page.goto(`/library?q=${encodeURIComponent(title)}`);
+    await expect(page.getByTitle("Steam")).toBeVisible(); // the brand icon on the card
+
     // "Main story + side quests" is its own completion level, distinct from plain "Main story".
     await page.goto(`/library?q=${encodeURIComponent(title)}&completion=main_story_side_quests`);
     await expect(page.getByRole("link", { name: new RegExp(title) })).toBeVisible();
@@ -200,6 +211,9 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByRole("listitem").filter({ hasText: "Fake" }).first()).toContainText("-");
     await expect(page.getByText("E2E Studio").first()).toBeVisible();
     await expect(page.getByText("Main story + side quests")).toBeVisible();
+    const launchers = page.locator("dt", { hasText: "Launchers" }).locator("xpath=following-sibling::dd");
+    await expect(launchers).toContainText("Steam");
+    await expect(launchers).toContainText("Ubisoft Connect");
     await expect(page.getByText("7.5").first()).toBeVisible();
 
     // Both languages are available, English first.
@@ -262,6 +276,9 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByRole("button", { name: "Adventure", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("button", { name: "PC", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("switch", { name: "Online / competitive game" })).toBeChecked();
+    await expect(page.getByRole("button", { name: "Steam", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("button", { name: "Ubisoft Connect", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await expect(page.getByRole("button", { name: "Battle.net", exact: true })).toHaveAttribute("aria-pressed", "false");
     // Nothing personal is copied.
     for (const field of ["#title", "#slug", "#rating", "#review_en", "#review_it", "#release_date"]) {
       await expect(page.locator(field)).toHaveValue("");

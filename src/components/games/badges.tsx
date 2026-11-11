@@ -1,5 +1,13 @@
 import { Wifi } from "lucide-react";
-import { COMPLETION_LABEL, PLAY_STATUS_LABEL, type CompletionStatus, type PlayStatus } from "@/lib/types";
+import { LauncherIcon } from "@/components/ui/launcher-icon";
+import {
+  COMPLETION_LABEL,
+  LAUNCHER_NAME,
+  PLAY_STATUS_LABEL,
+  type CompletionStatus,
+  type LauncherId,
+  type PlayStatus,
+} from "@/lib/types";
 import { formatRating } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
@@ -31,6 +39,21 @@ export function OnlineBadge({ className, label = "Online" }: { className?: strin
     >
       <Wifi aria-hidden className="size-3" />
       {label}
+    </span>
+  );
+}
+
+/** The launchers a game is owned on, as small brand icons (the names stay available to screen readers and as tooltips). */
+export function LauncherIcons({ launchers, className }: { launchers: LauncherId[]; className?: string }) {
+  if (launchers.length === 0) return null;
+  return (
+    <span className={cn("inline-flex items-center gap-1.5 text-muted-foreground", className)}>
+      {launchers.map((id) => (
+        <span key={id} title={LAUNCHER_NAME[id]} className="inline-flex">
+          <LauncherIcon id={id} className="size-3.5" />
+          <span className="sr-only">{LAUNCHER_NAME[id]}</span>
+        </span>
+      ))}
     </span>
   );
 }

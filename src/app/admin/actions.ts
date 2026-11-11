@@ -99,6 +99,7 @@ export async function saveGame(
     cons: v.cons,
     featured: v.featured,
     is_online: v.is_online,
+    launchers: v.launchers,
   };
 
   const write = isEdit
@@ -229,7 +230,7 @@ export async function searchGameTemplates(
   let q = supabase
     .from("games")
     .select(
-      "id, title, release_date, developer, publisher, is_online, genres:game_genres(genre_id), platforms:game_platforms(platform_id), tags:game_tags(tag:tags(name))",
+      "id, title, release_date, developer, publisher, is_online, launchers, genres:game_genres(genre_id), platforms:game_platforms(platform_id), tags:game_tags(tag:tags(name))",
     )
     .limit(8);
 
@@ -252,6 +253,7 @@ export async function searchGameTemplates(
     developer: string | null;
     publisher: string | null;
     is_online: boolean;
+    launchers: GameTemplate["launchers"];
     genres: { genre_id: string }[];
     platforms: { platform_id: string }[];
     tags: { tag: { name: string } | null }[];
@@ -263,6 +265,7 @@ export async function searchGameTemplates(
     developer: g.developer,
     publisher: g.publisher,
     is_online: g.is_online,
+    launchers: g.launchers ?? [],
     genre_ids: g.genres.map((x) => x.genre_id),
     platform_ids: g.platforms.map((x) => x.platform_id),
     tags: g.tags.flatMap((x) => (x.tag ? [x.tag.name] : [])),

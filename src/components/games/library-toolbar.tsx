@@ -15,15 +15,19 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { LauncherIcon } from "@/components/ui/launcher-icon";
 import { useDebouncedValue } from "@/hooks/use-debounced-value";
 import { useQueryParams } from "@/hooks/use-query-params";
 import {
   COMPLETION_LABEL,
   COMPLETION_STATUSES,
+  LAUNCHERS,
+  LAUNCHER_NAME,
   PLAY_STATUSES,
   PLAY_STATUS_LABEL,
   REVIEW_SORT_OPTIONS,
   SORT_OPTIONS,
+  type LauncherId,
   type Taxonomy,
 } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -37,7 +41,7 @@ export interface FilterOptions {
 }
 
 const FILTER_KEYS = [
-  "genre", "platform", "year", "status", "completion", "min", "max", "developer", "publisher", "type",
+  "genre", "platform", "year", "status", "completion", "launcher", "min", "max", "developer", "publisher", "type",
 ];
 
 const ANY = "__any";
@@ -84,7 +88,7 @@ export function LibraryToolbar({
   const activeCount = FILTER_KEYS.reduce((n, k) => {
     const v = searchParams.get(k);
     if (!v) return n;
-    return n + (["genre", "platform", "year", "status", "completion"].includes(k) ? v.split(",").length : 1);
+    return n + (["genre", "platform", "year", "status", "completion", "launcher"].includes(k) ? v.split(",").length : 1);
   }, 0);
 
   return (
@@ -289,6 +293,17 @@ function FilterSheet({
             ))}
           </FilterGroup>
 
+          <FilterGroup label="Launcher">
+            {LAUNCHERS.map((l) => (
+              <Chip key={l.id} pressed={getList("launcher").includes(l.id)} onClick={() => toggle("launcher", l.id)}>
+                <span className="inline-flex items-center gap-1.5">
+                  <LauncherIcon id={l.id} className="size-3.5" />
+                  {l.name}
+                </span>
+              </Chip>
+            ))}
+          </FilterGroup>
+
           {options.genres.length > 0 && (
             <FilterGroup label="Genre">
               {options.genres.map((g) => (
@@ -414,6 +429,9 @@ function ActiveFilters({
   }
   for (const c of list("completion") as (keyof typeof COMPLETION_LABEL)[]) {
     if (COMPLETION_LABEL[c]) chips.push({ key: `completion-${c}`, label: COMPLETION_LABEL[c], remove: () => toggle("completion", c) });
+  }
+  for (const id of list("launcher") as LauncherId[]) {
+    if (LAUNCHER_NAME[id]) chips.push({ key: `launcher-${id}`, label: LAUNCHER_NAME[id], remove: () => toggle("launcher", id) });
   }
   const min = searchParams.get("min");
   const max = searchParams.get("max");

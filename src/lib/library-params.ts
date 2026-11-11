@@ -1,5 +1,7 @@
 import {
   COMPLETION_STATUSES,
+  LAUNCHER_IDS,
+  type LauncherId,
   PLAY_STATUSES,
   REVIEW_SORT_OPTIONS,
   SORT_OPTIONS,
@@ -53,6 +55,9 @@ export function parseLibraryParams(
     publisher: first(raw.publisher)?.slice(0, 120) || undefined,
     reviewedOnly: mode === "reviews",
     online: first(raw.type) === "online" ? true : first(raw.type) === "solo" ? false : undefined,
+    launchers: list(raw.launcher).filter((l): l is LauncherId =>
+      (LAUNCHER_IDS as readonly string[]).includes(l),
+    ),
     sort,
     page,
     view: first(raw.view) === "list" ? "list" : "grid",
@@ -76,6 +81,7 @@ export function countActiveFilters(f: LibraryFilters): number {
     (f.maxRating !== undefined ? 1 : 0) +
     (f.developer ? 1 : 0) +
     (f.publisher ? 1 : 0) +
-    (f.online !== undefined ? 1 : 0)
+    (f.online !== undefined ? 1 : 0) +
+    (f.launchers?.length ?? 0)
   );
 }

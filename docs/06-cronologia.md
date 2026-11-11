@@ -41,6 +41,8 @@ Cosa è stato fatto, nell'ordine, e i problemi incontrati con le relative soluzi
 | Niente scrollbar nei grafici delle statistiche | Vedi sotto. |
 | "Completed" e "Reviewed" non hanno più senso: ogni gioco è già completato e recensito | Tolti dalla home e da Statistics perché ripetevano il numero dei giochi. Home: giochi, ore giocate, voto medio, voto più alto. Statistics: giochi giocati, voto medio, ore giocate. |
 | Qualche icona carina con `lucide-react` | Icone discrete in home, Statistics, scheda del gioco, badge Online, stati vuoti, pagine di errore/404 e About. Nessuna nel menu e nel footer. |
+| L'icona di Steam | Logo preso da Simple Icons (CC0) e usato davanti al link al profilo Steam in About e nel footer. |
+| Si usano più launcher (Steam, Ubisoft Connect, EA, Battle.net) e anche giochi Nintendo | Nuovo campo "Launcher" per gioco (migrazione `launchers`, tutti i giochi esistenti su Steam), con icone su card, lista e scheda, filtro in libreria e selezione nel form. Nintendo resta gestito dalle piattaforme. |
 | Cliccando uno sviluppatore si apre una pagina con tutti i suoi giochi | Nuova pagina `/developers/[slug]`; i nomi sono link su card, lista, gioco in evidenza e scheda del gioco. Gestiti anche i giochi con più sviluppatori. |
 | "Playing now" non serve: i giochi si aggiungono solo a gioco finito | Rimossi il numero "Playing now" (home e Statistics) e lo scaffale "Currently playing"; in home al suo posto "Reviewed". Lo stato "Playing" resta disponibile nel form e nei filtri. |
 | Via anche "Abandoned" dalle statistiche (difficilmente abbandona giochi) | Rimosso il numero "Abandoned" dalla pagina Statistics, che ora mostra quattro numeri: giochi, completati, voto medio, ore. Lo stato "Dropped" resta nel form e nei filtri. |
@@ -68,6 +70,8 @@ another"** e **"Parti da un gioco esistente"** (vedi [04-cms-admin.md](04-cms-ad
   deploy Vercel (*deployment skew*). Rimosso `updateTag` da `createTaxonomy` (con commento) e aggiunto
   l'avviso `beforeunload` per modifiche non salvate.
 - **Header e footer duplicati nel 404 dentro `(site)`**: `(site)/not-found.tsx` separato + `NotFoundView`.
+- **Footer troppo largo su telefono dopo aver aggiunto l'icona di Steam**: i test responsive hanno segnalato lo
+  scorrimento orizzontale; la riga dei link ora va a capo (`flex-wrap`).
 - **Overflow orizzontale della pagina Statistics su mobile** (grafico per anno): `min-w-0` sulla sezione e
   `relative` sul contenitore scorrevole.
 - **Interruttore "Online" non cliccabile nel test** (colpiva l'input nascosto): `getByRole("switch", …)`.

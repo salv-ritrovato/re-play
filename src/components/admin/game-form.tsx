@@ -27,6 +27,7 @@ import { gameSchema, type GameFormInput, type GameFormValues } from "@/lib/valid
 import { CopyFromGame } from "./copy-from-game";
 import { DeleteGameButton } from "./delete-game-button";
 import { Field, FormSection } from "./field";
+import { LauncherPicker } from "./launcher-picker";
 import { emptyMedia, MediaFields, type MediaState } from "./media-fields";
 import { TagInput } from "./tag-input";
 import { TaxonomyPicker } from "./taxonomy-picker";
@@ -42,6 +43,7 @@ function toDefaults(game?: GameDetail): GameFormInput {
     publisher: game?.publisher ?? "",
     genre_ids: game?.genres.map((g) => g.id) ?? [],
     platform_ids: game?.platforms.map((p) => p.id) ?? [],
+    launchers: game?.launchers ?? [],
     tags: game?.tags.map((t) => t.name) ?? [],
     rating: game?.rating === null || game?.rating === undefined ? "" : String(game.rating),
     play_status: game?.play_status ?? "backlog",
@@ -136,6 +138,7 @@ export function GameForm({
     setValue("publisher", t.publisher ?? "", opts);
     setValue("genre_ids", t.genre_ids, opts);
     setValue("platform_ids", t.platform_ids, opts);
+    setValue("launchers", t.launchers, opts);
     setValue("tags", t.tags, opts);
     setValue("is_online", t.is_online, opts);
     toast.success(`Copied details from ${t.title}`);
@@ -275,6 +278,11 @@ export function GameForm({
               onCreated={(item) => setPlatforms((p) => [...p, item].sort((a, b) => a.name.localeCompare(b.name)))}
             />
           )}
+        />
+        <Controller
+          control={control}
+          name="launchers"
+          render={({ field }) => <LauncherPicker value={field.value} onChange={field.onChange} />}
         />
         <div className="flex items-center justify-between gap-4 rounded-md border border-border p-4 sm:col-span-2">
           <div>

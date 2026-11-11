@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { COMPLETION_STATUSES, PLAY_STATUSES } from "@/lib/types";
+import { COMPLETION_STATUSES, LAUNCHER_IDS, PLAY_STATUSES } from "@/lib/types";
 
 const text = (max: number) =>
   z
@@ -55,6 +55,7 @@ export const gameSchema = z
     genre_ids: z.array(z.uuid()),
     platform_ids: z.array(z.uuid()),
     tags: z.array(z.string().trim().min(1).max(40)).max(30),
+    launchers: z.array(z.enum(LAUNCHER_IDS)).max(LAUNCHER_IDS.length),
 
     rating: numberString(0, 10, "Rating"),
     play_status: z.enum(PLAY_STATUSES),

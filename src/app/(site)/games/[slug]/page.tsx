@@ -6,6 +6,7 @@ import {
   Flag,
   Layers,
   Monitor,
+  Rocket,
   Star,
   Store,
   Trophy,
@@ -15,18 +16,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { CompletionBadge, OnlineBadge, Rating, StatusBadge } from "@/components/games/badges";
+import { CompletionBadge, LauncherIcons, OnlineBadge, Rating, StatusBadge } from "@/components/games/badges";
 import { DeveloperLinks } from "@/components/games/developer-links";
 import { GameCard } from "@/components/games/game-card";
 import { GameCover } from "@/components/games/game-cover";
 import { ReviewTabs } from "@/components/games/review-tabs";
 import { Container, Section } from "@/components/layout/page-header";
 import { IconLabel } from "@/components/ui/icon-label";
+import { LauncherIcon } from "@/components/ui/launcher-icon";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getGameBySlug, getRelatedGames } from "@/lib/data/public";
 import { excerpt, formatDate, formatPlaytime, yearOf } from "@/lib/format";
 import { mediaUrl } from "@/lib/media";
-import type { GameDetail } from "@/lib/types";
+import { LAUNCHER_NAME, type GameDetail } from "@/lib/types";
 
 export async function generateMetadata({ params }: PageProps<"/games/[slug]">): Promise<Metadata> {
   const { slug } = await params;
@@ -98,6 +100,7 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
               {year}
               {year && game.developer ? " · " : null}
               <DeveloperLinks value={game.developer} />
+              <LauncherIcons launchers={game.launchers} className="ml-3 align-middle" />
             </p>
             {game.short_description && (
               <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-foreground/80">
@@ -156,6 +159,22 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
               <Detail icon={Store} label="Publisher" value={game.publisher} />
               <Detail icon={Layers} label="Genres" value={game.genres.map((g) => g.name).join(", ") || null} />
               <Detail icon={Monitor} label="Platforms" value={game.platforms.map((p) => p.name).join(", ") || null} />
+              {game.launchers.length > 0 && (
+                <Detail
+                  icon={Rocket}
+                  label="Launchers"
+                  value={
+                    <ul className="space-y-1.5">
+                      {game.launchers.map((id) => (
+                        <li key={id} className="flex items-center gap-2">
+                          <LauncherIcon id={id} className="size-4 text-muted-foreground" />
+                          {LAUNCHER_NAME[id]}
+                        </li>
+                      ))}
+                    </ul>
+                  }
+                />
+              )}
             </dl>
           </div>
         </Section>

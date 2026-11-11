@@ -4,6 +4,17 @@ export type PlayStatus = (typeof PLAY_STATUSES)[number];
 export const COMPLETION_STATUSES = ["none", "main_story", "main_story_side_quests", "completionist"] as const;
 export type CompletionStatus = (typeof COMPLETION_STATUSES)[number];
 
+/** Where a PC game is owned. Consoles are covered by platforms, so a game may have no launcher at all. */
+export const LAUNCHERS = [
+  { id: "steam", name: "Steam" },
+  { id: "ubisoft-connect", name: "Ubisoft Connect" },
+  { id: "ea-app", name: "EA app" },
+  { id: "battle-net", name: "Battle.net" },
+] as const;
+export type LauncherId = (typeof LAUNCHERS)[number]["id"];
+export const LAUNCHER_IDS = LAUNCHERS.map((l) => l.id) as [LauncherId, ...LauncherId[]];
+export const LAUNCHER_NAME = Object.fromEntries(LAUNCHERS.map((l) => [l.id, l.name])) as Record<LauncherId, string>;
+
 export const PLAY_STATUS_LABEL: Record<PlayStatus, string> = {
   backlog: "Backlog",
   playing: "Playing",
@@ -33,6 +44,7 @@ export interface GameTemplate {
   developer: string | null;
   publisher: string | null;
   is_online: boolean;
+  launchers: LauncherId[];
   genre_ids: string[];
   platform_ids: string[];
   tags: string[];
@@ -57,6 +69,7 @@ export interface GameSummary {
   cover_blur: string | null;
   created_at: string;
   is_online: boolean;
+  launchers: LauncherId[];
   genres: Taxonomy[];
   platforms: Taxonomy[];
   total_count: number;
@@ -84,6 +97,7 @@ export interface GameDetail {
   cover_blur: string | null;
   featured: boolean;
   is_online: boolean;
+  launchers: LauncherId[];
   created_at: string;
   updated_at: string;
   genres: Taxonomy[];
@@ -105,6 +119,7 @@ export interface LibraryFilters {
   reviewedOnly?: boolean;
   /** undefined = everything, true = online/competitive only, false = single-player only */
   online?: boolean;
+  launchers?: LauncherId[];
   sort: SortKey;
   page: number;
   view: "grid" | "list";

@@ -47,6 +47,7 @@ export async function searchGames(
     p_limit: pageSize,
     p_offset: (Math.max(filters.page, 1) - 1) * pageSize,
     p_online: filters.online ?? null,
+    p_launchers: filters.launchers?.length ? filters.launchers : null,
   });
   if (error) fail("searchGames", error);
 
@@ -158,7 +159,7 @@ export async function getAllSlugs(): Promise<string[]> {
 const SUMMARY_SELECT = `
   id, slug, title, short_description, release_date, developer, publisher, rating,
   play_status, completion_status, playtime_hours, review_en, review_it,
-  cover_path, cover_blur, created_at, is_online,
+  cover_path, cover_blur, created_at, is_online, launchers,
   genres:game_genres(genre:genres(id, name, slug)),
   platforms:game_platforms(platform:platforms(id, name, slug))
 `;

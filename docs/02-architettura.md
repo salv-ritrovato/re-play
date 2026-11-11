@@ -98,6 +98,15 @@ profilo Steam è la costante `STEAM_URL`.
   scheda del gioco, nel badge "Online" (Wifi), negli stati vuoti (`EmptyState` accetta `icon`), nelle pagine
   di errore e 404 e nel riquadro "In breve" di About (ogni voce ha una chiave `icon` in `about.ts`, tradotta
   in icona da `about-view.tsx`). Menu principale e footer restano senza icone, di proposito.
+- **Launcher** (Steam, Ubisoft Connect, EA app, Battle.net): ogni gioco può avere zero o più launcher
+  (`games.launchers`). L'elenco è la costante `LAUNCHERS` in `src/lib/types.ts`: per aggiungerne uno basta
+  inserirlo lì e aggiungere il suo logo in `launcher-icon.tsx`. Mostrati come icone sulle card, sulle righe
+  della lista e accanto allo sviluppatore nella scheda del gioco (con nome e tooltip per chi usa lo screen
+  reader), per esteso nei dettagli, e come filtro "Launcher" in libreria (`?launcher=steam,ea-app`). I giochi
+  Nintendo e console restano gestiti dalle piattaforme e non hanno launcher.
+- **Loghi dei marchi** (`src/components/ui/launcher-icon.tsx`): `lucide-react` non ha icone di marchi, quindi i
+  tracciati SVG vengono da Simple Icons (licenza CC0). `SteamIcon` è usata anche davanti al link al profilo
+  Steam in About e nel footer.
 - Componenti shadcn in `src/components/ui`; `ButtonLink` rende un link con l'aspetto di un bottone (così
   il ruolo ARIA resta `link`).
 - Il toast (Sonner, solo tema scuro) è in alto a destra per non coprire il pulsante "Add game" fisso.

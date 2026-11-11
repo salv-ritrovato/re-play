@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { SteamIcon } from "@/components/ui/launcher-icon";
 import { STEAM_URL } from "@/content/about";
 import { Wordmark, TAGLINE } from "./wordmark";
 
@@ -10,12 +11,18 @@ export function SiteFooter() {
           <Wordmark />
           <p className="text-sm text-muted-foreground">{TAGLINE}</p>
         </div>
-        <div className="flex items-center gap-5 text-sm text-subtle">
+        <div className="flex flex-wrap items-center gap-x-5 gap-y-2 text-sm text-subtle">
           <Link href="/library" className="hover:text-foreground">Library</Link>
           <Link href="/reviews" className="hover:text-foreground">Reviews</Link>
           <Link href="/statistics" className="hover:text-foreground">Statistics</Link>
           <Link href="/about" className="hover:text-foreground">About</Link>
-          <a href={STEAM_URL} target="_blank" rel="noopener noreferrer" className="hover:text-foreground">
+          <a
+            href={STEAM_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1.5 hover:text-foreground"
+          >
+            <SteamIcon className="size-3.5" />
             Steam
             <span className="sr-only"> (opens in a new tab)</span>
           </a>
