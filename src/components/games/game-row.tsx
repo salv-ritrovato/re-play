@@ -55,7 +55,7 @@ export function GameRow({ game }: { game: GameSummary }) {
         <div className="hidden flex-col gap-1 sm:flex">
           <StatusBadge status={game.play_status} />
           <div className="flex items-center gap-2">
-            <CompletionBadge status={game.completion_status} />
+            {!game.is_online && <CompletionBadge status={game.completion_status} />}
             {playtime && <span className="text-xs text-subtle">{playtime}</span>}
           </div>
         </div>

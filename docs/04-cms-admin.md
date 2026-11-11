@@ -29,6 +29,12 @@ Comportamenti da conoscere:
 - **Reset dopo il salvataggio e su "Cancel"**: `resetForm({ values })`. Senza, Next riutilizzerebbe lo stato
   del gioco precedente (le pagine visitate restano in memoria).
 - **Protezione dalle perdite di dati**: `beforeunload` avvisa se ci sono modifiche non salvate.
+- **Giochi online / competitivi** (interruttore "Online / competitive game"): non hanno una fine, quindi
+  accendendo l'interruttore il form nasconde "Completion status" e "Completion date" (e li azzera), toglie
+  "Completed" e "Backlog" dalle scelte di "Playing status" (restano Playing, On hold, Dropped, e se serve
+  passa a Playing) e mostra una nota. La stessa regola vale sul server (`gameSchema`): un gioco online non può
+  avere livello o data di completamento né stato "completed". Sul sito pubblico un gioco online non mostra
+  il completamento (scheda in alto, lista, data nella barra laterale).
 - **Aggiungi e aggiungine un altro** (solo su "Nuovo gioco"): il pulsante "Add and add another" salva il gioco,
   mostra un avviso e riapre il form **vuoto** con il cursore sul titolo, senza tornare all'elenco. Non porta
   con sé nulla del gioco appena salvato (per i dati in comune si usa il punto successivo).

@@ -57,7 +57,6 @@ test.describe.serial("CMS end to end", () => {
     await page.getByRole("button", { name: "Ubisoft Connect", exact: true }).click();
     await page.locator("#tags").fill("e2e-tag");
     await page.locator("#tags").press("Enter");
-    await page.getByRole("switch", { name: "Online / competitive game" }).click(); // flag as online / competitive
 
     await page.locator("#rating").fill("7.5");
     await page.locator("#playtime_hours").fill("12");
@@ -195,16 +194,13 @@ test.describe.serial("CMS end to end", () => {
     await page.goto(`/library?q=${encodeURIComponent(title)}&completion=main_story`);
     await expect(page.getByText("No games match these filters")).toBeVisible();
 
-    // Online / competitive games stay in the library, flagged and filterable.
-    await page.goto(`/library?q=${encodeURIComponent(title)}`);
-    await expect(page.getByText("Online", { exact: true })).toBeVisible();
-    await page.goto(`/library?q=${encodeURIComponent(title)}&type=online`);
-    await expect(page.getByRole("link", { name: new RegExp(title) })).toBeVisible();
+    // A single-player game is not an online one (the online case is covered further down).
     await page.goto(`/library?q=${encodeURIComponent(title)}&type=solo`);
+    await expect(page.getByRole("link", { name: new RegExp(title) })).toBeVisible();
+    await page.goto(`/library?q=${encodeURIComponent(title)}&type=online`);
     await expect(page.getByText("No games match these filters")).toBeVisible();
 
     await page.goto(`/games/${slug}`);
-    await expect(page.getByText("Online / competitive")).toBeVisible();
     await expect(page.getByRole("heading", { level: 1, name: title })).toBeVisible();
     // Pros get a green "+", cons a red "-".
     await expect(page.getByRole("listitem").filter({ hasText: "Fast" }).first()).toContainText("+");
@@ -289,7 +285,6 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.locator("#publisher")).toHaveValue("E2E Publishing");
     await expect(page.getByRole("button", { name: "Adventure", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("button", { name: "PC", exact: true })).toHaveAttribute("aria-pressed", "true");
-    await expect(page.getByRole("switch", { name: "Online / competitive game" })).toBeChecked();
     await expect(page.getByRole("button", { name: "Steam", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("button", { name: "Ubisoft Connect", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("button", { name: "Battle.net", exact: true })).toHaveAttribute("aria-pressed", "false");
@@ -297,6 +292,19 @@ test.describe.serial("CMS end to end", () => {
     for (const field of ["#title", "#slug", "#rating", "#review_en", "#review_it", "#release_date"]) {
       await expect(page.locator(field)).toHaveValue("");
     }
+
+    // A normal game has a completion level and date...
+    await expect(page.locator("#completion_status")).toBeVisible();
+    await expect(page.locator("#completed_on")).toBeVisible();
+    // ...an online one has no ending: both disappear and "Completed" is no longer offered.
+    await page.getByRole("switch", { name: "Online / competitive game" }).click();
+    await expect(page.locator("#completion_status")).toHaveCount(0);
+    await expect(page.locator("#completed_on")).toHaveCount(0);
+    await expect(page.getByText("Online games have no ending")).toBeVisible();
+    await page.locator("#play_status").click();
+    await expect(page.getByRole("option", { name: "Completed", exact: true })).toHaveCount(0);
+    await expect(page.getByRole("option", { name: "Backlog", exact: true })).toHaveCount(0);
+    await page.getByRole("option", { name: "Playing", exact: true }).click();
 
     await page.locator("#title").fill(second);
     // Several studios in one field are listed separately, each with its own page.
@@ -310,7 +318,23 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.locator("#title")).toBeFocused();
     await expect(page.locator("#developer")).toHaveValue("");
     await expect(page.getByRole("switch", { name: "Online / competitive game" })).not.toBeChecked();
+    await expect(page.locator("#completion_status")).toBeVisible(); // a blank form is a normal game again
     await expect(page.getByText(/^Copied from/)).toHaveCount(0);
+
+    // The online game is in the library with its label, filterable, and shows no completion anywhere.
+    await page.goto(`/library?q=${encodeURIComponent(second)}&type=online`);
+    await expect(page.getByRole("link", { name: new RegExp(second) })).toBeVisible();
+    await expect(page.getByText("Online", { exact: true })).toBeVisible();
+    await page.goto(`/library?q=${encodeURIComponent(second)}&type=solo`);
+    await expect(page.getByText("No games match these filters")).toBeVisible();
+    await page.goto(`/library?q=${encodeURIComponent(second)}&view=list`);
+    await expect(page.getByText("Not completed")).toHaveCount(0);
+    await page.getByRole("link", { name: second }).click();
+    await expect(page.getByRole("heading", { level: 1, name: second })).toBeVisible();
+    await expect(page.getByText("Online / competitive")).toBeVisible();
+    await expect(page.getByText("Playing", { exact: true }).first()).toBeVisible();
+    await expect(page.locator("dt", { hasText: "Completion" })).toHaveCount(0);
+    await expect(page.locator("dt", { hasText: "Completed" })).toHaveCount(0);
 
     await page.goto("/developers/e2e-partner");
     await expect(page.getByRole("heading", { level: 1, name: "E2E Partner" })).toBeVisible();

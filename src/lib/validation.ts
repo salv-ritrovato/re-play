@@ -70,6 +70,19 @@ export const gameSchema = z
     featured: z.boolean(),
     is_online: z.boolean(),
   })
+  // An online game has no ending: no completion level, no completion date, never "completed".
+  .refine((v) => !v.is_online || v.completion_status === "none", {
+    path: ["completion_status"],
+    message: "Online games have no completion level",
+  })
+  .refine((v) => !v.is_online || !v.completed_on, {
+    path: ["completed_on"],
+    message: "Online games have no completion date",
+  })
+  .refine((v) => !v.is_online || v.play_status !== "completed", {
+    path: ["play_status"],
+    message: "An online game can't be completed: use Playing, On hold or Dropped",
+  })
   // A review always exists in both languages, or not at all.
   .refine((v) => !v.review_en || v.review_it, {
     path: ["review_it"],

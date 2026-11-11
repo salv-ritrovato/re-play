@@ -33,6 +33,9 @@ import { emptyMedia, MediaFields, type MediaState } from "./media-fields";
 import { TagInput } from "./tag-input";
 import { TaxonomyPicker } from "./taxonomy-picker";
 
+/** Online / competitive games have no ending, so only these statuses make sense for them. */
+const ONLINE_PLAY_STATUSES: readonly string[] = ["playing", "on_hold", "dropped"];
+
 function toDefaults(game?: GameDetail): GameFormInput {
   return {
     title: game?.title ?? "",
@@ -47,11 +50,13 @@ function toDefaults(game?: GameDetail): GameFormInput {
     launchers: game?.launchers ?? [],
     tags: game?.tags.map((t) => t.name) ?? [],
     rating: game?.rating === null || game?.rating === undefined ? "" : String(game.rating),
-    play_status: game?.play_status ?? "backlog",
-    completion_status: game?.completion_status ?? "none",
+    // An online game has no ending: it can be played, paused or dropped, never completed.
+    play_status:
+      game?.is_online && !ONLINE_PLAY_STATUSES.includes(game.play_status) ? "playing" : (game?.play_status ?? "backlog"),
+    completion_status: game?.is_online ? "none" : (game?.completion_status ?? "none"),
     playtime_hours:
       game?.playtime_hours === null || game?.playtime_hours === undefined ? "" : String(game.playtime_hours),
-    completed_on: game?.completed_on ?? "",
+    completed_on: game?.is_online ? "" : (game?.completed_on ?? ""),
     review_en: game?.review_en ?? "",
     review_it: game?.review_it ?? "",
     pros: game?.pros.join("\n") ?? "",
@@ -91,6 +96,7 @@ export function GameForm({
   const { register, control, setValue, formState } = form;
   const errors = formState.errors;
   const title = useWatch({ control, name: "title" });
+  const isOnline = useWatch({ control, name: "is_online" });
 
   // Warn before a full page reload / tab close would throw away unsaved work (this also catches
   // reloads the browser performs on its own, e.g. after a new deployment).
@@ -132,6 +138,17 @@ export function GameForm({
     }
   }
 
+  /** Flags the game as online. An online game has no ending, so completion is cleared and "completed" is not offered. */
+  function changeOnline(on: boolean) {
+    setValue("is_online", on, { shouldDirty: true });
+    if (!on) return;
+    setValue("completion_status", "none", { shouldDirty: true });
+    setValue("completed_on", "", { shouldDirty: true });
+    if (!ONLINE_PLAY_STATUSES.includes(form.getValues("play_status"))) {
+      setValue("play_status", "playing", { shouldDirty: true });
+    }
+  }
+
   /** Copies what a series / studio shares from another game; never anything personal. */
   function applyTemplate(t: GameTemplate): CopiedItem[] {
     const opts = { shouldDirty: true } as const;
@@ -141,7 +158,7 @@ export function GameForm({
     setValue("platform_ids", t.platform_ids, opts);
     setValue("launchers", t.launchers, opts);
     setValue("tags", t.tags, opts);
-    setValue("is_online", t.is_online, opts);
+    changeOnline(t.is_online);
     toast.success(`Copied details from ${t.title}`);
 
     // Tell the owner exactly what landed in the form (the fields are further down the page).
@@ -310,7 +327,7 @@ export function GameForm({
             control={control}
             name="is_online"
             render={({ field }) => (
-              <Switch id="is_online" checked={field.value} onCheckedChange={field.onChange} />
+              <Switch id="is_online" checked={field.value} onCheckedChange={changeOnline} />
             )}
           />
         </div>
@@ -342,28 +359,40 @@ export function GameForm({
                 id="play_status"
                 value={field.value}
                 onValueChange={field.onChange}
-                options={PLAY_STATUSES.map((s) => ({ value: s, label: PLAY_STATUS_LABEL[s] }))}
+                options={PLAY_STATUSES.filter((s) => !isOnline || ONLINE_PLAY_STATUSES.includes(s)).map((s) => ({
+                  value: s,
+                  label: PLAY_STATUS_LABEL[s],
+                }))}
               />
             )}
           />
         </Field>
-        <Field id="completion_status" label="Completion status">
-          <Controller
-            control={control}
-            name="completion_status"
-            render={({ field }) => (
-              <OptionSelect
-                id="completion_status"
-                value={field.value}
-                onValueChange={field.onChange}
-                options={COMPLETION_STATUSES.map((s) => ({ value: s, label: COMPLETION_LABEL[s] }))}
+        {isOnline ? (
+          <p className="rounded-md border border-dashed border-border p-4 text-xs text-subtle sm:col-span-2">
+            Online games have no ending, so they have no completion level or completion date. Use the playing
+            status to say whether you still play it.
+          </p>
+        ) : (
+          <>
+            <Field id="completion_status" label="Completion status">
+              <Controller
+                control={control}
+                name="completion_status"
+                render={({ field }) => (
+                  <OptionSelect
+                    id="completion_status"
+                    value={field.value}
+                    onValueChange={field.onChange}
+                    options={COMPLETION_STATUSES.map((s) => ({ value: s, label: COMPLETION_LABEL[s] }))}
+                  />
+                )}
               />
-            )}
-          />
-        </Field>
-        <Field id="completed_on" label="Completion date" error={err("completed_on")} hint="Optional. Leave it empty if you don't remember.">
-          <Input id="completed_on" type="date" {...register("completed_on")} {...aria("completed_on")} />
-        </Field>
+            </Field>
+            <Field id="completed_on" label="Completion date" error={err("completed_on")} hint="Optional. Leave it empty if you don't remember.">
+              <Input id="completed_on" type="date" {...register("completed_on")} {...aria("completed_on")} />
+            </Field>
+          </>
+        )}
         <div className="flex items-center justify-between gap-4 rounded-md border border-border p-4 sm:self-end">
           <div>
             <label htmlFor="featured" className="text-sm font-medium">Feature on the home page</label>

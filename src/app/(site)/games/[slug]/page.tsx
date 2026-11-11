@@ -110,16 +110,19 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
               </p>
             )}
 
-            <dl className="mt-10 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-border pt-8 sm:grid-cols-4">
+            <dl className={cn("mt-10 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-border pt-8", game.is_online ? "sm:grid-cols-3" : "sm:grid-cols-4")}>
               <Fact icon={Star} label="My rating">
                 <Rating value={game.rating} size="lg" />
               </Fact>
               <Fact icon={Flag} label="Status">
                 <StatusBadge status={game.play_status} className="text-sm text-foreground" />
               </Fact>
-              <Fact icon={Trophy} label="Completion">
-                <CompletionBadge status={game.completion_status} />
-              </Fact>
+              {/* An online game has no ending, so there is no completion level to show. */}
+              {!game.is_online && (
+                <Fact icon={Trophy} label="Completion">
+                  <CompletionBadge status={game.completion_status} />
+                </Fact>
+              )}
               <Fact icon={Clock} label="Playtime">
                 <span className="text-sm">{formatPlaytime(game.playtime_hours) ?? "-"}</span>
               </Fact>
