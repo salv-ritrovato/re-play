@@ -28,7 +28,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getGameBySlug, getRelatedGames } from "@/lib/data/public";
 import { excerpt, formatDate, formatPlaytime, yearOf } from "@/lib/format";
 import { mediaUrl } from "@/lib/media";
-import { LAUNCHER_NAME, type GameDetail } from "@/lib/types";
+import { COMPLETION_LABEL, LAUNCHER_NAME, type GameDetail } from "@/lib/types";
 
 export async function generateMetadata({ params }: PageProps<"/games/[slug]">): Promise<Metadata> {
   const { slug } = await params;
@@ -159,22 +159,8 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
               <Detail icon={Store} label="Publisher" value={game.publisher} />
               <Detail icon={Layers} label="Genres" value={game.genres.map((g) => g.name).join(", ") || null} />
               <Detail icon={Monitor} label="Platforms" value={game.platforms.map((p) => p.name).join(", ") || null} />
-              {game.launchers.length > 0 && (
-                <Detail
-                  icon={Rocket}
-                  label="Played via"
-                  value={
-                    <ul className="space-y-1.5">
-                      {game.launchers.map((id) => (
-                        <li key={id} className="flex items-center gap-2">
-                          <LauncherIcon id={id} className="size-4 text-muted-foreground" />
-                          {LAUNCHER_NAME[id]}
-                        </li>
-                      ))}
-                    </ul>
-                  }
-                />
-              )}
+              {/* With a written take, where it was played lives next to the review instead. */}
+              {!hasPersonal && <PlayedVia game={game} />}
             </dl>
           </div>
         </Section>
@@ -214,12 +200,52 @@ function PersonalSection({ game }: { game: GameDetail }) {
           )}
         </div>
 
-        <aside aria-label="Play history" className="space-y-5 text-sm lg:border-l lg:border-border lg:pl-8">
-          <Detail icon={CalendarCheck} label="Completed" value={completed} />
-          <Detail icon={Clock} label="Playtime" value={formatPlaytime(game.playtime_hours)} />
+        {/* The border runs the full height of the review; the card inside follows you while you read. */}
+        <aside aria-label="My playthrough" className="lg:border-l lg:border-border lg:pl-8">
+          <dl className="space-y-6 text-sm lg:sticky lg:top-24">
+            <Detail icon={Star} label="My rating" value={<Rating value={game.rating} size="lg" />} />
+            <Detail
+              icon={Trophy}
+              label="Completion"
+              value={
+                <span className="block space-y-0.5">
+                  <span className="block">{COMPLETION_LABEL[game.completion_status]}</span>
+                  {completed && (
+                    <span className="flex items-center gap-1.5 text-muted-foreground">
+                      <CalendarCheck aria-hidden className="size-3.5" />
+                      {completed}
+                    </span>
+                  )}
+                </span>
+              }
+            />
+            <Detail icon={Clock} label="Playtime" value={formatPlaytime(game.playtime_hours)} />
+            <PlayedVia game={game} />
+          </dl>
         </aside>
       </div>
     </section>
+  );
+}
+
+/** The launchers the game is owned on, as the owner plays it. (Platforms are where the game exists, not where it was played.) */
+function PlayedVia({ game }: { game: GameDetail }) {
+  if (game.launchers.length === 0) return null;
+  return (
+    <Detail
+      icon={Rocket}
+      label="Played via"
+      value={
+        <ul className="space-y-1.5">
+          {game.launchers.map((id) => (
+            <li key={id} className="flex items-center gap-2">
+              <LauncherIcon id={id} className="size-4 text-muted-foreground" />
+              {LAUNCHER_NAME[id]}
+            </li>
+          ))}
+        </ul>
+      }
+    />
   );
 }
 

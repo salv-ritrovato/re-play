@@ -33,7 +33,9 @@ integrato sotto `/admin`.
   (genere, piattaforma, anno, stato, completamento, voto, tipo solo/online), ordinamenti e paginazione.
   Filtri e ordinamento vivono nell'URL, quindi ogni vista è condivisibile.
 - **Gioco** (`/games/[slug]`): scheda con copertina, metadati, voto, pro e contro e recensione in inglese e
-  italiano (tab EN/IT).
+  italiano (tab EN/IT). Accanto alla recensione c'è la scheda **"My playthrough"** (resta in vista mentre si
+  scorre): voto, livello e data di completamento, ore e launcher ("Played via"). Le piattaforme restano tra i
+  dettagli del gioco, perché indicano dove il gioco *esce*, non dove è stato giocato.
 - **Sviluppatore** (`/developers/[slug]`): cliccando il nome di uno sviluppatore (su card, righe della lista,
   gioco in evidenza e scheda del gioco) si apre la pagina con tutti i suoi giochi, dal più recente, con
   numero di giochi e voto medio. Se il campo ne elenca più d'uno ("2K Australia, Gearbox Software") ogni
