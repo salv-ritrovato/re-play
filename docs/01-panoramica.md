@@ -29,7 +29,7 @@ integrato sotto `/admin`.
 - **Overview** (`/`): numeri chiave (giochi, ore giocate, voto medio, voto più alto), gioco in evidenza e scaffali
   "Recently added" (solo i giochi aggiunti negli ultimi 7 giorni, `RECENT_DAYS`; se non ce ne sono, lo
   scaffale non compare), "Browse by genre" (blocchi con i generi e il numero di giochi, che aprono la
-  libreria già filtrata), "Latest reviews", "Highest rated" e "Lowest rated" ("The blunt truth": mai gli
+  libreria già filtrata), "Highest rated" e "Lowest rated" ("The blunt truth": mai gli
   stessi giochi di "Highest rated"). Nell'intestazione c'è anche **"Surprise me"**, che apre un gioco a caso
   (`/random`), e in fondo una striscia "Who's behind the reviews" con il link all'About. Non c'è più "Playing now": i giochi si aggiungono
   quando sono finiti.

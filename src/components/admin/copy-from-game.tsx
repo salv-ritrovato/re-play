@@ -60,7 +60,7 @@ export function CopyFromGame({ onCopy }: { onCopy: (game: GameTemplate) => Copie
         </h2>
         <p className="text-xs text-subtle">
           Copies developer, publisher, genres, platforms, launchers, tags and the online flag. Handy for series,
-          sequels and the same studio. Title, rating, review and cover are never copied.
+          sequels and games from the same studio. Title, rating, review and cover are never copied.
         </p>
       </div>
 

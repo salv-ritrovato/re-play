@@ -24,7 +24,7 @@ export default function HomePage() {
 }
 
 async function HomeContent() {
-  const { totals, recentlyAdded, recentlyReviewed, topRated, lowestRated, genreTiles, featured } = await getHomeData();
+  const { totals, recentlyAdded, topRated, lowestRated, genreTiles, featured } = await getHomeData();
   const isEmpty = !totals || totals.total_games === 0;
 
   return (
@@ -119,15 +119,6 @@ async function HomeContent() {
                   ))}
                 </ul>
               </Section>
-            )}
-            {recentlyReviewed.length > 0 && (
-              <Shelf
-                title="Latest reviews"
-                eyebrow="Reviews"
-                games={recentlyReviewed.slice(0, 6)}
-                href="/reviews"
-                hrefLabel="All reviews"
-              />
             )}
             {topRated.length > 0 && (
               <Shelf

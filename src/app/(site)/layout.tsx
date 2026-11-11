@@ -30,7 +30,7 @@ function SetupRequired() {
         <code className="rounded bg-elevated px-1.5 py-0.5 text-sm">.env.local</code>, fill in{" "}
         <code className="rounded bg-elevated px-1.5 py-0.5 text-sm">NEXT_PUBLIC_SUPABASE_URL</code> and{" "}
         <code className="rounded bg-elevated px-1.5 py-0.5 text-sm">NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code>,
-        apply the SQL migration in <code className="rounded bg-elevated px-1.5 py-0.5 text-sm">supabase/migrations</code>,
+        apply the SQL migrations in<code className="rounded bg-elevated px-1.5 py-0.5 text-sm">supabase/migrations</code>,
         then restart the dev server.
       </p>
     </div>

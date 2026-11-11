@@ -25,7 +25,7 @@ export default function GlobalError({
         The archive hit an unexpected error
       </h1>
       <p className="max-w-md text-muted-foreground">
-        Nothing was lost. Try again, and if it keeps happening check that the Supabase environment
+        Nothing was lost. Try again, and if it keeps happening, check that the Supabase environment
         variables are configured.
       </p>
       <Button onClick={reset}>Try again</Button>

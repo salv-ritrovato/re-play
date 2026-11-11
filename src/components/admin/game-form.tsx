@@ -437,7 +437,7 @@ export function GameForm({
         <div className="flex items-center justify-between gap-4 rounded-md border border-border p-4 sm:self-end">
           <div>
             <label htmlFor="featured" className="text-sm font-medium">Feature on the home page</label>
-            <p className="text-xs text-subtle">Only one game is shown at a time (the latest updated).</p>
+            <p className="text-xs text-subtle">Only one game is shown at a time (the most recently updated one).</p>
           </div>
           <Controller
             control={control}

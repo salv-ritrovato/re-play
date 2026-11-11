@@ -67,7 +67,7 @@ export function DeleteGameButton({
         <AlertDialogHeader>
           <AlertDialogTitle>Delete “{title}”?</AlertDialogTitle>
           <AlertDialogDescription>
-            This permanently removes the game, its review, rating, cover and all uploaded images.
+            This permanently removes the game, its review, rating and cover.
             This can&apos;t be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>

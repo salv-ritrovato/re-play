@@ -82,7 +82,7 @@ async function StatsContent() {
         <Section eyebrow="Timeline" title="Games played by year">
           <Columns
             items={yearItems}
-            emptyLabel="Add start or completion dates to see your timeline."
+            emptyLabel="Add completion dates to see your timeline."
           />
         </Section>
       </div>

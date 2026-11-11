@@ -43,15 +43,15 @@ export const about: Record<Lang, AboutContent> = {
       {
         heading: "From consoles to the PC",
         paragraphs: [
-          "Over the years I've owned every Nintendo console and every PlayStation up to the 3. After the PS3 I went all-in on PC gaming, with the dream of becoming a competitive player.",
+          "Over the years I've owned every Nintendo console and every PlayStation up to the PS3. After the PS3 I went all-in on PC gaming, with the dream of becoming a competitive player.",
           "I've played many competitive titles and I've always been in the high ranks. Among my favourites, the ones that made my “story”, are definitely World of Warcraft, Hearthstone, League of Legends and Rainbow Six: Siege.",
         ],
       },
       {
         heading: "Beyond the games",
         paragraphs: [
-          "My interests are wide, and most of them live in the nerd world: anime, manga, comics, TV series, fantasy books and, of course, video games.",
-          "By trade I'm an AI-Assisted Software Developer, so I love every modern technology, especially anything that touches the world of electronics.",
+          "My interests are wide-ranging, and most of them live in the nerd world: anime, manga, comics, TV series, fantasy books and, of course, video games.",
+          "I work as an AI-Assisted Software Developer, so I love all modern technology, especially anything that touches the world of electronics.",
           "For years I've also loved fitness, bodybuilding in particular, which I mostly use as an outlet.",
         ],
       },
@@ -62,7 +62,7 @@ export const about: Record<Lang, AboutContent> = {
     facts: [
       { icon: "games", label: "Games played", value: "1,500+" },
       { icon: "heart", label: "Childhood favourite", value: "Jurassic War (MS-DOS)" },
-      { icon: "console", label: "Consoles owned", value: "Every Nintendo, every PlayStation up to the 3" },
+      { icon: "console", label: "Consoles owned", value: "Every Nintendo console, every PlayStation up to the PS3" },
       { icon: "pc", label: "Then", value: "PC gaming, aiming at competitive play" },
       { icon: "story", label: "Games that made my story", value: "World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege" },
     ],
