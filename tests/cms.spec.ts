@@ -407,6 +407,43 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByText("9-10")).toBeVisible();
   });
 
+  test("the home page carousel shows the reviews of games rated 9 or more (5 at most)", async ({ page }) => {
+    // The test game was just raised to 9.5 and has a review in both languages.
+    await page.goto("/");
+    const carousel = page.getByRole("region", { name: "Standout reviews" });
+    await expect(carousel).toBeVisible();
+    const slides = carousel.getByRole("group", { name: /^\d+ of \d+$/ });
+    const count = await slides.count();
+    expect(count).toBeGreaterThanOrEqual(1);
+    expect(count).toBeLessThanOrEqual(5);
+
+    // Every slide is rated 9 or more, best first: the test game (9.5) opens the carousel.
+    const labels = await carousel
+      .locator('[aria-label^="Rated"]')
+      .evaluateAll((els) => els.map((e) => e.getAttribute("aria-label") ?? ""));
+    for (const label of labels) expect(Number(label.match(/Rated ([\d.]+)/)![1])).toBeGreaterThanOrEqual(9);
+    await expect(slides.first()).toContainText(title);
+    await expect(slides.first()).toContainText("Updated English review.");
+
+    // The same review can be read in Italian.
+    await carousel.getByRole("button", { name: "Italiano" }).click();
+    await expect(slides.first()).toContainText("Recensione italiana aggiornata.");
+    await expect(slides.first().getByRole("link", { name: /Leggi la recensione completa/ })).toBeVisible();
+    await carousel.getByRole("button", { name: "English" }).click();
+
+    // With more than one review, arrows and dots move between them.
+    if (count > 1) {
+      await carousel.getByRole("button", { name: "Next review" }).click();
+      await expect(carousel.getByRole("button", { name: /\(2 of \d+\)/ })).toHaveAttribute("aria-current", "true");
+      await carousel.getByRole("button", { name: /\(1 of \d+\)/ }).click();
+      await expect(carousel.getByRole("button", { name: /\(1 of \d+\)/ })).toHaveAttribute("aria-current", "true");
+    }
+
+    // "Read the full review" opens the game.
+    await slides.first().getByRole("link", { name: /Read the full review/ }).click();
+    await expect(page).toHaveURL(new RegExp(`/games/${slug}$`));
+  });
+
   test("replace and remove the cover", async ({ page }) => {
     await page.goto(`/admin/games?q=${encodeURIComponent(title)}`);
     await page.getByRole("link", { name: `Edit ${title}` }).click();

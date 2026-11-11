@@ -26,7 +26,9 @@ integrato sotto `/admin`.
 
 ### Parte pubblica
 
-- **Overview** (`/`): numeri chiave (giochi, ore giocate, voto medio, voto più alto), gioco in evidenza e scaffali
+- **Overview** (`/`): numeri chiave (giochi, ore giocate, voto medio, voto più alto), il **carosello "Standout reviews"** (le
+  recensioni dei giochi con voto 9 o più, al massimo 5, anche in italiano), il gioco scelto con "Feature on the
+  home page" (se c'è) e gli scaffali
   "Recently added" (solo i giochi aggiunti negli ultimi 7 giorni, `RECENT_DAYS`; se non ce ne sono, lo
   scaffale non compare), "Browse by genre" (blocchi con i generi e il numero di giochi, che aprono la
   libreria già filtrata), "Highest rated" e "Lowest rated" ("The blunt truth": mai gli

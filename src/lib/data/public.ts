@@ -262,6 +262,10 @@ export async function getOgOverview() {
 // ---------------------------------------------------------------------------
 // Home
 // ---------------------------------------------------------------------------
+/** The home page carousel shows the reviews of games rated at least this much, at most STANDOUT_MAX of them. */
+export const STANDOUT_MIN_RATING = 9;
+export const STANDOUT_MAX = 5;
+
 /** The home page "Recently added" shelf only shows games added within this many days. */
 export const RECENT_DAYS = 7;
 
@@ -274,7 +278,7 @@ export async function getHomeData() {
   const search = (sort: string, extra: Record<string, unknown> = {}, limit = 8) =>
     supabase.rpc("library_search", { p_sort: sort, p_limit: limit, p_offset: 0, ...extra });
 
-  const [totals, added, top, featured, lowest, genreCounts] = await Promise.all([
+  const [totals, added, top, featured, lowest, genreCounts, standout] = await Promise.all([
     supabase.from("stats_totals").select("*").maybeSingle(),
     search("added"),
     search("rating_desc", { p_min_rating: 0 }),
@@ -287,8 +291,9 @@ export async function getHomeData() {
       .maybeSingle(),
     search("rating_asc", { p_min_rating: 0 }),
     supabase.from("genres").select("id, name, game_genres(count)"),
+    search("rating_desc", { p_min_rating: STANDOUT_MIN_RATING, p_reviewed_only: true }, STANDOUT_MAX),
   ]);
-  for (const r of [totals, added, top, featured, lowest, genreCounts]) {
+  for (const r of [totals, added, top, featured, lowest, genreCounts, standout]) {
     if (r.error) fail("getHomeData", r.error);
   }
 
@@ -316,6 +321,7 @@ export async function getHomeData() {
     topRated: rated.slice(0, 6),
     lowestRated,
     genreTiles,
+    standout: ((standout.data ?? []) as GameSummary[]).filter((g) => g.rating !== null),
     featured: featured.data
       ? normalizeDetail(featured.data as unknown as RawDetail)
       : null,

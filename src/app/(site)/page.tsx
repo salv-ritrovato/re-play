@@ -3,6 +3,7 @@ import { ArrowRight, Clock, Gamepad2, Shuffle, Star, Trophy, type LucideIcon } f
 import { Rating } from "@/components/games/badges";
 import { DeveloperLinks } from "@/components/games/developer-links";
 import { GameCard } from "@/components/games/game-card";
+import { StandoutCarousel, type StandoutSlide } from "@/components/games/standout-carousel";
 import { GameCover } from "@/components/games/game-cover";
 import { EmptyState } from "@/components/layout/empty-state";
 import { Container, Section } from "@/components/layout/page-header";
@@ -24,7 +25,17 @@ export default function HomePage() {
 }
 
 async function HomeContent() {
-  const { totals, recentlyAdded, topRated, lowestRated, genreTiles, featured } = await getHomeData();
+  const { totals, recentlyAdded, topRated, lowestRated, genreTiles, featured, standout } = await getHomeData();
+  const slides: StandoutSlide[] = standout.map((g) => ({
+    slug: g.slug,
+    title: g.title,
+    year: yearOf(g.release_date),
+    developer: g.developer,
+    rating: Number(g.rating),
+    cover_path: g.cover_path,
+    cover_blur: g.cover_blur,
+    excerpt: { en: excerpt(g.review_en, 300), it: g.review_it ? excerpt(g.review_it, 300) : null },
+  }));
   const isEmpty = !totals || totals.total_games === 0;
 
   return (
@@ -78,7 +89,8 @@ async function HomeContent() {
           />
         ) : (
           <>
-            <Featured game={featured} fallback={topRated[0]} />
+            {slides.length > 0 && <StandoutCarousel slides={slides} label="Standout reviews" />}
+            {featured && <Featured game={featured} />}
 
             {recentlyAdded.length > 0 && (
               <Shelf
@@ -215,22 +227,16 @@ function Shelf({
   );
 }
 
-function Featured({
-  game,
-  fallback,
-}: {
-  game: Awaited<ReturnType<typeof getHomeData>>["featured"];
-  fallback?: GameSummary;
-}) {
-  const g = game ?? fallback;
-  if (!g) return null;
+/** The game the owner picked with "Feature on the home page" (no automatic fallback: the carousel covers the best ones). */
+function Featured({ game }: { game: NonNullable<Awaited<ReturnType<typeof getHomeData>>["featured"]> }) {
+  const g = game;
   const year = yearOf(g.release_date);
   const text =
     g.short_description || g.review_en || ("description" in g ? g.description : null) || "";
 
   return (
     <section aria-labelledby="featured" className="space-y-6">
-      <p className="eyebrow">{game ? "Featured" : "Standout"}</p>
+      <p className="eyebrow">Featured</p>
       {/* The title link is stretched over the whole card, which leaves room for the developer links. */}
       <div className="group relative grid gap-8 rounded-md border border-border bg-surface p-5 transition-colors hover:border-muted-foreground/40 sm:grid-cols-[14rem_1fr] sm:gap-12 sm:p-8 lg:grid-cols-[18rem_1fr] lg:p-10">
         <GameCover

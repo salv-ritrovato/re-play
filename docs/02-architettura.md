@@ -82,6 +82,14 @@ di debug.
 
 ## Home
 
+**Carosello "Standout reviews"** (`src/components/games/standout-carousel.tsx`): una slide per gioco con
+copertina, titolo, anno e sviluppatore, voto, l'inizio della recensione e il link "Read the full review". I
+giochi sono quelli con voto **almeno 9** (`STANDOUT_MIN_RATING`) e una recensione, dal voto più alto, **al
+massimo 5** (`STANDOUT_MAX`), presi con `library_search`. Scorre di lato con scorrimento a scatti (swipe, frecce,
+puntini e tasti freccia), non parte da solo e ha i ruoli ARIA di un carosello; un selettore English/Italiano
+cambia la lingua dell'estratto. Con una sola recensione i comandi non compaiono. Prende il posto dell'ex
+"Standout" automatico: il blocco "Featured" resta solo per il gioco scelto a mano nel form.
+
 `getHomeData()` (`src/lib/data/public.ts`, in cache) prepara tutto in una volta: numeri, gioco in evidenza,
 scaffali e i dati dei nuovi blocchi. I generi per "Browse by genre" arrivano da `genres` con il conteggio
 delle righe di `game_genres`; "Lowest rated" usa `library_search` con ordinamento `rating_asc` ed esclude i
