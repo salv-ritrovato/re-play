@@ -40,13 +40,10 @@ Le copertine sono compresse **due volte**:
 
 1. **Browser** (`src/lib/client-image.ts`): ridimensionamento e conversione WebP su canvas prima dell'upload,
    per non inviare file enormi.
-2. **Server** (`src/lib/images.ts`, `sharp`): rotazione EXIF, rimozione metadati, adattamento a un riquadro 3:4 di
-   900×1200, WebP qualità 80, e calcolo di un **blur placeholder** salvato in `games.cover_blur`.
-   L'adattamento **non taglia mai la grafica**: se le proporzioni sono entro il 4% da 3:4 si ritaglia (la perdita
-   non si nota), altrimenti l'immagine intera viene ridotta per stare nel riquadro e i lati vuoti sono riempiti
-   con una copia sfocata e scurita della stessa grafica. L'anteprima nel form mostra lo stesso risultato. Le
-   copertine già salvate restano com'erano (l'originale non viene conservato): per sistemarne una basta
-   ricaricarla dal form.
+2. **Server** (`src/lib/images.ts`, `sharp`): rotazione EXIF, rimozione metadati, ritaglio 3:4 a
+   900×1200, WebP qualità 80, e calcolo di un **blur placeholder** salvato in `games.cover_blur`. Il ritaglio
+   tiene la parte più interessante dell'immagine (`sharp.strategy.attention`), ma una grafica con proporzioni
+   molto diverse da 3:4 perde i bordi.
 
 In lettura, `next/image` serve AVIF/WebP alla dimensione giusta (`qualities` 60/75/85, `remotePatterns`
 verso Supabase). Le server action accettano body fino a 12 MB (`serverActions.bodySizeLimit`).

@@ -1,7 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { cleanupE2E } from "./cleanup";
-import sharp from "sharp";
-import { expectPreviewImage, login, makeBandedImage, makeImage, owner, uniqueTitle } from "./helpers";
+import { expectPreviewImage, login, makeImage, owner, uniqueTitle } from "./helpers";
 
 test.skip(!owner.username || !owner.password, "E2E_USERNAME / E2E_PASSWORD not set");
 
@@ -449,41 +448,6 @@ test.describe.serial("CMS end to end", () => {
     // "Read the full review" opens the game.
     await slides.first().getByRole("link", { name: /Read the full review/ }).click();
     await expect(page).toHaveURL(new RegExp(`/games/${slug}$`));
-  });
-
-  test("a cover with other proportions is shown whole, not cropped", async ({ page, request }) => {
-    await page.goto(`/admin/games?q=${encodeURIComponent(title)}`);
-    await page.getByRole("link", { name: `Edit ${title}` }).click();
-    // Tall art (1:2) does not fit a 3:4 frame; its top and bottom bands must survive.
-    await page.locator('input[type="file"]').setInputFiles(await makeBandedImage(1200, 2400));
-    await expect(page.getByText(/Cover ready/)).toBeVisible();
-    await page.getByRole("button", { name: "Save changes" }).click();
-    await expect(page).toHaveURL(/\/admin\/games$/);
-
-    // The stored file is the real 3:4 cover: read it from the address behind the optimized image.
-    await page.goto(`/games/${slug}`);
-    const src = await page.getByAltText(`${title} cover`).getAttribute("src");
-    const stored = new URL(src!, page.url()).searchParams.get("url")!;
-    const res = await request.get(stored);
-    expect(res.ok()).toBe(true);
-    const { data, info } = await sharp(await res.body())
-      .removeAlpha()
-      .raw()
-      .toBuffer({ resolveWithObject: true });
-    expect([info.width, info.height]).toEqual([900, 1200]);
-    const pixel = (x: number, y: number) => {
-      const i = (y * info.width + x) * 3;
-      return { r: data[i], g: data[i + 1], b: data[i + 2] };
-    };
-    const top = pixel(450, 6); // the red band, at the very top of the frame
-    const bottom = pixel(450, 1193); // the blue band, at the very bottom
-    expect(top.r).toBeGreaterThan(170);
-    expect(top.g).toBeLessThan(90);
-    expect(bottom.b).toBeGreaterThan(170);
-    expect(bottom.r).toBeLessThan(90);
-    // The sides are filled with a darkened, blurred copy, not left empty or white.
-    const side = pixel(10, 600);
-    expect(side.r + side.g + side.b).toBeLessThan(300);
   });
 
   test("replace and remove the cover", async ({ page }) => {

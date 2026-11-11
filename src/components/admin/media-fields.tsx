@@ -70,28 +70,14 @@ export function MediaFields({
         )}
       >
         {coverSrc ? (
-          <>
-            {/* A new upload is shown whole, over a blurred copy: what the server will store (the stored cover is already 3:4). */}
-            {value.cover && (
-              <Image
-                src={coverSrc}
-                alt=""
-                aria-hidden
-                fill
-                sizes="176px"
-                unoptimized
-                className="scale-110 object-cover opacity-50 blur-xl"
-              />
-            )}
-            <Image
-              src={coverSrc}
-              alt={`Cover preview for ${title || "this game"}`}
-              fill
-              sizes="176px"
-              unoptimized={Boolean(value.cover)}
-              className={value.cover ? "object-contain" : "object-cover"}
-            />
-          </>
+          <Image
+            src={coverSrc}
+            alt={`Cover preview for ${title || "this game"}`}
+            fill
+            sizes="176px"
+            unoptimized={Boolean(value.cover)}
+            className="object-cover"
+          />
         ) : (
           <div className="flex h-full flex-col items-center justify-center gap-2 p-3 text-center text-xs text-subtle">
             <ImagePlus className="size-5" />
@@ -105,8 +91,7 @@ export function MediaFields({
           <p className="text-sm font-medium">Cover artwork</p>
           <p className="mt-1 text-xs text-subtle">
             JPEG, PNG, WebP or AVIF. Automatically resized and compressed to WebP (3:4) before and
-            after upload. Art that is not 3:4 is never cropped: it is shown whole, with a blurred copy filling the
-            sides.
+            after upload.
           </p>
         </div>
         <input
