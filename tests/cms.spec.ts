@@ -214,6 +214,15 @@ test.describe.serial("CMS end to end", () => {
     const launchers = page.locator("dt", { hasText: "Played via" }).locator("xpath=following-sibling::dd");
     await expect(launchers).toContainText("Steam");
     await expect(launchers).toContainText("Ubisoft Connect");
+
+    // The side card next to the review adds what the top block does not say, and repeats nothing.
+    const side = page.getByRole("complementary", { name: "My playthrough" });
+    await expect(side).toContainText("Played via");
+    await expect(side).toContainText("e2e-tag");
+    await expect(side).toContainText("20 July 2021"); // completion date
+    for (const repeated of ["My rating", "Completion", "Playtime"]) {
+      await expect(side).not.toContainText(repeated);
+    }
     await expect(page.getByText("7.5").first()).toBeVisible();
 
     // Both languages are available, English first.

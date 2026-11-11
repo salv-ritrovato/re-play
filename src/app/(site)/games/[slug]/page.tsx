@@ -9,6 +9,7 @@ import {
   Rocket,
   Star,
   Store,
+  Tag,
   Trophy,
   type LucideIcon,
 } from "lucide-react";
@@ -28,7 +29,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { getGameBySlug, getRelatedGames } from "@/lib/data/public";
 import { excerpt, formatDate, formatPlaytime, yearOf } from "@/lib/format";
 import { mediaUrl } from "@/lib/media";
-import { COMPLETION_LABEL, LAUNCHER_NAME, type GameDetail } from "@/lib/types";
+import { LAUNCHER_NAME, type GameDetail } from "@/lib/types";
+import { cn } from "@/lib/utils";
 
 export async function generateMetadata({ params }: PageProps<"/games/[slug]">): Promise<Metadata> {
   const { slug } = await params;
@@ -122,19 +124,6 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
                 <span className="text-sm">{formatPlaytime(game.playtime_hours) ?? "-"}</span>
               </Fact>
             </dl>
-
-            {game.tags.length > 0 && (
-              <ul className="mt-8 flex flex-wrap gap-1.5" aria-label="Tags">
-                {game.tags.map((t) => (
-                  <li
-                    key={t.id}
-                    className="rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground"
-                  >
-                    {t.name}
-                  </li>
-                ))}
-              </ul>
-            )}
           </div>
         </Container>
       </div>
@@ -176,10 +165,12 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
 // ---------------------------------------------------------------------------
 function PersonalSection({ game }: { game: GameDetail }) {
   const completed = formatDate(game.completed_on);
+  // Rating, completion level and playtime are already in the block at the top of the page.
+  const hasAside = Boolean(completed) || game.launchers.length > 0 || game.tags.length > 0;
 
   return (
     <section aria-labelledby="my-take" className="rounded-md border border-border bg-card/50">
-      <div className="grid gap-12 p-6 sm:p-10 lg:grid-cols-[1fr_17rem] lg:p-14">
+      <div className={cn("grid gap-12 p-6 sm:p-10 lg:p-14", hasAside && "lg:grid-cols-[1fr_17rem]")}>
         <div>
           <p className="eyebrow text-violet">My take</p>
           <h2 id="my-take" className="sr-only">Personal review of {game.title}</h2>
@@ -201,28 +192,29 @@ function PersonalSection({ game }: { game: GameDetail }) {
         </div>
 
         {/* The border runs the full height of the review; the card inside follows you while you read. */}
-        <aside aria-label="My playthrough" className="lg:border-l lg:border-border lg:pl-8">
-          <dl className="space-y-6 text-sm lg:sticky lg:top-24">
-            <Detail icon={Star} label="My rating" value={<Rating value={game.rating} size="lg" />} />
-            <Detail
-              icon={Trophy}
-              label="Completion"
-              value={
-                <span className="block space-y-0.5">
-                  <span className="block">{COMPLETION_LABEL[game.completion_status]}</span>
-                  {completed && (
-                    <span className="flex items-center gap-1.5 text-muted-foreground">
-                      <CalendarCheck aria-hidden className="size-3.5" />
-                      {completed}
-                    </span>
-                  )}
-                </span>
-              }
-            />
-            <Detail icon={Clock} label="Playtime" value={formatPlaytime(game.playtime_hours)} />
-            <PlayedVia game={game} />
-          </dl>
-        </aside>
+        {hasAside && (
+          <aside aria-label="My playthrough" className="lg:border-l lg:border-border lg:pl-8">
+            <dl className="space-y-6 text-sm lg:sticky lg:top-24">
+              {completed && <Detail icon={CalendarCheck} label="Completed" value={completed} />}
+              <PlayedVia game={game} />
+              {game.tags.length > 0 && (
+                <Detail
+                  icon={Tag}
+                  label="Tags"
+                  value={
+                    <ul className="flex flex-wrap gap-1.5">
+                      {game.tags.map((t) => (
+                        <li key={t.id} className="rounded-md border border-border px-2.5 py-1 text-xs text-muted-foreground">
+                          {t.name}
+                        </li>
+                      ))}
+                    </ul>
+                  }
+                />
+              )}
+            </dl>
+          </aside>
+        )}
       </div>
     </section>
   );
