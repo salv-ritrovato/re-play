@@ -93,6 +93,18 @@ test.describe("public navigation", () => {
     const res = await request.get("/random", { maxRedirects: 0 });
     expect(res.status()).toBe(307);
     expect(res.headers()["location"]).toMatch(/\/(games\/[a-z0-9-]+|library)$/);
+    expect(res.headers()["cache-control"]).toContain("no-store");
+
+    // Every click leads to a different title: never the same twice in a row, and no repeats while the
+    // archive still has unseen games (the request context keeps the memory cookie, like a browser).
+    await page.goto("/library");
+    const total = Number((await page.getByText(/^\d+ games?/).first().innerText()).match(/\d+/)![0]);
+    const picks: string[] = [];
+    for (let i = 0; i < Math.min(8, total - 1); i++) {
+      const r = await request.get("/random", { maxRedirects: 0 });
+      picks.push(r.headers()["location"]);
+    }
+    expect(new Set(picks).size).toBe(picks.length);
 
     // A short word about the owner, with the way to the About page.
     await page.goto("/");

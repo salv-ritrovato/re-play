@@ -63,7 +63,10 @@ scaffali e i dati dei nuovi blocchi. I generi per "Browse by genre" arrivano da 
 delle righe di `game_genres`; "Lowest rated" usa `library_search` con ordinamento `rating_asc` ed esclude i
 giochi già in "Highest rated". "Surprise me" punta a `src/app/(site)/random/route.ts`: un route handler che,
 con `connection()` per non essere prerenderizzato, sceglie uno slug a caso da `getAllSlugs()` e risponde con un
-redirect 307 (verso la libreria se l'archivio è vuoto). Il pulsante non usa il prefetch, perché aprirebbe un
+redirect 307 (verso la libreria se l'archivio è vuoto), con `Cache-Control: no-store`. Ogni clic porta a un
+titolo diverso: un piccolo cookie (`random_seen`, gli ultimi 30 slug mostrati, 30 giorni, nessun dato personale)
+ricorda gli ultimi giochi proposti e li esclude, quindi non si ripete mai lo stesso gioco di fila e, con pochi
+giochi, si vedono quasi tutti prima che uno ricompaia. Il pulsante non usa il prefetch, perché aprirebbe un
 gioco a caso già in anticipo.
 
 ## Pagine degli sviluppatori
