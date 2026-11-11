@@ -19,11 +19,13 @@ import {
   COMPLETION_STATUSES,
   LAUNCHER_NAME,
   PLAY_STATUSES,
+  RANK_SUGGESTIONS,
   PLAY_STATUS_LABEL,
   type GameDetail,
   type GameTemplate,
   type Taxonomy,
 } from "@/lib/types";
+import { cn } from "@/lib/utils";
 import { gameSchema, type GameFormInput, type GameFormValues } from "@/lib/validation";
 import { CopyFromGame, type CopiedItem } from "./copy-from-game";
 import { DeleteGameButton } from "./delete-game-button";
@@ -63,6 +65,7 @@ function toDefaults(game?: GameDetail): GameFormInput {
     cons: game?.cons.join("\n") ?? "",
     featured: game?.featured ?? false,
     is_online: game?.is_online ?? false,
+    rank: game?.is_online ? (game.rank ?? "") : "",
   };
 }
 
@@ -97,6 +100,7 @@ export function GameForm({
   const errors = formState.errors;
   const title = useWatch({ control, name: "title" });
   const isOnline = useWatch({ control, name: "is_online" });
+  const rank = useWatch({ control, name: "rank" });
 
   // Warn before a full page reload / tab close would throw away unsaved work (this also catches
   // reloads the browser performs on its own, e.g. after a new deployment).
@@ -141,7 +145,10 @@ export function GameForm({
   /** Flags the game as online. An online game has no ending, so completion is cleared and "completed" is not offered. */
   function changeOnline(on: boolean) {
     setValue("is_online", on, { shouldDirty: true });
-    if (!on) return;
+    if (!on) {
+      setValue("rank", "", { shouldDirty: true }); // only online games have a rank
+      return;
+    }
     setValue("completion_status", "none", { shouldDirty: true });
     setValue("completed_on", "", { shouldDirty: true });
     if (!ONLINE_PLAY_STATUSES.includes(form.getValues("play_status"))) {
@@ -368,10 +375,44 @@ export function GameForm({
           />
         </Field>
         {isOnline ? (
-          <p className="rounded-md border border-dashed border-border p-4 text-xs text-subtle sm:col-span-2">
-            Online games have no ending, so they have no completion level or completion date. Use the playing
-            status to say whether you still play it.
-          </p>
+          <>
+            <Field
+              id="rank"
+              label="Rank reached"
+              error={err("rank")}
+              hint="Free text, e.g. Diamond, Legend, Gladiator. Pick None if the game has no ranking."
+              className="sm:col-span-2"
+            >
+              <div className="space-y-2.5">
+                <Input id="rank" maxLength={40} autoComplete="off" {...register("rank")} {...aria("rank")} />
+                <div className="flex flex-wrap gap-1.5" role="group" aria-label="Quick rank picks">
+                  {RANK_SUGGESTIONS.map((r) => {
+                    const on = rank.trim().toLowerCase() === r.toLowerCase();
+                    return (
+                      <button
+                        key={r}
+                        type="button"
+                        aria-pressed={on}
+                        onClick={() => setValue("rank", on ? "" : r, { shouldDirty: true, shouldValidate: true })}
+                        className={cn(
+                          "rounded-md border px-2.5 py-1 text-xs transition-colors outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                          on
+                            ? "border-foreground/70 bg-foreground text-background"
+                            : "border-border text-muted-foreground hover:border-muted-foreground/50 hover:text-foreground",
+                        )}
+                      >
+                        {r}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </Field>
+            <p className="rounded-md border border-dashed border-border p-4 text-xs text-subtle sm:col-span-2">
+              Online games have no ending, so they have no completion level or completion date. Use the playing
+              status to say whether you still play it.
+            </p>
+          </>
         ) : (
           <>
             <Field id="completion_status" label="Completion status">

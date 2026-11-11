@@ -15,6 +15,20 @@ export type LauncherId = (typeof LAUNCHERS)[number]["id"];
 export const LAUNCHER_IDS = LAUNCHERS.map((l) => l.id) as [LauncherId, ...LauncherId[]];
 export const LAUNCHER_NAME = Object.fromEntries(LAUNCHERS.map((l) => [l.id, l.name])) as Record<LauncherId, string>;
 
+/** Rank reached in an online game is free text; these are the quick picks offered in the form. */
+export const NO_RANK = "None";
+export const RANK_SUGGESTIONS = [
+  NO_RANK,
+  "Bronze",
+  "Silver",
+  "Gold",
+  "Platinum",
+  "Diamond",
+  "Master",
+  "Grandmaster",
+  "Champion",
+] as const;
+
 export const PLAY_STATUS_LABEL: Record<PlayStatus, string> = {
   backlog: "Backlog",
   playing: "Playing",
@@ -97,6 +111,8 @@ export interface GameDetail {
   cover_blur: string | null;
   featured: boolean;
   is_online: boolean;
+  /** Rank reached, only for online games ("Diamond", or "None" when the game has no ranking). */
+  rank: string | null;
   launchers: LauncherId[];
   created_at: string;
   updated_at: string;

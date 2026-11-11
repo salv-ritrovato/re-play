@@ -35,6 +35,11 @@ Comportamenti da conoscere:
   passa a Playing) e mostra una nota. La stessa regola vale sul server (`gameSchema`): un gioco online non può
   avere livello o data di completamento né stato "completed". Sul sito pubblico un gioco online non mostra
   il completamento (scheda in alto, lista, data nella barra laterale).
+  Al posto del completamento c'è il **rank raggiunto** ("Rank reached"): testo libero con scelte rapide
+  (None, Bronze, Silver, Gold, Platinum, Diamond, Master, Grandmaster, Champion). "None" serve per i giochi
+  senza classifica. Il rank compare nel blocco in alto della scheda del gioco, al posto del completamento,
+  e solo se compilato; spegnendo l'interruttore online viene azzerato. Le scelte rapide stanno in
+  `RANK_SUGGESTIONS` in `src/lib/types.ts`.
 - **Aggiungi e aggiungine un altro** (solo su "Nuovo gioco"): il pulsante "Add and add another" salva il gioco,
   mostra un avviso e riapre il form **vuoto** con il cursore sul titolo, senza tornare all'elenco. Non porta
   con sé nulla del gioco appena salvato (per i dati in comune si usa il punto successivo).

@@ -293,9 +293,10 @@ test.describe.serial("CMS end to end", () => {
       await expect(page.locator(field)).toHaveValue("");
     }
 
-    // A normal game has a completion level and date...
+    // A normal game has a completion level and date, and no rank...
     await expect(page.locator("#completion_status")).toBeVisible();
     await expect(page.locator("#completed_on")).toBeVisible();
+    await expect(page.locator("#rank")).toHaveCount(0);
     // ...an online one has no ending: both disappear and "Completed" is no longer offered.
     await page.getByRole("switch", { name: "Online / competitive game" }).click();
     await expect(page.locator("#completion_status")).toHaveCount(0);
@@ -305,6 +306,20 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByRole("option", { name: "Completed", exact: true })).toHaveCount(0);
     await expect(page.getByRole("option", { name: "Backlog", exact: true })).toHaveCount(0);
     await page.getByRole("option", { name: "Playing", exact: true }).click();
+
+    // ...while an online game has the rank reached: quick picks (including "None") or free text.
+    await expect(page.locator("#rank")).toBeVisible();
+    const picks = page.getByRole("group", { name: "Quick rank picks" });
+    for (const r of ["None", "Bronze", "Gold", "Diamond", "Grandmaster", "Champion"]) {
+      await expect(picks.getByRole("button", { name: r, exact: true })).toBeVisible();
+    }
+    await picks.getByRole("button", { name: "Diamond", exact: true }).click();
+    await expect(page.locator("#rank")).toHaveValue("Diamond");
+    await expect(picks.getByRole("button", { name: "Diamond", exact: true })).toHaveAttribute("aria-pressed", "true");
+    await picks.getByRole("button", { name: "None", exact: true }).click();
+    await expect(page.locator("#rank")).toHaveValue("None");
+    await page.locator("#rank").fill("Legend");
+    await expect(picks.getByRole("button", { name: "None", exact: true })).toHaveAttribute("aria-pressed", "false");
 
     await page.locator("#title").fill(second);
     // Several studios in one field are listed separately, each with its own page.
@@ -319,6 +334,7 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.locator("#developer")).toHaveValue("");
     await expect(page.getByRole("switch", { name: "Online / competitive game" })).not.toBeChecked();
     await expect(page.locator("#completion_status")).toBeVisible(); // a blank form is a normal game again
+    await expect(page.locator("#rank")).toHaveCount(0);
     await expect(page.getByText(/^Copied from/)).toHaveCount(0);
 
     // The online game is in the library with its label, filterable, and shows no completion anywhere.
@@ -335,6 +351,10 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByText("Playing", { exact: true }).first()).toBeVisible();
     await expect(page.locator("dt", { hasText: "Completion" })).toHaveCount(0);
     await expect(page.locator("dt", { hasText: "Completed" })).toHaveCount(0);
+    // The rank reached takes the place of the completion level.
+    await expect(
+      page.locator("dt", { hasText: "Rank reached" }).locator("xpath=following-sibling::dd"),
+    ).toHaveText("Legend");
 
     await page.goto("/developers/e2e-partner");
     await expect(page.getByRole("heading", { level: 1, name: "E2E Partner" })).toBeVisible();

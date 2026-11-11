@@ -100,6 +100,7 @@ export async function saveGame(
     featured: v.featured,
     is_online: v.is_online,
     launchers: v.launchers,
+    rank: v.is_online ? v.rank : null,
   };
 
   const write = isEdit

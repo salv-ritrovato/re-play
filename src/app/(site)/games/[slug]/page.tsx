@@ -5,6 +5,7 @@ import {
   Clock,
   Flag,
   Layers,
+  Medal,
   Monitor,
   Rocket,
   Star,
@@ -110,15 +111,21 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
               </p>
             )}
 
-            <dl className={cn("mt-10 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-border pt-8", game.is_online ? "sm:grid-cols-3" : "sm:grid-cols-4")}>
+            <dl className={cn("mt-10 grid grid-cols-2 gap-x-8 gap-y-6 border-t border-border pt-8", game.is_online && !game.rank ? "sm:grid-cols-3" : "sm:grid-cols-4")}>
               <Fact icon={Star} label="My rating">
                 <Rating value={game.rating} size="lg" />
               </Fact>
               <Fact icon={Flag} label="Status">
                 <StatusBadge status={game.play_status} className="text-sm text-foreground" />
               </Fact>
-              {/* An online game has no ending, so there is no completion level to show. */}
-              {!game.is_online && (
+              {/* An online game has no ending: it shows the rank reached instead of a completion level. */}
+              {game.is_online ? (
+                game.rank && (
+                  <Fact icon={Medal} label="Rank reached">
+                    <span className="text-sm">{game.rank}</span>
+                  </Fact>
+                )
+              ) : (
                 <Fact icon={Trophy} label="Completion">
                   <CompletionBadge status={game.completion_status} />
                 </Fact>
