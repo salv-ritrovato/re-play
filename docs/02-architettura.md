@@ -56,6 +56,21 @@ verso Supabase). Le server action accettano body fino a 12 MB (`serverActions.bo
   aggiornamenti in caso di click ravvicinati sui filtri.
 - La pagina Reviews usa gli stessi parametri con opzioni di ordinamento dedicate (`REVIEW_SORT_OPTIONS`).
 
+## Pagine degli sviluppatori
+
+- Il campo `developer` è testo libero e spesso elenca più studi separati da virgola o punto e virgola.
+  `splitDevelopers` (`src/lib/developers.ts`) lo scompone in nomi singoli (senza doppioni; "Inc.", "Ltd" e
+  simili restano attaccati al nome che li precede) e `developerHref` costruisce l'indirizzo
+  `/developers/<slug>`, dove lo slug è `slugify(nome)`.
+- `getDeveloperGames(slug)` (`src/lib/data/public.ts`, in cache e con tag `games`) cerca tra i valori distinti
+  di `filter_developers` il nome che corrisponde allo slug, poi legge i giochi con `ilike` e tiene solo
+  quelli in cui quel nome è davvero uno degli studi. Nessuna modifica al database. Se non trova nulla, la
+  pagina mostra il 404 del sito.
+- **Card cliccabili con link dentro.** Un link non può stare dentro un altro link, quindi in `GameCard`,
+  `GameRow` e nel gioco in evidenza della home il link del titolo è "esteso" su tutta la card
+  (`after:absolute after:inset-0`) e i nomi degli sviluppatori (`DeveloperLinks`) stanno sopra con
+  `relative z-10`. Cliccare ovunque sulla card apre il gioco, cliccare un nome apre lo sviluppatore.
+
 ## Recensioni bilingue
 
 - Colonne `review_en` e `review_it`; vincolo "entrambe o nessuna" nel database e `refine` nello schema Zod.

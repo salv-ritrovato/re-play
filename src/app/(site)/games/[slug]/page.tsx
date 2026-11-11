@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CompletionBadge, OnlineBadge, Rating, StatusBadge } from "@/components/games/badges";
+import { DeveloperLinks } from "@/components/games/developer-links";
 import { GameCard } from "@/components/games/game-card";
 import { GameCover } from "@/components/games/game-cover";
 import { ReviewTabs } from "@/components/games/review-tabs";
@@ -80,7 +81,9 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
               {game.title}
             </h1>
             <p className="mt-4 text-base text-muted-foreground">
-              {[year, game.developer].filter(Boolean).join(" · ")}
+              {year}
+              {year && game.developer ? " · " : null}
+              <DeveloperLinks value={game.developer} />
             </p>
             {game.short_description && (
               <p className="mt-6 max-w-2xl text-lg leading-relaxed text-pretty text-foreground/80">
@@ -131,7 +134,10 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
             </div>
             <dl className="space-y-5 text-sm">
               <Detail label="Release date" value={formatDate(game.release_date)} />
-              <Detail label="Developer" value={game.developer} />
+              <Detail
+                label="Developer"
+                value={game.developer ? <DeveloperLinks value={game.developer} /> : null}
+              />
               <Detail label="Publisher" value={game.publisher} />
               <Detail label="Genres" value={game.genres.map((g) => g.name).join(", ") || null} />
               <Detail label="Platforms" value={game.platforms.map((p) => p.name).join(", ") || null} />
@@ -215,7 +221,7 @@ function Fact({ label, children }: { label: string; children: React.ReactNode })
   );
 }
 
-function Detail({ label, value }: { label: string; value: string | null }) {
+function Detail({ label, value }: { label: string; value: React.ReactNode }) {
   return (
     <div className="space-y-1">
       <dt className="eyebrow">{label}</dt>

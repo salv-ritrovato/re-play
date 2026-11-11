@@ -57,9 +57,8 @@ async function StatsContent() {
 
   return (
     <div className="space-y-20">
-      <dl className="grid grid-cols-2 gap-x-8 gap-y-10 border-y border-border py-10 sm:grid-cols-4">
+      <dl className="grid grid-cols-2 gap-x-8 gap-y-10 border-y border-border py-10 sm:grid-cols-3">
         <Figure label="Games played" value={totals.total_games} />
-        <Figure label="Completed" value={totals.completed} />
         <Figure label="Average rating" value={formatRating(totals.average_rating)} />
         <Figure label="Hours played" value={Number(totals.total_playtime_hours.toFixed(1))} />
       </dl>

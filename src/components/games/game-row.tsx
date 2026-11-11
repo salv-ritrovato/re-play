@@ -2,6 +2,7 @@ import Link from "next/link";
 import { formatPlaytime, yearOf } from "@/lib/format";
 import type { GameSummary } from "@/lib/types";
 import { CompletionBadge, OnlineBadge, Rating, StatusBadge } from "./badges";
+import { DeveloperLinks } from "./developer-links";
 import { GameCover } from "./game-cover";
 
 export function GameRow({ game }: { game: GameSummary }) {
@@ -10,10 +11,8 @@ export function GameRow({ game }: { game: GameSummary }) {
 
   return (
     <li>
-      <Link
-        href={`/games/${game.slug}`}
-        className="group grid grid-cols-[3.5rem_1fr_auto] items-center gap-4 border-b border-border py-3 transition-colors hover:bg-surface sm:grid-cols-[3.5rem_minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1fr)_5rem] sm:px-2"
-      >
+      {/* The title link is stretched over the whole row, which leaves room for the developer links. */}
+      <div className="group relative grid grid-cols-[3.5rem_1fr_auto] items-center gap-4 border-b border-border py-3 transition-colors hover:bg-surface sm:grid-cols-[3.5rem_minmax(0,2fr)_minmax(0,1.2fr)_minmax(0,1fr)_5rem] sm:px-2">
         <GameCover
           title={game.title}
           path={game.cover_path}
@@ -24,11 +23,21 @@ export function GameRow({ game }: { game: GameSummary }) {
         />
         <div className="min-w-0">
           <div className="flex min-w-0 items-center gap-2">
-            <h3 className="truncate text-sm font-medium">{game.title}</h3>
+            <h3 className="truncate text-sm font-medium">
+              <Link
+                href={`/games/${game.slug}`}
+                className="outline-none after:absolute after:inset-0 focus-visible:after:outline-2 focus-visible:after:-outline-offset-2 focus-visible:after:outline-ring"
+              >
+                {game.title}
+              </Link>
+            </h3>
             {game.is_online && <OnlineBadge className="shrink-0" />}
           </div>
-          <p className="mt-0.5 truncate text-xs text-subtle">
-            {[year, game.developer].filter(Boolean).join(" · ") || "-"}
+          <p className="relative z-10 mt-0.5 truncate text-xs text-subtle">
+            {year}
+            {year && game.developer ? " · " : null}
+            <DeveloperLinks value={game.developer} />
+            {!year && !game.developer ? "-" : null}
           </p>
           <p className="mt-1 truncate text-xs text-muted-foreground sm:hidden">
             {game.platforms.map((p) => p.name).join(", ")}
@@ -52,7 +61,7 @@ export function GameRow({ game }: { game: GameSummary }) {
         <div className="text-right">
           <Rating value={game.rating} />
         </div>
-      </Link>
+      </div>
     </li>
   );
 }

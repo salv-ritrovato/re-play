@@ -58,6 +58,12 @@ test.describe("public navigation", () => {
     await expect(page.getByRole("link", { name: "Back to the overview" })).toBeVisible();
   });
 
+  test("an unknown developer renders the not-found page", async ({ page }) => {
+    await page.goto("/developers/nobody-ever-made-this");
+    await expect(page.getByRole("heading", { name: /isn't in the archive/ })).toBeVisible();
+    await expect(page.getByRole("navigation", { name: "Primary" })).toBeVisible();
+  });
+
   test("library filters live in the URL and can be combined and cleared", async ({ page }) => {
     await page.goto("/library");
     await page.getByRole("button", { name: /Filters/ }).click();

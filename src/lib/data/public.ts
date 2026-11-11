@@ -1,4 +1,6 @@
 import { cacheLife, cacheTag } from "next/cache";
+import { splitDevelopers } from "@/lib/developers";
+import { slugify } from "@/lib/format";
 import { createPublicClient } from "@/lib/supabase/public";
 import type {
   GameDetail,
@@ -148,6 +150,73 @@ export async function getAllSlugs(): Promise<string[]> {
   const { data, error } = await supabase.from("games").select("slug");
   if (error) fail("getAllSlugs", error);
   return (data ?? []).map((g) => g.slug as string);
+}
+
+// ---------------------------------------------------------------------------
+// Developer page: everything one studio made
+// ---------------------------------------------------------------------------
+const SUMMARY_SELECT = `
+  id, slug, title, short_description, release_date, developer, publisher, rating,
+  play_status, completion_status, playtime_hours, review_en, review_it,
+  cover_path, cover_blur, created_at, is_online,
+  genres:game_genres(genre:genres(id, name, slug)),
+  platforms:game_platforms(platform:platforms(id, name, slug))
+`;
+
+export async function getDeveloperGames(
+  slug: string,
+): Promise<{ name: string; games: GameSummary[] } | null> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(TAGS.games);
+
+  const supabase = createPublicClient();
+
+  // 1. The developer field lists one or several studios, so find the name behind this slug.
+  const { data: options, error: optionsError } = await supabase
+    .from("filter_developers")
+    .select("name, games");
+  if (optionsError) fail("getDeveloperGames", optionsError);
+
+  const spellings = new Map<string, number>();
+  for (const option of options ?? []) {
+    for (const name of splitDevelopers(option.name as string)) {
+      if (slugify(name) === slug) spellings.set(name, (spellings.get(name) ?? 0) + Number(option.games));
+    }
+  }
+  if (spellings.size === 0) return null;
+  const [name] = [...spellings.entries()].sort((a, b) => b[1] - a[1])[0];
+
+  // 2. Narrow down in the database, then keep only games where it really is one of the studios.
+  const pattern = `%${name.replace(/[\\%_]/g, (c) => `\\${c}`)}%`;
+  const { data, error } = await supabase
+    .from("games")
+    .select(SUMMARY_SELECT)
+    .ilike("developer", pattern);
+  if (error) fail("getDeveloperGames", error);
+
+  type Row = Omit<GameSummary, "genres" | "platforms" | "total_count" | "rating" | "playtime_hours"> & {
+    rating: number | string | null;
+    playtime_hours: number | string | null;
+    genres: { genre: Taxonomy }[];
+    platforms: { platform: Taxonomy }[];
+  };
+  const byName = (a: Taxonomy, b: Taxonomy) => a.name.localeCompare(b.name);
+  const games = ((data ?? []) as unknown as Row[])
+    .filter((g) => splitDevelopers(g.developer).some((n) => slugify(n) === slug))
+    .map<GameSummary>((g) => ({
+      ...g,
+      rating: g.rating === null ? null : Number(g.rating),
+      playtime_hours: g.playtime_hours === null ? null : Number(g.playtime_hours),
+      genres: g.genres.map((x) => x.genre).sort(byName),
+      platforms: g.platforms.map((x) => x.platform).sort(byName),
+      total_count: 0,
+    }))
+    // Newest first; games without a release date go last.
+    .sort((a, b) => (b.release_date ?? "").localeCompare(a.release_date ?? "") || a.title.localeCompare(b.title));
+
+  if (games.length === 0) return null;
+  return { name, games: games.map((g) => ({ ...g, total_count: games.length })) };
 }
 
 // ---------------------------------------------------------------------------

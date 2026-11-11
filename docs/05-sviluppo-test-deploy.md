@@ -51,7 +51,8 @@ Cosa coprono:
   ricerca e scheda, recensioni nelle due lingue, statistiche, "Parti da un gioco esistente" e "Add and add
   another" (con eliminazione del gioco creato), modifica, sostituzione/rimozione della
   copertina, eliminazione con conferma, 404 dentro l'admin.
-- **public**: navigazione tra le sezioni, pagina About (EN/IT e link Steam), 404, filtri nell'URL,
+- **public**: navigazione tra le sezioni, pagina About (EN/IT e link Steam), 404 (anche per uno sviluppatore
+  sconosciuto), filtri nell'URL,
   parametri non validi ignorati.
 - **responsive**: nessun overflow orizzontale (anche sulle statistiche), menu mobile, barra filtri,
   grafici senza scrollbar verticale.

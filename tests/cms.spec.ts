@@ -213,6 +213,30 @@ test.describe.serial("CMS end to end", () => {
     await expect(img).toHaveAttribute("src", /\/_next\/image\?url=/);
   });
 
+  test("clicking a developer opens a page with all their games", async ({ page }) => {
+    // On a card the developer is its own link; the rest of the card still opens the game.
+    await page.goto(`/library?q=${encodeURIComponent(title)}`);
+    const cover = page.getByAltText(`${title} cover`);
+    await expect(cover).toBeVisible();
+    const box = (await cover.boundingBox())!;
+    await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
+    await expect(page).toHaveURL(new RegExp(`/games/${slug}$`));
+
+    await page.goto(`/library?q=${encodeURIComponent(title)}`);
+    await page.getByRole("link", { name: "E2E Studio" }).click();
+    await expect(page).toHaveURL(/\/developers\/e2e-studio$/);
+    await expect(page.getByRole("heading", { level: 1, name: "E2E Studio" })).toBeVisible();
+    await expect(page.getByText("1 game in the archive")).toBeVisible();
+    await expect(page.getByRole("link", { name: title })).toBeVisible();
+
+    // The same link is on the game page, in the list view and in the details.
+    await page.goto(`/games/${slug}`);
+    await expect(page.getByRole("link", { name: "E2E Studio" })).toHaveCount(2);
+    await page.goto(`/library?q=${encodeURIComponent(title)}&view=list`);
+    await page.getByRole("link", { name: "E2E Studio" }).click();
+    await expect(page).toHaveURL(/\/developers\/e2e-studio$/);
+  });
+
   test("the review appears in the reviews section in both languages", async ({ page }) => {
     await page.goto(`/reviews?q=${encodeURIComponent(title)}`);
     await expect(page.getByText("An English review written by the test suite.")).toBeVisible();
@@ -244,6 +268,8 @@ test.describe.serial("CMS end to end", () => {
     }
 
     await page.locator("#title").fill(second);
+    // Several studios in one field are listed separately, each with its own page.
+    await page.locator("#developer").fill("E2E Studio, E2E Partner");
     await page.getByRole("button", { name: "Add and add another" }).click();
     await expect(page.getByText(`${second} added. Ready for the next one.`)).toBeVisible();
 
@@ -254,6 +280,14 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.locator("#developer")).toHaveValue("");
     await expect(page.getByRole("switch", { name: "Online / competitive game" })).not.toBeChecked();
     await expect(page.getByText(/^Copied from/)).toHaveCount(0);
+
+    await page.goto("/developers/e2e-partner");
+    await expect(page.getByRole("heading", { level: 1, name: "E2E Partner" })).toBeVisible();
+    await expect(page.getByText("1 game in the archive")).toBeVisible();
+    await page.goto("/developers/e2e-studio");
+    await expect(page.getByText("2 games in the archive")).toBeVisible();
+    await expect(page.getByRole("link", { name: second })).toBeVisible();
+    await expect(page.getByRole("link", { name: title })).toBeVisible();
 
     // The game was saved: remove it again so the rest of the run counts one game.
     await page.goto(`/admin/games?q=${encodeURIComponent(second)}`);

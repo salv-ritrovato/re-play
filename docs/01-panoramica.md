@@ -26,7 +26,7 @@ integrato sotto `/admin`.
 
 ### Parte pubblica
 
-- **Overview** (`/`): numeri chiave (giochi, completati, recensiti, voto medio), gioco in evidenza e scaffali
+- **Overview** (`/`): numeri chiave (giochi, ore giocate, voto medio, voto più alto), gioco in evidenza e scaffali
   "Recently added", "Latest reviews" e "Highest rated". Non c'è più "Playing now": i giochi si aggiungono
   quando sono finiti.
 - **Library** (`/library`): tutti i giochi in vista griglia o lista, con ricerca, filtri combinabili
@@ -34,6 +34,10 @@ integrato sotto `/admin`.
   Filtri e ordinamento vivono nell'URL, quindi ogni vista è condivisibile.
 - **Gioco** (`/games/[slug]`): scheda con copertina, metadati, voto, pro e contro e recensione in inglese e
   italiano (tab EN/IT).
+- **Sviluppatore** (`/developers/[slug]`): cliccando il nome di uno sviluppatore (su card, righe della lista,
+  gioco in evidenza e scheda del gioco) si apre la pagina con tutti i suoi giochi, dal più recente, con
+  numero di giochi e voto medio. Se il campo ne elenca più d'uno ("2K Australia, Gearbox Software") ogni
+  studio ha il suo link e la sua pagina.
 - **Reviews** (`/reviews`): solo i giochi recensiti, con anteprima e selezione lingua (`?lang=it`).
 - **Statistics** (`/statistics`): totali, generi, piattaforme, distribuzione dei voti, giochi per anno.
 - **About** (`/about`): presentazione personale in italiano e inglese, riquadro "In breve" e link al

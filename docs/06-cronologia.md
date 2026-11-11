@@ -39,6 +39,8 @@ Cosa è stato fatto, nell'ordine, e i problemi incontrati con le relative soluzi
 | Aggiungere Rainbow Six: Siege ai giochi che hanno fatto la sua storia | Aggiunto al paragrafo e al riquadro, in entrambe le lingue. |
 | Link al profilo Steam | Nella pagina About e nel footer; aperto in una nuova scheda. |
 | Niente scrollbar nei grafici delle statistiche | Vedi sotto. |
+| "Completed" e "Reviewed" non hanno più senso: ogni gioco è già completato e recensito | Tolti dalla home e da Statistics perché ripetevano il numero dei giochi. Home: giochi, ore giocate, voto medio, voto più alto. Statistics: giochi giocati, voto medio, ore giocate. |
+| Cliccando uno sviluppatore si apre una pagina con tutti i suoi giochi | Nuova pagina `/developers/[slug]`; i nomi sono link su card, lista, gioco in evidenza e scheda del gioco. Gestiti anche i giochi con più sviluppatori. |
 | "Playing now" non serve: i giochi si aggiungono solo a gioco finito | Rimossi il numero "Playing now" (home e Statistics) e lo scaffale "Currently playing"; in home al suo posto "Reviewed". Lo stato "Playing" resta disponibile nel form e nei filtri. |
 | Via anche "Abandoned" dalle statistiche (difficilmente abbandona giochi) | Rimosso il numero "Abandoned" dalla pagina Statistics, che ora mostra quattro numeri: giochi, completati, voto medio, ore. Lo stato "Dropped" resta nel form e nei filtri. |
 | Oltre a "Main story", anche "Main story + side quests" | Nuovo valore dell'enum `completion_status` (migrazione `main_story_side_quests`), presente nel form, nei filtri della libreria e nelle schede. |

@@ -3,8 +3,13 @@ import { yearOf } from "@/lib/format";
 import type { GameSummary } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { OnlineBadge, Rating, StatusBadge } from "./badges";
+import { DeveloperLinks } from "./developer-links";
 import { GameCover } from "./game-cover";
 
+/**
+ * The whole card opens the game: the title link is stretched over it (`after:absolute`), which leaves
+ * room for the developer links on top (a link cannot live inside another link).
+ */
 export function GameCard({
   game,
   className,
@@ -19,10 +24,7 @@ export function GameCard({
   const year = yearOf(game.release_date);
 
   return (
-    <Link
-      href={`/games/${game.slug}`}
-      className={cn("group block rounded-md outline-offset-4", className)}
-    >
+    <div className={cn("group relative rounded-md", className)}>
       <GameCover
         title={game.title}
         path={game.cover_path}
@@ -33,14 +35,24 @@ export function GameCard({
       />
       <div className="mt-3 flex items-start justify-between gap-3">
         <div className="min-w-0">
-          <h3 className="truncate text-sm font-medium text-foreground">{game.title}</h3>
-          <p className="mt-0.5 truncate text-xs text-subtle">
-            {[year, game.developer].filter(Boolean).join(" · ") || "-"}
+          <h3 className="truncate text-sm font-medium text-foreground">
+            <Link
+              href={`/games/${game.slug}`}
+              className="outline-none after:absolute after:inset-0 after:rounded-md focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-ring"
+            >
+              {game.title}
+            </Link>
+          </h3>
+          <p className="relative z-10 mt-0.5 truncate text-xs text-subtle">
+            {year}
+            {year && game.developer ? " · " : null}
+            <DeveloperLinks value={game.developer} />
+            {!year && !game.developer ? "-" : null}
           </p>
         </div>
         <Rating value={game.rating} size="sm" />
       </div>
       {showStatus && <StatusBadge status={game.play_status} className="mt-1.5" />}
-    </Link>
+    </div>
   );
 }

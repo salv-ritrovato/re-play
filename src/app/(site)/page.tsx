@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { Rating } from "@/components/games/badges";
+import { DeveloperLinks } from "@/components/games/developer-links";
 import { GameCard } from "@/components/games/game-card";
 import { GameCover } from "@/components/games/game-cover";
 import { EmptyState } from "@/components/layout/empty-state";
@@ -51,9 +52,9 @@ async function HomeContent() {
 
           <dl className="grid grid-cols-2 gap-x-12 gap-y-8 border-t border-border pt-8 lg:min-w-96 lg:border-t-0 lg:border-l lg:pt-0 lg:pl-12">
             <Stat label="Games" value={totals?.total_games ?? 0} />
-            <Stat label="Completed" value={totals?.completed ?? 0} />
-            <Stat label="Reviewed" value={totals?.reviewed ?? 0} />
+            <Stat label="Hours played" value={Number((totals?.total_playtime_hours ?? 0).toFixed(1))} />
             <Stat label="Average rating" value={formatRating(totals?.average_rating ?? null)} />
+            <Stat label="Highest rating" value={formatRating(topRated[0]?.rating ?? null)} />
           </dl>
         </Container>
       </section>
@@ -169,10 +170,8 @@ function Featured({
   return (
     <section aria-labelledby="featured" className="space-y-6">
       <p className="eyebrow">{game ? "Featured" : "Standout"}</p>
-      <Link
-        href={`/games/${g.slug}`}
-        className="group grid gap-8 rounded-md border border-border bg-surface p-5 transition-colors hover:border-muted-foreground/40 sm:grid-cols-[14rem_1fr] sm:gap-12 sm:p-8 lg:grid-cols-[18rem_1fr] lg:p-10"
-      >
+      {/* The title link is stretched over the whole card, which leaves room for the developer links. */}
+      <div className="group relative grid gap-8 rounded-md border border-border bg-surface p-5 transition-colors hover:border-muted-foreground/40 sm:grid-cols-[14rem_1fr] sm:gap-12 sm:p-8 lg:grid-cols-[18rem_1fr] lg:p-10">
         <GameCover
           title={g.title}
           path={g.cover_path}
@@ -182,10 +181,17 @@ function Featured({
         />
         <div className="flex flex-col justify-center">
           <h2 id="featured" className="text-4xl font-semibold tracking-tight text-balance sm:text-5xl">
-            {g.title}
+            <Link
+              href={`/games/${g.slug}`}
+              className="outline-none after:absolute after:inset-0 after:rounded-md focus-visible:after:outline-2 focus-visible:after:outline-offset-4 focus-visible:after:outline-ring"
+            >
+              {g.title}
+            </Link>
           </h2>
-          <p className="mt-3 text-sm text-subtle">
-            {[year, g.developer].filter(Boolean).join(" · ")}
+          <p className="relative z-10 mt-3 text-sm text-subtle">
+            {year}
+            {year && g.developer ? " · " : null}
+            <DeveloperLinks value={g.developer} />
           </p>
           {text && (
             <p className="mt-6 max-w-xl text-base leading-relaxed text-pretty text-muted-foreground">
@@ -200,7 +206,7 @@ function Featured({
             </span>
           </div>
         </div>
-      </Link>
+      </div>
     </section>
   );
 }
