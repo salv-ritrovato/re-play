@@ -57,6 +57,7 @@ Cosa è stato fatto, nell'ordine, e i problemi incontrati con le relative soluzi
 | "Surprise me" deve portare ogni volta a un titolo diverso | Prima sceglieva a caso e poteva ripetersi. Ora un cookie con gli ultimi 30 giochi proposti li esclude, e la risposta non viene mai messa in cache. |
 | Un'immagine di anteprima per le varie sezioni del sito | Immagini Open Graph generate per home, Library, Reviews, Statistics, About, ogni gioco (con la sua copertina) e ogni sviluppatore, nello stile del sito; la pagina del gioco usa quella generata al posto della sola copertina. Test: ogni sezione dichiara un PNG 1200×630 diverso dalle altre. |
 | Un carosello di recensioni dei giochi di punta, con voto superiore a 9, al massimo 5 | Nuovo carosello in home con le recensioni dei giochi con voto 9 o più, al massimo 5. Si è usato "9 o più" (e non "strettamente più di 9") perché il voto più alto oggi è 9.0 e il carosello sarebbe vuoto. Il vecchio "Standout" automatico non c'è più; "Featured" resta solo se scelto a mano. |
+| Le copertine con proporzioni diverse venivano tagliate (es. il titolo di Castle Crashers) | Se le proporzioni non sono (quasi) 3:4 l'immagine intera viene ridotta nel riquadro, con i lati riempiti da una copia sfocata e scurita; l'anteprima nel form mostra lo stesso risultato. Test: un'immagine 1:2 con una fascia rossa in alto e una blu in basso le conserva entrambe. Le copertine già caricate non cambiano (l'originale non è conservato) e vanno ricaricate. |
 | La home sembra scarna | Aggiunti "Browse by genre", lo scaffale "Lowest rated" (The blunt truth), il pulsante "Surprise me" e la striscia "Who's behind the reviews". Nota: "Latest reviews" e "Recently added" mostrano oggi gli stessi giochi, perché ogni gioco ha una recensione. |
 | Cliccando uno sviluppatore si apre una pagina con tutti i suoi giochi | Nuova pagina `/developers/[slug]`; i nomi sono link su card, lista, gioco in evidenza e scheda del gioco. Gestiti anche i giochi con più sviluppatori. |
 | "Playing now" non serve: i giochi si aggiungono solo a gioco finito | Rimossi il numero "Playing now" (home e Statistics) e lo scaffale "Currently playing"; in home al suo posto "Reviewed". Lo stato "Playing" resta disponibile nel form e nei filtri. |
@@ -87,6 +88,10 @@ another"** e **"Parti da un gioco esistente"** (vedi [04-cms-admin.md](04-cms-ad
 - **Header e footer duplicati nel 404 dentro `(site)`**: `(site)/not-found.tsx` separato + `NotFoundView`.
 - **Footer troppo largo su telefono dopo aver aggiunto l'icona di Steam**: i test responsive hanno segnalato lo
   scorrimento orizzontale; la riga dei link ora va a capo (`flex-wrap`).
+- **Home che scorreva di lato con due o più recensioni nel carosello**: i testi nascosti (`sr-only`) della
+  seconda slide sono posizionati in modo assoluto e il contenitore scorrevole, non essendo `relative`, non li
+  tratteneva. Stessa causa dei grafici delle statistiche; ora il contenitore è `relative`. Il test del
+  carosello controlla anche questo (con una sola slide il problema non si vede).
 - **Overflow orizzontale della pagina Statistics su mobile** (grafico per anno): `min-w-0` sulla sezione e
   `relative` sul contenitore scorrevole.
 - **Interruttore "Online" non cliccabile nel test** (colpiva l'input nascosto): `getByRole("switch", …)`.

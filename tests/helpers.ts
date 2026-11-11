@@ -40,3 +40,20 @@ export async function expectPreviewImage(page: Page, request: APIRequestContext)
   expect([png.format, png.width, png.height]).toEqual(["png", 1200, 630]);
   return new URL(og!).pathname;
 }
+
+/**
+ * An image with a red band at the top and a blue band at the bottom, green in between: after fitting it to
+ * a cover, a crop would cut the bands off, while showing the whole image keeps them.
+ */
+export async function makeBandedImage(width: number, height: number) {
+  const band = Math.round(height * 0.1);
+  const solid = (h: number, color: string) => ({ create: { width, height: h, channels: 3 as const, background: color } });
+  const buffer = await sharp({ create: { width, height, channels: 3, background: "#22aa22" } })
+    .composite([
+      { input: solid(band, "#ee2222"), top: 0, left: 0 },
+      { input: solid(band, "#2222ee"), top: height - band, left: 0 },
+    ])
+    .png()
+    .toBuffer();
+  return { name: "banded.png", mimeType: "image/png", buffer };
+}

@@ -95,7 +95,7 @@ export function StandoutCarousel({ slides, label }: { slides: StandoutSlide[]; l
             go(index - 1);
           }
         }}
-        className="flex snap-x snap-mandatory overflow-x-auto rounded-md border border-border bg-surface [scrollbar-width:none] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none [&::-webkit-scrollbar]:hidden"
+        className="relative flex snap-x snap-mandatory overflow-x-auto rounded-md border border-border bg-surface [scrollbar-width:none] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none [&::-webkit-scrollbar]:hidden"
       >
         {slides.map((slide, i) => {
           const text = (lang === "it" && slide.excerpt.it) || slide.excerpt.en;
