@@ -211,7 +211,7 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByRole("listitem").filter({ hasText: "Fake" }).first()).toContainText("-");
     await expect(page.getByText("E2E Studio").first()).toBeVisible();
     await expect(page.getByText("Main story + side quests")).toBeVisible();
-    const launchers = page.locator("dt", { hasText: "Launchers" }).locator("xpath=following-sibling::dd");
+    const launchers = page.locator("dt", { hasText: "Played via" }).locator("xpath=following-sibling::dd");
     await expect(launchers).toContainText("Steam");
     await expect(launchers).toContainText("Ubisoft Connect");
     await expect(page.getByText("7.5").first()).toBeVisible();

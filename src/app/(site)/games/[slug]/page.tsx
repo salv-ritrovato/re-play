@@ -162,7 +162,7 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
               {game.launchers.length > 0 && (
                 <Detail
                   icon={Rocket}
-                  label="Launchers"
+                  label="Played via"
                   value={
                     <ul className="space-y-1.5">
                       {game.launchers.map((id) => (
