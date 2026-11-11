@@ -56,6 +56,30 @@ verso Supabase). Le server action accettano body fino a 12 MB (`serverActions.bo
   aggiornamenti in caso di click ravvicinati sui filtri.
 - La pagina Reviews usa gli stessi parametri con opzioni di ordinamento dedicate (`REVIEW_SORT_OPTIONS`).
 
+## Immagini di anteprima (Open Graph)
+
+Quando si condivide un link (chat, social), compare un'immagine 1200×630 generata dal sito, con lo stile del
+sito: sfondo scuro, logo Re:Play, un'etichetta, il titolo in grande, una riga di contesto e, a destra,
+copertine o numeri. Ogni sezione ha la sua, con i file `opengraph-image.tsx` della convenzione di Next:
+
+| Pagina | Immagine |
+| --- | --- |
+| Home (e pagine senza una propria) | `src/app/opengraph-image.tsx`: copertine dei giochi meglio votati |
+| Library | `(site)/library/opengraph-image.tsx`: gli ultimi giochi aggiunti |
+| Reviews | `(site)/reviews/opengraph-image.tsx`: altre copertine, diverse dalla home |
+| Statistics | `(site)/statistics/opengraph-image.tsx`: giochi, ore e voto medio |
+| About | `(site)/about/opengraph-image.tsx`: solo testo |
+| Gioco | `(site)/games/[slug]/opengraph-image.tsx`: copertina, titolo, sviluppatore/anno e voto |
+| Sviluppatore | `(site)/developers/[slug]/opengraph-image.tsx`: nome, numero di giochi, voto medio e copertine |
+
+Il disegno comune sta in `src/lib/og.tsx` (`renderOg`); i dati in `getOgOverview()`. Le copertine, salvate in
+WebP, vengono lette e ridotte a piccoli JPEG con `sharp` prima di entrare nell'immagine. Le immagini sono
+generate al momento della richiesta e riutilizzate per un'ora (browser e CDN). Il layout (`layout.tsx`) chiede
+la scheda grande per X (`twitter:card = summary_large_image`) e indica il nome del sito. Gli indirizzi nelle
+anteprime sono assoluti e derivano da `NEXT_PUBLIC_SITE_URL`: in produzione deve essere l'indirizzo vero del
+sito. Chat e social tengono l'anteprima in cache: dopo una modifica può servire "ripulirla" dai loro strumenti
+di debug.
+
 ## Home
 
 `getHomeData()` (`src/lib/data/public.ts`, in cache) prepara tutto in una volta: numeri, gioco in evidenza,

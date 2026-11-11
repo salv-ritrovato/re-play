@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { cleanupE2E } from "./cleanup";
-import { login, makeImage, owner, uniqueTitle } from "./helpers";
+import { expectPreviewImage, login, makeImage, owner, uniqueTitle } from "./helpers";
 
 test.skip(!owner.username || !owner.password, "E2E_USERNAME / E2E_PASSWORD not set");
 
@@ -169,7 +169,7 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByText("Slug already in use")).toBeVisible();
   });
 
-  test("the new game shows up in the library, search and detail page", async ({ page }) => {
+  test("the new game shows up in the library, search and detail page", async ({ page, request }) => {
     await page.goto(`/library?q=${encodeURIComponent(title)}`);
     await expect(page.getByRole("link", { name: new RegExp(title) })).toBeVisible();
 
@@ -230,6 +230,10 @@ test.describe.serial("CMS end to end", () => {
     const img = page.getByAltText(`${title} cover`);
     await expect(img).toBeVisible();
     await expect(img).toHaveAttribute("src", /\/_next\/image\?url=/);
+
+    // The game page has a preview image of its own (cover, title and rating together) for sharing.
+    const preview = await expectPreviewImage(page, request);
+    expect(preview).toContain(`/games/${slug}/opengraph-image`);
   });
 
   test("a game added just now is on the home page under Recently added", async ({ page }) => {
@@ -274,7 +278,7 @@ test.describe.serial("CMS end to end", () => {
     expect(await totalGames(page)).toBe(gamesBefore + 1);
   });
 
-  test("start from an existing game, then add and add another", async ({ page }) => {
+  test("start from an existing game, then add and add another", async ({ page, request }) => {
     const second = uniqueTitle();
     await page.goto("/admin/games/new");
 
@@ -362,7 +366,9 @@ test.describe.serial("CMS end to end", () => {
       page.locator("dt", { hasText: "Rank reached" }).locator("xpath=following-sibling::dd"),
     ).toHaveText("Legend");
 
+    // A developer page has a preview image of its own too.
     await page.goto("/developers/e2e-partner");
+    await expectPreviewImage(page, request);
     await expect(page.getByRole("heading", { level: 1, name: "E2E Partner" })).toBeVisible();
     await expect(page.getByText("1 game in the archive")).toBeVisible();
     await page.goto("/developers/e2e-studio");

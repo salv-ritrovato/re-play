@@ -1,4 +1,4 @@
-import { expect, type Page } from "@playwright/test";
+import { expect, type APIRequestContext, type Page } from "@playwright/test";
 import sharp from "sharp";
 
 export const owner = {
@@ -22,3 +22,21 @@ export async function makeImage(width: number, height: number, color: string, fo
 }
 
 export const uniqueTitle = (prefix = "E2E Game") => `${prefix} ${Date.now().toString(36)}`;
+
+/**
+ * Checks the preview image a page declares for sharing (Open Graph): the page points to it, it is a
+ * real 1200x630 PNG and the page asks for the large card on X. Returns the image address.
+ */
+export async function expectPreviewImage(page: Page, request: APIRequestContext): Promise<string> {
+  const og = await page.locator('meta[property="og:image"]').getAttribute("content");
+  expect(og, "the page must declare an og:image").toBeTruthy();
+  await expect(page.locator('meta[name="twitter:card"]')).toHaveAttribute("content", "summary_large_image");
+
+  // The address is absolute (site URL); ask the server under test for the same path.
+  const res = await request.get(new URL(og!).pathname + new URL(og!).search);
+  expect(res.status()).toBe(200);
+  expect(res.headers()["content-type"]).toBe("image/png");
+  const png = await sharp(await res.body()).metadata();
+  expect([png.format, png.width, png.height]).toEqual(["png", 1200, 630]);
+  return new URL(og!).pathname;
+}

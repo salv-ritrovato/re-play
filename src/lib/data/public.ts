@@ -221,6 +221,45 @@ export async function getDeveloperGames(
 }
 
 // ---------------------------------------------------------------------------
+// Preview images (Open Graph): numbers and a few covers
+// ---------------------------------------------------------------------------
+export async function getOgOverview() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(TAGS.games);
+
+  const supabase = createPublicClient();
+  const [totals, top, recent] = await Promise.all([
+    supabase.from("stats_totals").select("*").maybeSingle(),
+    supabase
+      .from("games")
+      .select("cover_path")
+      .not("cover_path", "is", null)
+      .order("rating", { ascending: false, nullsFirst: false })
+      .limit(12),
+    supabase
+      .from("games")
+      .select("cover_path")
+      .not("cover_path", "is", null)
+      .order("created_at", { ascending: false })
+      .limit(8),
+  ]);
+  for (const r of [totals, top, recent]) {
+    if (r.error) fail("getOgOverview", r.error);
+  }
+  const t = totals.data as StatsTotals | null;
+  const paths = (rows: { cover_path: string | null }[] | null) =>
+    (rows ?? []).map((r) => r.cover_path).filter((p): p is string => Boolean(p));
+  return {
+    games: t?.total_games ?? 0,
+    hours: Number(t?.total_playtime_hours ?? 0),
+    average: t?.average_rating === null || t?.average_rating === undefined ? null : Number(t.average_rating),
+    topCovers: paths(top.data),
+    recentCovers: paths(recent.data),
+  };
+}
+
+// ---------------------------------------------------------------------------
 // Home
 // ---------------------------------------------------------------------------
 /** The home page "Recently added" shelf only shows games added within this many days. */

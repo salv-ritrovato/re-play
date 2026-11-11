@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { expectPreviewImage } from "./helpers";
 
 test.describe("public navigation", () => {
   test("navigates between every main section", async ({ page }) => {
@@ -132,6 +133,17 @@ test.describe("public navigation", () => {
     const siteLinks = page.getByRole("navigation", { name: "Footer" });
     await expect(siteLinks.getByRole("link", { name: "Library" })).toBeVisible();
     await expect(siteLinks.getByRole("link", { name: /Steam|Instagram|AniList|inLumine/ })).toHaveCount(0);
+  });
+
+  test("every section has its own preview image for sharing", async ({ page, request }) => {
+    const paths = ["/", "/library", "/reviews", "/statistics", "/about"];
+    const images: string[] = [];
+    for (const path of paths) {
+      await page.goto(path);
+      images.push(await expectPreviewImage(page, request));
+    }
+    // One image per section, not the same one everywhere.
+    expect(new Set(images).size).toBe(paths.length);
   });
 
   test("an unknown developer renders the not-found page", async ({ page }) => {
