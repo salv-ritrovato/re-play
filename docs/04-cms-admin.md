@@ -35,7 +35,9 @@ Comportamenti da conoscere:
 - **Parti da un gioco esistente** (solo su "Nuovo gioco", componente `copy-from-game.tsx`): in cima al form
   si cerca per titolo o sviluppatore, oppure si sceglie tra gli ultimi giochi toccati. Copia **sviluppatore,
   publisher, generi, piattaforme, launcher, tag e flag online**; mai titolo, voto, recensioni, copertina o date.
-  Dopo la copia si può modificare tutto. Utile per serie, sequel e giochi dello stesso studio.
+  Dopo la copia il box elenca esattamente cosa è stato copiato (sviluppatore, publisher, generi, piattaforme,
+  launcher, tag, online), con il pulsante "Show me" che porta ai campi compilati, più in basso nella pagina.
+  Si può modificare tutto. Utile per serie, sequel e giochi dello stesso studio.
 - **Creazione al volo** di generi, piattaforme e tag (`taxonomy-picker`, `tag-input`).
 - **Copertina** (`media-fields`): anteprima, sostituzione, rimozione; compressa nel browser prima dell'invio.
 

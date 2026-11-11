@@ -280,6 +280,11 @@ test.describe.serial("CMS end to end", () => {
     await page.getByRole("searchbox", { name: "Search a game to copy from" }).fill(title);
     await page.getByRole("button", { name: new RegExp(title) }).click();
     await expect(page.getByText(`Copied from ${title}`)).toBeVisible();
+    // The box lists exactly what landed in the form, so nothing has to be hunted down below.
+    const summary = page.getByRole("status").filter({ hasText: "Copied from" });
+    for (const copied of ["E2E Studio", "E2E Publishing", "Adventure", "PC", "Steam", "Ubisoft Connect", "e2e-tag"]) {
+      await expect(summary).toContainText(copied);
+    }
     await expect(page.locator("#developer")).toHaveValue("E2E Studio");
     await expect(page.locator("#publisher")).toHaveValue("E2E Publishing");
     await expect(page.getByRole("button", { name: "Adventure", exact: true })).toHaveAttribute("aria-pressed", "true");

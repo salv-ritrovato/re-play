@@ -12,11 +12,17 @@ import type { GameTemplate } from "@/lib/types";
  * tends to share (developer, publisher, genres, platforms, tags, online flag). Nothing personal
  * (title, rating, review, cover, dates) is ever copied.
  */
-export function CopyFromGame({ onCopy }: { onCopy: (game: GameTemplate) => void }) {
+/** One line of what was copied, e.g. { label: "Developer", value: "Treyarch" }. */
+export interface CopiedItem {
+  label: string;
+  value: string;
+}
+
+export function CopyFromGame({ onCopy }: { onCopy: (game: GameTemplate) => CopiedItem[] }) {
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<GameTemplate[] | null>(null);
   const [loading, setLoading] = useState(false);
-  const [copiedFrom, setCopiedFrom] = useState<string | null>(null);
+  const [copied, setCopied] = useState<{ from: string; items: CopiedItem[] } | null>(null);
   const timer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const latest = useRef(0);
 
@@ -39,8 +45,7 @@ export function CopyFromGame({ onCopy }: { onCopy: (game: GameTemplate) => void 
   }
 
   function pick(game: GameTemplate) {
-    onCopy(game);
-    setCopiedFrom(game.title);
+    setCopied({ from: game.title, items: onCopy(game) });
     setQuery("");
     setResults(null);
     latest.current++; // drop any search still in flight
@@ -103,10 +108,36 @@ export function CopyFromGame({ onCopy }: { onCopy: (game: GameTemplate) => void 
           <p className="text-xs text-subtle">No game matches that search.</p>
         ))}
 
-      {copiedFrom && (
-        <p role="status" className="flex items-center gap-1.5 text-xs text-muted-foreground">
-          <Check className="size-3.5 text-positive" aria-hidden /> Copied from {copiedFrom}. Adjust anything below.
-        </p>
+      {copied && (
+        <div role="status" className="space-y-2 rounded-md border border-border bg-card/50 p-3 text-xs">
+          <p className="flex items-center gap-1.5 font-medium text-foreground">
+            <Check className="size-3.5 text-positive" aria-hidden /> Copied from {copied.from}
+          </p>
+          {copied.items.length > 0 ? (
+            <dl className="space-y-1 text-muted-foreground">
+              {copied.items.map((item) => (
+                <div key={item.label} className="flex gap-2">
+                  <dt className="w-20 shrink-0 text-subtle">{item.label}</dt>
+                  <dd>{item.value}</dd>
+                </div>
+              ))}
+            </dl>
+          ) : (
+            <p className="text-muted-foreground">That game has no details to copy yet.</p>
+          )}
+          <p className="text-subtle">
+            The fields below are filled in; adjust anything.{" "}
+            <button
+              type="button"
+              className="underline underline-offset-4 hover:text-foreground"
+              onClick={() =>
+                document.getElementById("developer")?.scrollIntoView({ behavior: "smooth", block: "center" })
+              }
+            >
+              Show me
+            </button>
+          </p>
+        </div>
       )}
     </section>
   );

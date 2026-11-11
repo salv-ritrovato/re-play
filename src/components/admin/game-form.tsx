@@ -17,6 +17,7 @@ import { slugify } from "@/lib/format";
 import {
   COMPLETION_LABEL,
   COMPLETION_STATUSES,
+  LAUNCHER_NAME,
   PLAY_STATUSES,
   PLAY_STATUS_LABEL,
   type GameDetail,
@@ -24,7 +25,7 @@ import {
   type Taxonomy,
 } from "@/lib/types";
 import { gameSchema, type GameFormInput, type GameFormValues } from "@/lib/validation";
-import { CopyFromGame } from "./copy-from-game";
+import { CopyFromGame, type CopiedItem } from "./copy-from-game";
 import { DeleteGameButton } from "./delete-game-button";
 import { Field, FormSection } from "./field";
 import { LauncherPicker } from "./launcher-picker";
@@ -132,7 +133,7 @@ export function GameForm({
   }
 
   /** Copies what a series / studio shares from another game; never anything personal. */
-  function applyTemplate(t: GameTemplate) {
+  function applyTemplate(t: GameTemplate): CopiedItem[] {
     const opts = { shouldDirty: true } as const;
     setValue("developer", t.developer ?? "", opts);
     setValue("publisher", t.publisher ?? "", opts);
@@ -142,6 +143,20 @@ export function GameForm({
     setValue("tags", t.tags, opts);
     setValue("is_online", t.is_online, opts);
     toast.success(`Copied details from ${t.title}`);
+
+    // Tell the owner exactly what landed in the form (the fields are further down the page).
+    const names = (ids: string[], list: Taxonomy[]) =>
+      ids.map((id) => list.find((x) => x.id === id)?.name).filter(Boolean).join(", ");
+    const items: (CopiedItem | null)[] = [
+      t.developer ? { label: "Developer", value: t.developer } : null,
+      t.publisher ? { label: "Publisher", value: t.publisher } : null,
+      t.genre_ids.length ? { label: "Genres", value: names(t.genre_ids, genres) } : null,
+      t.platform_ids.length ? { label: "Platforms", value: names(t.platform_ids, platforms) } : null,
+      t.launchers.length ? { label: "Launchers", value: t.launchers.map((l) => LAUNCHER_NAME[l]).join(", ") } : null,
+      t.tags.length ? { label: "Tags", value: t.tags.join(", ") } : null,
+      t.is_online ? { label: "Online", value: "Online / competitive" } : null,
+    ];
+    return items.filter((i): i is CopiedItem => i !== null);
   }
 
   /** "list": save and go back to the list. "another": save and start a fresh blank form. */
