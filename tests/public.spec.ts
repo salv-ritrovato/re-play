@@ -187,6 +187,96 @@ test.describe("public navigation", () => {
     await expect(page).not.toHaveURL(/genre=/);
   });
 
+  test("the library searches, filters, sorts and pages in the browser, without asking the server", async ({ page }) => {
+    // Anything that goes back to the server for /library (a page load or an RSC fetch) counts.
+    const trips: string[] = [];
+    page.on("request", (req) => {
+      if (new URL(req.url()).pathname === "/library") trips.push(req.url());
+    });
+
+    await page.goto("/library");
+    const summary = page.locator("p[aria-live=polite]");
+    await expect(summary).toHaveText(/^\d+ games?/);
+    const total = Number((await summary.innerText()).match(/\d+/)![0]);
+    test.skip(total < 3, "needs a few games in the archive");
+    const firstTitle = (await page.locator("main h3").first().innerText()).trim();
+    trips.length = 0;
+
+    // Typing narrows the results on the spot (no wait for the URL, no round trip).
+    const search = page.getByRole("searchbox", { name: "Search" });
+    await search.fill(firstTitle);
+    await expect(page.locator("main h3", { hasText: firstTitle }).first()).toBeVisible();
+    await expect(summary).toHaveText(/matches? your search/);
+    await expect(page).toHaveURL(/q=/);
+    await search.fill("zzzz no game is called this");
+    await expect(page.getByText("No games match these filters")).toBeVisible();
+    await search.fill("");
+    await expect(summary).toHaveText(new RegExp(`^${total} games?$`));
+    await expect(page).not.toHaveURL(/q=/);
+
+    // A filter and a new sort order apply at once.
+    await page.getByRole("button", { name: /Filters/ }).click();
+    await page.getByRole("button", { name: "Completed", exact: true }).click();
+    await expect(page).toHaveURL(/status=completed/);
+    await page.keyboard.press("Escape");
+    await page.getByRole("combobox", { name: "Sort by" }).click();
+    await page.getByRole("option", { name: "Lowest rated" }).click();
+    await expect(page).toHaveURL(/sort=rating_asc/);
+    const ratings = await page.locator("main li [aria-label^='Rated']").evaluateAll((els) =>
+      els.map((el) => Number(/Rated ([d.]+)/.exec(el.getAttribute("aria-label") ?? "")?.[1])),
+    );
+    expect(ratings.length).toBeGreaterThan(1);
+    expect([...ratings].sort((x, y) => x - y)).toEqual(ratings);
+
+    // Back to everything, then to the second page, when there is one.
+    await page.getByRole("button", { name: /Filters/ }).click();
+    await page.getByRole("button", { name: "Clear all" }).click();
+    await page.keyboard.press("Escape");
+    await expect(summary).toHaveText(new RegExp(`^${total} games?$`));
+    if (total > 24) {
+      const before = (await page.locator("main h3").first().innerText()).trim();
+      await page.getByRole("link", { name: "Page 2" }).click();
+      await expect(page).toHaveURL(/page=2/);
+      await expect(page.locator("main h3").first()).not.toHaveText(before);
+      await page.getByRole("link", { name: "Page 1" }).click();
+      await expect(page.locator("main h3").first()).toHaveText(before);
+    }
+
+    expect(trips, "the library asked the server for something").toEqual([]);
+
+    // A shared link still arrives already filtered.
+    await page.goto(`/library?q=${encodeURIComponent(firstTitle)}`);
+    await expect(page.locator("main h3", { hasText: firstTitle }).first()).toBeVisible();
+    await expect(summary).toHaveText(/matches? your search/);
+    await expect(search).toHaveValue(firstTitle);
+  });
+
+  test("genres lead to the games of that genre, and every genre has its place", async ({ page }) => {
+    await page.goto("/");
+    test.skip(await page.getByText("Nothing here yet").isVisible(), "needs at least one game in the archive");
+
+    // The home shows only the biggest genres; "All genres" opens the complete list.
+    const home = page.locator("section").filter({ has: page.getByRole("heading", { name: "Browse by genre" }) });
+    const onHome = await home.getByRole("list").getByRole("link").count();
+    await home.getByRole("link", { name: "All genres" }).click();
+    await expect(page).toHaveURL(/\/genres$/);
+    await expect(page.getByRole("heading", { level: 1, name: "All the genres" })).toBeVisible();
+    const tiles = page.getByRole("list").getByRole("link");
+    expect(await tiles.count()).toBeGreaterThanOrEqual(onHome);
+
+    // A genre opens the library with only its games.
+    await tiles.first().click();
+    await expect(page).toHaveURL(/\/library\?genre=[0-9a-f-]{36}$/);
+    await expect(page.locator("p[aria-live=polite]")).toHaveText(/match/);
+
+    // On a game, the genre names are links too.
+    await page.goto("/library");
+    await page.locator("main h3 a").first().click();
+    const genre = page.getByRole("link", { name: /^[^/]+$/ }).and(page.locator("a[href^='/library?genre=']")).first();
+    await genre.click();
+    await expect(page).toHaveURL(/\/library\?genre=[0-9a-f-]{36}$/);
+  });
+
   test("invalid query params are ignored instead of crashing", async ({ page }) => {
     const res = await page.goto("/library?genre=not-a-uuid&min=abc&sort=hack&page=-4&status=nope");
     expect(res?.status()).toBe(200);

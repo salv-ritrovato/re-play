@@ -32,7 +32,7 @@ import {
 } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-interface FilterOptions {
+export interface FilterOptions {
   genres: Taxonomy[];
   platforms: Taxonomy[];
   years: { year: number; games: number }[];
@@ -54,12 +54,16 @@ export function LibraryToolbar({
   options,
   mode,
   total,
+  onQueryChange,
 }: {
   options: FilterOptions;
   mode: "library" | "reviews";
   total: number;
+  /** Called on every keystroke, before the URL catches up (the library filters as you type). */
+  onQueryChange?: (query: string) => void;
 }) {
-  const { searchParams, update, toggle, getList, clear, isPending } = useQueryParams();
+  // The library holds all its data in the browser, so its filters never leave the page.
+  const { searchParams, update, toggle, getList, clear, isPending } = useQueryParams({ shallow: mode === "library" });
 
   // Search: local state for instant typing, debounced into the URL.
   const urlQuery = searchParams.get("q") ?? "";
@@ -102,7 +106,10 @@ export function LibraryToolbar({
           <Input
             type="search"
             value={query}
-            onChange={(e) => setQuery(e.target.value)}
+            onChange={(e) => {
+              setQuery(e.target.value);
+              onQueryChange?.(e.target.value);
+            }}
             placeholder={mode === "reviews" ? "Search reviews" : "Search title, developer or publisher"}
             id="library-search"
             aria-label="Search"

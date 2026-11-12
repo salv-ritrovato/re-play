@@ -6,6 +6,7 @@ import type {
   GameDetail,
   GameSummary,
   LibraryFilters,
+  LibraryRecord,
   Taxonomy,
 } from "@/lib/types";
 
@@ -53,6 +54,47 @@ export async function searchGames(
 
   const items = (data ?? []) as GameSummary[];
   return { items, total: items[0] ? Number(items[0].total_count) : 0 };
+}
+
+/** The library is small enough to ship whole to the browser, which then filters it instantly. */
+const LIBRARY_MAX = 1000;
+
+/** Every game, newest first, without the review texts: the browser does the searching and filtering. */
+export async function getLibraryGames(): Promise<LibraryRecord[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(TAGS.games, TAGS.taxonomy);
+
+  const supabase = createPublicClient();
+  const { data, error } = await supabase.rpc("library_search", {
+    p_sort: "added",
+    p_limit: LIBRARY_MAX,
+    p_offset: 0,
+  });
+  if (error) fail("getLibraryGames", error);
+
+  return ((data ?? []) as (GameSummary & { completed_on: string | null })[]).map(
+    (g): LibraryRecord => ({
+      id: g.id,
+      slug: g.slug,
+      title: g.title,
+      release_date: g.release_date,
+      developer: g.developer,
+      publisher: g.publisher,
+      rating: g.rating === null ? null : Number(g.rating),
+      play_status: g.play_status,
+      completion_status: g.completion_status,
+      playtime_hours: g.playtime_hours === null ? null : Number(g.playtime_hours),
+      cover_path: g.cover_path,
+      cover_blur: g.cover_blur,
+      created_at: g.created_at,
+      completed_on: g.completed_on ?? null,
+      is_online: g.is_online,
+      launchers: g.launchers,
+      genres: g.genres,
+      platforms: g.platforms,
+    }),
+  );
 }
 
 export async function getFilterOptions() {
@@ -309,13 +351,8 @@ export async function getHomeData() {
     .filter((g) => g.rating !== null && !topIds.has(g.id))
     .slice(0, 6);
 
-  // Genres with at least one game, biggest first, for the "Browse by genre" tiles.
-  type GenreRow = { id: string; name: string; game_genres: { count: number }[] };
-  const genreTiles = ((genreCounts.data ?? []) as unknown as GenreRow[])
-    .map((g) => ({ id: g.id, name: g.name, games: Number(g.game_genres?.[0]?.count ?? 0) }))
-    .filter((g) => g.games > 0)
-    .sort((a, b) => b.games - a.games || a.name.localeCompare(b.name))
-    .slice(0, 10);
+  // The ten biggest genres, for the "Browse by genre" tiles (the Genres page lists them all).
+  const genreTiles = toGenreList(genreCounts.data).slice(0, 10);
 
   const recentSince = Date.now() - RECENT_DAYS * 24 * 60 * 60 * 1000;
   const recent = ((added.data ?? []) as GameSummary[]).filter((g) => new Date(g.created_at).getTime() >= recentSince);
@@ -332,6 +369,28 @@ export async function getHomeData() {
       ? normalizeDetail(featured.data as unknown as RawDetail)
       : null,
   };
+}
+
+type GenreRow = { id: string; name: string; game_genres: { count: number }[] };
+
+/** Genres with at least one game, biggest first. */
+function toGenreList(rows: unknown): { id: string; name: string; games: number }[] {
+  return ((rows ?? []) as GenreRow[])
+    .map((g) => ({ id: g.id, name: g.name, games: Number(g.game_genres?.[0]?.count ?? 0) }))
+    .filter((g) => g.games > 0)
+    .sort((a, b) => b.games - a.games || a.name.localeCompare(b.name));
+}
+
+/** Every genre that has games, with how many, for the Genres page. */
+export async function getGenreList() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(TAGS.games, TAGS.taxonomy);
+
+  const supabase = createPublicClient();
+  const { data, error } = await supabase.from("genres").select("id, name, game_genres(count)");
+  if (error) fail("getGenreList", error);
+  return toGenreList(data);
 }
 
 // ---------------------------------------------------------------------------

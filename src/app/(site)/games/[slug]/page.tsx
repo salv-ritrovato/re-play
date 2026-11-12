@@ -18,6 +18,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CompletionBadge, LauncherIcons, OnlineBadge, Rating, StatusBadge } from "@/components/games/badges";
+import { GenreLinks } from "@/components/games/genre-links";
 import { DeveloperLinks } from "@/components/games/developer-links";
 import { GameCard } from "@/components/games/game-card";
 import { GameCover } from "@/components/games/game-cover";
@@ -90,7 +91,9 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
               <div className="mb-3 flex flex-wrap items-center gap-3">
                 {game.is_online && <OnlineBadge label="Online / competitive" />}
                 {game.genres.length > 0 && (
-                  <p className="eyebrow">{game.genres.map((g) => g.name).join(" · ")}</p>
+                  <p className="eyebrow">
+                    <GenreLinks genres={game.genres} separator=" · " />
+                  </p>
                 )}
               </div>
             )}
@@ -154,7 +157,7 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
                 value={game.developer ? <DeveloperLinks value={game.developer} /> : null}
               />
               <Detail icon={Store} label="Publisher" value={game.publisher} />
-              <Detail icon={Layers} label="Genres" value={game.genres.map((g) => g.name).join(", ") || null} />
+              <Detail icon={Layers} label="Genres" value={game.genres.length > 0 ? <GenreLinks genres={game.genres} /> : null} />
               <Detail icon={Monitor} label="Platforms" value={game.platforms.map((p) => p.name).join(", ") || null} />
               {/* With a written take, where it was played lives next to the review instead. */}
               {!hasPersonal && <PlayedVia game={game} />}

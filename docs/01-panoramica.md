@@ -30,14 +30,17 @@ integrato sotto `/admin`.
   recensioni dei giochi con voto 9 o più, al massimo 5, anche in italiano), il gioco scelto con "Feature on the
   home page" (se c'è) e gli scaffali
   "Recently added" (solo i giochi aggiunti negli ultimi 7 giorni, `RECENT_DAYS`; se non ce ne sono, lo
-  scaffale non compare), "Browse by genre" (blocchi con i generi e il numero di giochi, che aprono la
-  libreria già filtrata), "Highest rated" e "Lowest rated" ("The blunt truth": mai gli
+  scaffale non compare), "Browse by genre" (i dieci generi più grandi, con il numero di giochi; "All genres" apre la
+  pagina con tutti, e ogni blocco la libreria già filtrata), "Highest rated" e "Lowest rated" ("The blunt truth": mai gli
   stessi giochi di "Highest rated"). Nell'intestazione c'è anche **"Surprise me"**, che apre un gioco a caso
   (`/random`), e in fondo una striscia "Who's behind the reviews" con il link all'About. Non c'è più "Playing now": i giochi si aggiungono
   quando sono finiti.
 - **Library** (`/library`): tutti i giochi in vista griglia o lista, con ricerca, filtri combinabili
   (genere, piattaforma, anno, stato, completamento, voto, tipo solo/online), ordinamenti e paginazione.
-  Filtri e ordinamento vivono nell'URL, quindi ogni vista è condivisibile.
+  Filtri e ordinamento vivono nell'URL, quindi ogni vista è condivisibile. Tutto avviene **subito, nel
+  browser**: ricerca (mentre si scrive), filtri, ordinamento e cambio pagina non chiedono nulla al server.
+- **Genres** (`/genres`): tutti i generi con il numero di giochi; cliccandone uno si apre la Library già
+  filtrata su quel genere. I nomi dei generi sono link anche nella scheda del gioco e nelle righe della lista.
 - **Gioco** (`/games/[slug]`): scheda con copertina, metadati, voto, pro e contro e recensione in inglese e
   italiano (tab EN/IT). In alto un colpo d'occhio con voto, stato, completamento e ore. Accanto alla
   recensione c'è la scheda **"My playthrough"** (resta in vista mentre si scorre) con ciò che in alto non c'è:

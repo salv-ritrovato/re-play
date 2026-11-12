@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { yearOf } from "@/lib/format";
-import type { GameSummary } from "@/lib/types";
+import type { LibraryGame } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { LauncherIcons, OnlineBadge, Rating, StatusBadge } from "./badges";
 import { DeveloperLinks } from "./developer-links";
@@ -16,7 +16,7 @@ export function GameCard({
   priority,
   showStatus = true,
 }: {
-  game: GameSummary;
+  game: LibraryGame;
   className?: string;
   priority?: boolean;
   showStatus?: boolean;

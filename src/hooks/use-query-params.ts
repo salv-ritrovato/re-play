@@ -9,11 +9,15 @@ type Updates = Record<string, string | string[] | null | undefined>;
  * URL-driven state for filters/sort/pagination. The URL is the single source of truth,
  * so every filtered view is shareable, bookmarkable and server-rendered.
  *
+ * With `shallow` the URL is rewritten in place (`history.replaceState`, which Next keeps in step with
+ * `useSearchParams`) and nothing is fetched: for pages that already hold all their data in the browser.
+ * Otherwise every change is a server navigation.
+ *
  * Navigation is async: if the user clicks two filters before the first navigation has
  * landed, the second update must build on the first instead of on the stale URL. We keep
  * the most recent query string in a ref for that.
  */
-export function useQueryParams() {
+export function useQueryParams({ shallow = false }: { shallow?: boolean } = {}) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -39,11 +43,16 @@ export function useQueryParams() {
       if (resetPage && !("page" in updates)) next.delete("page");
       const qs = next.toString();
       latest.current = qs;
+      const href = qs ? `${pathname}?${qs}` : pathname;
+      if (shallow) {
+        window.history.replaceState(null, "", href);
+        return;
+      }
       startTransition(() => {
-        router.replace(qs ? `${pathname}?${qs}` : pathname, { scroll: false });
+        router.replace(href, { scroll: false });
       });
     },
-    [pathname, router],
+    [pathname, router, shallow],
   );
 
   /** Values of a comma-separated param, for rendering. */

@@ -1,11 +1,12 @@
 import Link from "next/link";
 import { formatPlaytime, yearOf } from "@/lib/format";
-import type { GameSummary } from "@/lib/types";
+import type { LibraryGame } from "@/lib/types";
 import { CompletionBadge, LauncherIcons, OnlineBadge, Rating, StatusBadge } from "./badges";
 import { DeveloperLinks } from "./developer-links";
+import { GenreLinks } from "./genre-links";
 import { GameCover } from "./game-cover";
 
-export function GameRow({ game }: { game: GameSummary }) {
+export function GameRow({ game }: { game: LibraryGame }) {
   const year = yearOf(game.release_date);
   const playtime = formatPlaytime(game.playtime_hours);
 
@@ -45,8 +46,8 @@ export function GameRow({ game }: { game: GameSummary }) {
           </p>
         </div>
         <div className="hidden min-w-0 sm:block">
-          <p className="truncate text-xs text-muted-foreground">
-            {game.genres.map((g) => g.name).join(", ") || "-"}
+          <p className="relative z-10 truncate text-xs text-muted-foreground">
+            {game.genres.length > 0 ? <GenreLinks genres={game.genres} /> : "-"}
           </p>
           <p className="mt-1 truncate text-xs text-subtle">
             {game.platforms.map((p) => p.name).join(", ") || "-"}

@@ -88,6 +88,11 @@ export interface GameSummary {
   total_count: number;
 }
 
+/** What a card or a row needs: a library entry carries no review text, so the whole archive stays light. */
+export type LibraryGame = Omit<GameSummary, "review_en" | "review_it" | "short_description" | "total_count">;
+/** A library entry as the browser filters it (see `filterLibrary`). */
+export type LibraryRecord = LibraryGame & { completed_on: string | null };
+
 export interface GameDetail {
   id: string;
   slug: string;

@@ -58,12 +58,24 @@ verso Supabase). Le server action accettano body fino a 12 MB (`serverActions.bo
 
 ## Ricerca, filtri, ordinamento, paginazione
 
-- Tutto passa da **un'unica funzione SQL**, `library_search` (vedi [03-database.md](03-database.md)),
-  pilotata dai parametri URL.
+- **Library: tutto nel browser.** `getLibraryGames()` (in cache) legge l'intero archivio con `library_search`
+  (senza i testi delle recensioni, `LibraryRecord`, fino a 1000 giochi) e lo passa a `LibraryBrowser`
+  (`src/components/games/library-browser.tsx`), che con `filterLibrary` (`src/lib/library-filter.ts`)
+  cerca, filtra, ordina e impagina (24 per pagina) senza altre richieste. L'URL resta la fonte di verità ma si
+  aggiorna sul posto con `history.replaceState` (`useQueryParams({ shallow: true })`; Next lo tiene allineato con
+  `useSearchParams`): un link condiviso arriva già filtrato, perché la pagina legge lo stesso URL. La ricerca
+  filtra a ogni tasto, l'URL si aggiorna dopo 300 ms. `filterLibrary` rispecchia la funzione SQL (stessi criteri e
+  stessi ordinamenti, a parità di voto vince il più recente): un test lo confronta con il database per ogni
+  ordinamento e per i filtri principali.
+- Home e pagina Reviews continuano a usare la funzione SQL `library_search` (vedi
+  [03-database.md](03-database.md)), pilotata dai parametri URL con una navigazione del server a ogni cambio.
 - `parseLibraryParams` (`src/lib/library-params.ts`) è difensivo: UUID non validi, numeri non numerici,
   ordinamenti sconosciuti o pagine negative vengono ignorati senza errori.
 - `useQueryParams` (`src/hooks/use-query-params.ts`) tiene l'ultima query in un `ref` per non perdere
-  aggiornamenti in caso di click ravvicinati sui filtri.
+  aggiornamenti in caso di click ravvicinati sui filtri. `Pagination` accetta `onPageChange` per cambiare pagina
+  sul posto (i link restano come ripiego, anche per aprire una pagina in una nuova scheda).
+- **Generi**: `getGenreList()` alimenta la pagina `/genres` (tutti i generi con almeno un gioco, dal più
+  grande); la home ne mostra i primi dieci. `GenreLinks` rende i nomi dei generi link a `/library?genre=<id>`.
 - La pagina Reviews usa gli stessi parametri con opzioni di ordinamento dedicate (`REVIEW_SORT_OPTIONS`).
 
 ## Immagini di anteprima (Open Graph)
@@ -103,7 +115,9 @@ puntini su telefono (pulsanti più grandi da toccare). Con una sola recensione i
 "Standout" automatico: il blocco "Featured" resta solo per il gioco scelto a mano nel form.
 
 `getHomeData()` (`src/lib/data/public.ts`, in cache) prepara tutto in una volta: numeri, gioco in evidenza,
-scaffali e i dati dei nuovi blocchi. I generi per "Browse by genre" arrivano da `genres` con il conteggio
+scaffali e i dati dei nuovi blocchi. Il quarto numero in cima ("Studios") è `studioCount`: i nomi di
+`filter_developers` passano da `splitDevelopers` e `slugify`, quindi "A, B" conta due studi e lo stesso studio
+in più giochi conta una volta sola. I generi per "Browse by genre" arrivano da `genres` con il conteggio
 delle righe di `game_genres`; "Lowest rated" usa `library_search` con ordinamento `rating_asc` ed esclude i
 giochi già in "Highest rated". "Surprise me" punta a `src/app/(site)/random/route.ts`: un route handler che,
 con `connection()` per non essere prerenderizzato, sceglie uno slug a caso da `getAllSlugs()` e risponde con un

@@ -1,3 +1,5 @@
+"use client";
+
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
@@ -32,15 +34,27 @@ export function Pagination({
   page,
   total,
   pageSize,
+  onPageChange,
 }: {
   basePath: string;
   params: RawParams;
   page: number;
   total: number;
   pageSize: number;
+  /** When given, a click changes the page in place instead of navigating (the links stay as a fallback). */
+  onPageChange?: (page: number) => void;
 }) {
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
   if (totalPages <= 1) return null;
+
+  const go = (p: number) =>
+    onPageChange
+      ? (e: React.MouseEvent) => {
+          if (e.metaKey || e.ctrlKey || e.shiftKey || e.button !== 0) return;
+          e.preventDefault();
+          onPageChange(p);
+        }
+      : undefined;
 
   const linkClass =
     "inline-flex h-9 min-w-9 items-center justify-center rounded-md border border-border px-3 text-sm text-muted-foreground transition-colors hover:border-muted-foreground/50 hover:text-foreground";
@@ -48,7 +62,7 @@ export function Pagination({
   return (
     <nav aria-label="Pagination" className="flex items-center justify-center gap-1.5 pt-10">
       {page > 1 ? (
-        <Link href={href(basePath, params, page - 1)} className={linkClass} aria-label="Previous page" rel="prev">
+        <Link href={href(basePath, params, page - 1)} onClick={go(page - 1)} className={linkClass} aria-label="Previous page" rel="prev">
           <ChevronLeft className="size-4" />
         </Link>
       ) : (
@@ -64,6 +78,7 @@ export function Pagination({
           <Link
             key={p}
             href={href(basePath, params, p)}
+            onClick={go(p)}
             aria-current={p === page ? "page" : undefined}
             aria-label={`Page ${p}`}
             className={cn(linkClass, p === page && "border-foreground bg-foreground text-background hover:text-background")}
@@ -74,7 +89,7 @@ export function Pagination({
       )}
 
       {page < totalPages ? (
-        <Link href={href(basePath, params, page + 1)} className={linkClass} aria-label="Next page" rel="next">
+        <Link href={href(basePath, params, page + 1)} onClick={go(page + 1)} className={linkClass} aria-label="Next page" rel="next">
           <ChevronRight className="size-4" />
         </Link>
       ) : (

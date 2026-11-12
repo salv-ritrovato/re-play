@@ -107,10 +107,10 @@ async function HomeContent() {
                 title="Browse by genre"
                 action={
                   <Link
-                    href="/library"
+                    href="/genres"
                     className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
                   >
-                    All games <ArrowRight className="size-3.5" />
+                    All genres <ArrowRight className="size-3.5" />
                   </Link>
                 }
               >
