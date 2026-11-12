@@ -63,11 +63,14 @@ test.describe.serial("CMS end to end", () => {
     await page.locator("#completed_on").fill("2021-07-20");
 
     // Server + client validation: a review needs both languages.
-    await page.locator("#review_en").fill("An English review written by the test suite.");
+    // Pasted bold markers disappear as soon as they land in the field.
+    await page.locator("#review_en").fill("An English **review** written by the test suite.");
+    await expect(page.locator("#review_en")).toHaveValue("An English review written by the test suite.");
     await page.getByRole("button", { name: "Add game" }).last().click();
     await expect(page.getByText("Add the Italian version of the review")).toBeVisible();
     await page.locator("#review_it").fill("Una recensione italiana scritta dalla suite di test.");
-    await page.locator("#pros").fill("Fast\nStable");
+    await page.locator("#pros").fill("*Fast*\n**Stable**");
+    await expect(page.locator("#pros")).toHaveValue("Fast\nStable");
     await page.locator("#cons").fill("Fake");
 
     // Cover (large, so client-side compression is exercised).
@@ -445,6 +448,19 @@ test.describe.serial("CMS end to end", () => {
       await expect(carousel.getByRole("button", { name: /\(2 of \d+\)/ })).toHaveAttribute("aria-current", "true");
       await carousel.getByRole("button", { name: /\(1 of \d+\)/ }).click();
       await expect(carousel.getByRole("button", { name: /\(1 of \d+\)/ })).toHaveAttribute("aria-current", "true");
+
+      // The arrows loop: after the last review comes the first, and back from the first goes to the last.
+      const dot = (n: number) => carousel.getByRole("button", { name: new RegExp(`\\(${n} of ${count}\\)`) });
+      for (let n = 2; n <= count; n++) {
+        await carousel.getByRole("button", { name: "Next review" }).click();
+        await expect(dot(n)).toHaveAttribute("aria-current", "true");
+      }
+      await carousel.getByRole("button", { name: "Next review" }).click();
+      await expect(dot(1)).toHaveAttribute("aria-current", "true");
+      await carousel.getByRole("button", { name: "Previous review" }).click();
+      await expect(dot(count)).toHaveAttribute("aria-current", "true");
+      await carousel.getByRole("button", { name: "Next review" }).click();
+      await expect(dot(1)).toHaveAttribute("aria-current", "true");
     }
 
     // "Read the full review" opens the game.

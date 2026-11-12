@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { stripAsterisks } from "@/lib/text";
 import { COMPLETION_STATUSES, LAUNCHER_IDS, PLAY_STATUSES } from "@/lib/types";
 
 const text = (max: number) =>
@@ -7,6 +8,9 @@ const text = (max: number) =>
     .trim()
     .max(max, `Max ${max} characters`)
     .transform((v) => (v === "" ? null : v));
+
+/** Free text the owner writes or pastes: stray asterisks (pasted bold markers) are removed. */
+const prose = (max: number) => z.string().transform(stripAsterisks).pipe(text(max));
 
 const dateString = z
   .string()
@@ -29,7 +33,8 @@ const numberString = (min: number, max: number, label: string) =>
 /** One item per line in the form, array in the database. */
 const lines = z
   .string()
-  .max(4000)
+  .transform(stripAsterisks)
+  .pipe(z.string().max(4000))
   .transform((v) =>
     v
       .split("\n")
@@ -46,8 +51,8 @@ export const gameSchema = z
       .min(1, "Slug is required")
       .max(80)
       .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Lowercase letters, numbers and single hyphens only"),
-    short_description: text(280),
-    description: text(8000),
+    short_description: prose(280),
+    description: prose(8000),
     release_date: dateString,
     developer: text(120),
     publisher: text(120),
@@ -62,8 +67,8 @@ export const gameSchema = z
     playtime_hours: numberString(0, 99999, "Playtime"),
     completed_on: dateString,
 
-    review_en: text(20000),
-    review_it: text(20000),
+    review_en: prose(20000),
+    review_it: prose(20000),
     pros: lines,
     cons: lines,
     featured: z.boolean(),

@@ -40,6 +40,13 @@ export function StandoutCarousel({ slides, label }: { slides: StandoutSlide[]; l
     el.scrollTo({ left: next * el.clientWidth, behavior: reduce ? "auto" : "smooth" });
   }
 
+  /** One review forward or back; after the last one it starts again from the first, and the other way round. */
+  function step(delta: 1 | -1) {
+    const last = slides.length - 1;
+    const next = index + delta;
+    go(next > last ? 0 : next < 0 ? last : next);
+  }
+
   function onScroll() {
     const el = track.current;
     if (el && el.clientWidth > 0) setIndex(Math.round(el.scrollLeft / el.clientWidth));
@@ -74,8 +81,8 @@ export function StandoutCarousel({ slides, label }: { slides: StandoutSlide[]; l
           )}
           {many && (
             <div className="hidden items-center gap-1.5 sm:flex">
-              <ArrowButton direction="previous" disabled={index === 0} onClick={() => go(index - 1)} />
-              <ArrowButton direction="next" disabled={index === slides.length - 1} onClick={() => go(index + 1)} />
+              <ArrowButton direction="previous" onClick={() => step(-1)} />
+              <ArrowButton direction="next" onClick={() => step(1)} />
             </div>
           )}
         </div>
@@ -89,10 +96,10 @@ export function StandoutCarousel({ slides, label }: { slides: StandoutSlide[]; l
         onKeyDown={(e) => {
           if (e.key === "ArrowRight") {
             e.preventDefault();
-            go(index + 1);
+            step(1);
           } else if (e.key === "ArrowLeft") {
             e.preventDefault();
-            go(index - 1);
+            step(-1);
           }
         }}
         className="relative flex snap-x snap-mandatory overflow-x-auto rounded-md border border-border bg-surface [scrollbar-width:none] focus-visible:ring-3 focus-visible:ring-ring/50 focus-visible:outline-none [&::-webkit-scrollbar]:hidden"
@@ -151,43 +158,43 @@ export function StandoutCarousel({ slides, label }: { slides: StandoutSlide[]; l
       </ul>
 
       {many && (
-        <div className="flex items-center justify-center gap-2" role="group" aria-label="Choose a review">
-          {slides.map((slide, i) => (
-            <button
-              key={slide.slug}
-              type="button"
-              aria-label={`Show ${slide.title} (${i + 1} of ${slides.length})`}
-              aria-current={i === index ? "true" : undefined}
-              onClick={() => go(i)}
-              className={cn(
-                "h-2 rounded-full transition-all outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
-                i === index ? "w-6 bg-foreground" : "w-2 bg-border hover:bg-muted-foreground",
-              )}
-            />
-          ))}
+        <div className="flex items-center justify-center gap-4">
+          {/* On a phone the arrows sit beside the dots (on larger screens they are next to the title). */}
+          <span className="sm:hidden">
+            <ArrowButton direction="previous" onClick={() => step(-1)} />
+          </span>
+          <div className="flex items-center gap-2" role="group" aria-label="Choose a review">
+            {slides.map((slide, i) => (
+              <button
+                key={slide.slug}
+                type="button"
+                aria-label={`Show ${slide.title} (${i + 1} of ${slides.length})`}
+                aria-current={i === index ? "true" : undefined}
+                onClick={() => go(i)}
+                className={cn(
+                  "h-2 rounded-full transition-all outline-none focus-visible:ring-3 focus-visible:ring-ring/50",
+                  i === index ? "w-6 bg-foreground" : "w-2 bg-border hover:bg-muted-foreground",
+                )}
+              />
+            ))}
+          </div>
+          <span className="sm:hidden">
+            <ArrowButton direction="next" onClick={() => step(1)} />
+          </span>
         </div>
       )}
     </section>
   );
 }
 
-function ArrowButton({
-  direction,
-  disabled,
-  onClick,
-}: {
-  direction: "previous" | "next";
-  disabled: boolean;
-  onClick: () => void;
-}) {
+function ArrowButton({ direction, onClick }: { direction: "previous" | "next"; onClick: () => void }) {
   const Icon = direction === "previous" ? ChevronLeft : ChevronRight;
   return (
     <button
       type="button"
       aria-label={direction === "previous" ? "Previous review" : "Next review"}
-      disabled={disabled}
       onClick={onClick}
-      className="grid size-8 place-items-center rounded-md border border-border text-muted-foreground transition-colors outline-none hover:border-muted-foreground/50 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-40"
+      className="grid size-10 place-items-center rounded-md border border-border text-muted-foreground transition-colors outline-none hover:border-muted-foreground/50 hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50 sm:size-8"
     >
       <Icon aria-hidden className="size-4" />
     </button>

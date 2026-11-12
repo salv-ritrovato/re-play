@@ -14,6 +14,7 @@ import { OptionSelect } from "@/components/ui/option-select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { slugify } from "@/lib/format";
+import { stripAsterisks } from "@/lib/text";
 import {
   COMPLETION_LABEL,
   COMPLETION_STATUSES,
@@ -113,6 +114,20 @@ export function GameForm({
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [hasUnsavedChanges, isSaving]);
+
+  /** Pasted bold markers (asterisks) vanish as soon as they land in a text field, keeping the cursor in place. */
+  function noAsterisks(name: "short_description" | "description" | "review_en" | "review_it" | "pros" | "cons") {
+    return {
+      onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+        const el = e.target;
+        if (!el.value.includes("*")) return;
+        const caret = el.selectionStart ?? el.value.length;
+        const removedBeforeCaret = el.value.slice(0, caret).replace(/[^*]/g, "").length;
+        setValue(name, stripAsterisks(el.value), { shouldDirty: true, shouldValidate: formState.isSubmitted });
+        el.setSelectionRange(caret - removedBeforeCaret, caret - removedBeforeCaret);
+      },
+    };
+  }
 
   function err(name: keyof GameFormInput) {
     const e = errors[name];
@@ -265,10 +280,10 @@ export function GameForm({
           />
         </Field>
         <Field id="short_description" label="Short description" error={err("short_description")} hint="One or two sentences, shown on cards and previews." className="sm:col-span-2">
-          <Textarea id="short_description" rows={2} {...register("short_description")} {...aria("short_description")} />
+          <Textarea id="short_description" rows={2} {...register("short_description", noAsterisks("short_description"))} {...aria("short_description")} />
         </Field>
         <Field id="description" label="Full description" error={err("description")} className="sm:col-span-2">
-          <Textarea id="description" rows={6} {...register("description")} {...aria("description")} />
+          <Textarea id="description" rows={6} {...register("description", noAsterisks("description"))} {...aria("description")} />
         </Field>
         <Field id="release_date" label="Release date" error={err("release_date")}>
           <Input id="release_date" type="date" {...register("release_date")} {...aria("release_date")} />
@@ -436,17 +451,17 @@ export function GameForm({
 
       {/* Editorial ------------------------------------------------------------ */}
       <FormSection title="Editorial" description="Your review, shown prominently on the game page.">
-        <Field id="review_en" label="Review (English)" error={err("review_en")} className="sm:col-span-2" hint="Separate paragraphs with a blank line. Every review needs both an English and an Italian version.">
-          <Textarea id="review_en" lang="en" rows={10} className="leading-relaxed" {...register("review_en")} {...aria("review_en")} />
+        <Field id="review_en" label="Review (English)" error={err("review_en")} className="sm:col-span-2" hint="Separate paragraphs with a blank line. Every review needs both an English and an Italian version. Asterisks (pasted bold text) are removed for you.">
+          <Textarea id="review_en" lang="en" rows={10} className="leading-relaxed" {...register("review_en", noAsterisks("review_en"))} {...aria("review_en")} />
         </Field>
-        <Field id="review_it" label="Recensione (Italiano)" error={err("review_it")} className="sm:col-span-2" hint="Separa i paragrafi con una riga vuota.">
-          <Textarea id="review_it" lang="it" rows={10} className="leading-relaxed" {...register("review_it")} {...aria("review_it")} />
+        <Field id="review_it" label="Recensione (Italiano)" error={err("review_it")} className="sm:col-span-2" hint="Separa i paragrafi con una riga vuota. Gli asterischi (testo incollato in grassetto) vengono tolti in automatico.">
+          <Textarea id="review_it" lang="it" rows={10} className="leading-relaxed" {...register("review_it", noAsterisks("review_it"))} {...aria("review_it")} />
         </Field>
         <Field id="pros" label="Pros" error={err("pros")} hint="One per line">
-          <Textarea id="pros" rows={5} {...register("pros")} {...aria("pros")} />
+          <Textarea id="pros" rows={5} {...register("pros", noAsterisks("pros"))} {...aria("pros")} />
         </Field>
         <Field id="cons" label="Cons" error={err("cons")} hint="One per line">
-          <Textarea id="cons" rows={5} {...register("cons")} {...aria("cons")} />
+          <Textarea id="cons" rows={5} {...register("cons", noAsterisks("cons"))} {...aria("cons")} />
         </Field>
       </FormSection>
 

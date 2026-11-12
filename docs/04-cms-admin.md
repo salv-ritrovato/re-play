@@ -29,6 +29,10 @@ Comportamenti da conoscere:
 - **Reset dopo il salvataggio e su "Cancel"**: `resetForm({ values })`. Senza, Next riutilizzerebbe lo stato
   del gioco precedente (le pagine visitate restano in memoria).
 - **Protezione dalle perdite di dati**: `beforeunload` avvisa se ci sono modifiche non salvate.
+- **Asterischi tolti in automatico**: nei campi di testo (descrizioni, recensioni in inglese e italiano, pro e
+  contro) gli asterischi, residui del grassetto del testo incollato (`**così**`), spariscono appena incollati
+  nel form, e il server li toglie comunque al salvataggio (`stripAsterisks` in `src/lib/text.ts`, usata da
+  `gameSchema`). Un testo fatto solo di asterischi conta come vuoto.
 - **Giochi online / competitivi** (interruttore "Online / competitive game"): non hanno una fine, quindi
   accendendo l'interruttore il form nasconde "Completion status" e "Completion date" (e li azzera), toglie
   "Completed" e "Backlog" dalle scelte di "Playing status" (restano Playing, On hold, Dropped, e se serve

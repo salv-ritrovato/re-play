@@ -97,7 +97,9 @@ copertina, titolo, anno e sviluppatore, voto, l'inizio della recensione e il lin
 giochi sono quelli con voto **almeno 9** (`STANDOUT_MIN_RATING`) e una recensione, dal voto più alto, **al
 massimo 5** (`STANDOUT_MAX`), presi con `library_search`. Scorre di lato con scorrimento a scatti (swipe, frecce,
 puntini e tasti freccia), non parte da solo e ha i ruoli ARIA di un carosello; un selettore English/Italiano
-cambia la lingua dell'estratto. Con una sola recensione i comandi non compaiono. Prende il posto dell'ex
+cambia la lingua dell'estratto. Le frecce **ricominciano da capo**: dopo l'ultima recensione si torna alla
+prima, e "indietro" dalla prima porta all'ultima. Sono accanto al titolo su schermi larghi e ai lati dei
+puntini su telefono (pulsanti più grandi da toccare). Con una sola recensione i comandi non compaiono. Prende il posto dell'ex
 "Standout" automatico: il blocco "Featured" resta solo per il gioco scelto a mano nel form.
 
 `getHomeData()` (`src/lib/data/public.ts`, in cache) prepara tutto in una volta: numeri, gioco in evidenza,

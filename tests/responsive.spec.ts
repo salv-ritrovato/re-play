@@ -28,6 +28,66 @@ test.describe("responsive layouts", () => {
     }
   });
 
+  test("the standout carousel works on this screen: swipe, looping arrows and dots", async ({ page, viewport }) => {
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    const carousel = page.getByRole("region", { name: "Standout reviews" });
+    await expect(carousel).toBeVisible();
+    const slides = carousel.getByRole("group", { name: /^\d+ of \d+$/ });
+    const count = await slides.count();
+    test.skip(count < 2, "needs two or more standout reviews in the archive");
+
+    // The carousel fits the screen and a slide is exactly as wide as the carousel (one at a time).
+    const track = carousel.locator("ul").first();
+    const trackBox = (await track.boundingBox())!;
+    expect(trackBox.width).toBeLessThanOrEqual((viewport?.width ?? 1024) + 1);
+    const inner = await track.evaluate((el) => el.clientWidth); // inside the 1px border
+    expect(Math.abs((await slides.first().boundingBox())!.width - inner)).toBeLessThanOrEqual(1);
+    await expectNoHorizontalScroll(page);
+
+    const dot = (n: number) => carousel.getByRole("button", { name: new RegExp(`\\(${n} of ${count}\\)`) });
+    await expect(dot(1)).toHaveAttribute("aria-current", "true");
+
+    // A real swipe with a finger: drag the carousel sideways and it settles on the next review.
+    await track.scrollIntoViewIfNeeded();
+    const swipeBox = (await track.boundingBox())!;
+    const screenHeight = viewport?.height ?? 800;
+    // Aim at the middle of the part of the carousel that is on screen.
+    const y = Math.round((Math.max(swipeBox.y, 0) + Math.min(swipeBox.y + swipeBox.height, screenHeight)) / 2);
+    const startX = Math.round(swipeBox.x + swipeBox.width * 0.85);
+    const endX = Math.round(swipeBox.x + swipeBox.width * 0.25);
+    const cdp = await page.context().newCDPSession(page);
+    const touch = (type: "touchStart" | "touchMove" | "touchEnd", x: number) =>
+      cdp.send("Input.dispatchTouchEvent", { type, touchPoints: type === "touchEnd" ? [] : [{ x, y }] });
+    await touch("touchStart", startX);
+    for (let step = 1; step <= 12; step++) {
+      await touch("touchMove", Math.round(startX + ((endX - startX) * step) / 12));
+      await page.waitForTimeout(16);
+    }
+    await touch("touchEnd", endX);
+    await expect(dot(2)).toHaveAttribute("aria-current", "true");
+    await expectNoHorizontalScroll(page);
+
+    // The arrows are on every screen size, and they loop at both ends.
+    const next = carousel.getByRole("button", { name: "Next review" });
+    const previous = carousel.getByRole("button", { name: "Previous review" });
+    await expect(next).toBeVisible();
+    await expect(previous).toBeVisible();
+    for (let n = 3; n <= count; n++) {
+      await next.click();
+      await expect(dot(n)).toHaveAttribute("aria-current", "true");
+    }
+    await next.click(); // past the last: back to the first
+    await expect(dot(1)).toHaveAttribute("aria-current", "true");
+    await previous.click(); // back from the first: the last
+    await expect(dot(count)).toHaveAttribute("aria-current", "true");
+
+    // The dots jump straight to a review and the page never scrolls sideways.
+    await dot(1).click();
+    await expect(dot(1)).toHaveAttribute("aria-current", "true");
+    await expectNoHorizontalScroll(page);
+  });
+
   test("navigation is reachable (menu on small screens, bar on large)", async ({ page, viewport }) => {
     await page.goto("/");
     if ((viewport?.width ?? 1024) < 768) {
