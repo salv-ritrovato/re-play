@@ -275,7 +275,7 @@ export async function getHomeData() {
   const search = (sort: string, extra: Record<string, unknown> = {}, limit = 8) =>
     supabase.rpc("library_search", { p_sort: sort, p_limit: limit, p_offset: 0, ...extra });
 
-  const [totals, added, top, featured, lowest, genreCounts, standout] = await Promise.all([
+  const [totals, added, top, featured, lowest, genreCounts, standout, developerNames] = await Promise.all([
     supabase.from("stats_totals").select("*").maybeSingle(),
     search("added"),
     search("rating_desc", { p_min_rating: 0 }),
@@ -289,12 +289,20 @@ export async function getHomeData() {
     search("rating_asc", { p_min_rating: 0 }),
     supabase.from("genres").select("id, name, game_genres(count)"),
     search("rating_desc", { p_min_rating: STANDOUT_MIN_RATING, p_reviewed_only: true }, STANDOUT_MAX),
+    supabase.from("filter_developers").select("name"),
   ]);
-  for (const r of [totals, added, top, featured, lowest, genreCounts, standout]) {
+  for (const r of [totals, added, top, featured, lowest, genreCounts, standout, developerNames]) {
     if (r.error) fail("getHomeData", r.error);
   }
 
   const rated = ((top.data ?? []) as GameSummary[]).filter((g) => g.rating !== null);
+
+  // How many different studios the archive covers (one field may list several: "A, B" counts both).
+  const studios = new Set(
+    (developerNames.data ?? []).flatMap((row) => splitDevelopers(row.name as string).map((n) => slugify(n))),
+  );
+  studios.delete("");
+
   // "The blunt truth": the lowest rated games, never the same ones as the highest rated shelf.
   const topIds = new Set(rated.slice(0, 6).map((g) => g.id));
   const lowestRated = ((lowest.data ?? []) as GameSummary[])
@@ -318,6 +326,7 @@ export async function getHomeData() {
     topRated: rated.slice(0, 6),
     lowestRated,
     genreTiles,
+    studioCount: studios.size,
     standout: ((standout.data ?? []) as GameSummary[]).filter((g) => g.rating !== null),
     featured: featured.data
       ? normalizeDetail(featured.data as unknown as RawDetail)

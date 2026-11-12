@@ -76,10 +76,12 @@ test.describe("public navigation", () => {
     const tiles = genres.getByRole("list").getByRole("link"); // (the section header has its own "All games" link)
     await expect(tiles.first()).toBeVisible();
 
-    // The key figures name the genre played the most, which is the first tile (no "highest rating": it is always 10).
-    const favourite = page.locator("dt", { hasText: "Favourite genre" }).locator("xpath=following-sibling::dd");
-    await expect(tiles.first()).toContainText((await favourite.innerText()).trim());
+    // The key figures count the studios met so far. Not "highest rating" (always 10) nor "favourite genre"
+    // (Action is broad enough to win every time): neither says anything.
+    const studios = page.locator("dt", { hasText: "Studios" }).locator("xpath=following-sibling::dd");
+    expect(Number((await studios.innerText()).trim())).toBeGreaterThanOrEqual(1);
     await expect(page.getByText("Highest rating")).toHaveCount(0);
+    await expect(page.getByText("Favourite genre")).toHaveCount(0);
     await tiles.first().click();
     await expect(page).toHaveURL(/\/library\?genre=[0-9a-f-]{36}$/);
 

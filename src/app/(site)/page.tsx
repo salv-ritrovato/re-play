@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Clock, Gamepad2, Layers, Shuffle, Star, type LucideIcon } from "lucide-react";
+import { ArrowRight, Building2, Clock, Gamepad2, Shuffle, Star, type LucideIcon } from "lucide-react";
 import { Rating } from "@/components/games/badges";
 import { DeveloperLinks } from "@/components/games/developer-links";
 import { GameCard } from "@/components/games/game-card";
@@ -25,7 +25,7 @@ export default function HomePage() {
 }
 
 async function HomeContent() {
-  const { totals, recentlyAdded, topRated, lowestRated, genreTiles, featured, standout } = await getHomeData();
+  const { totals, recentlyAdded, topRated, lowestRated, genreTiles, studioCount, featured, standout } = await getHomeData();
   const slides: StandoutSlide[] = standout.map((g) => ({
     slug: g.slug,
     title: g.title,
@@ -70,7 +70,7 @@ async function HomeContent() {
             <Stat icon={Gamepad2} label="Games" value={totals?.total_games ?? 0} />
             <Stat icon={Clock} label="Hours played" value={Number((totals?.total_playtime_hours ?? 0).toFixed(1))} />
             <Stat icon={Star} label="Average rating" value={formatRating(totals?.average_rating ?? null)} />
-            <Stat icon={Layers} label="Favourite genre" value={genreTiles[0]?.name ?? "-"} />
+            <Stat icon={Building2} label="Studios" value={studioCount} />
           </dl>
         </Container>
       </section>
