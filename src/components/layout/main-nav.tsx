@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
 import { cn } from "@/lib/utils";
+import { NavSearch } from "./nav-search";
 import { Wordmark, TAGLINE } from "./wordmark";
 
 const NAV_ITEMS = [
@@ -27,7 +28,7 @@ export function MainNav() {
   const [open, setOpen] = useState(false);
 
   return (
-    <>
+    <div className="flex items-center gap-1">
       <nav aria-label="Primary" className="hidden items-center gap-1 md:flex">
         {NAV_ITEMS.map((item) => (
           <Link
@@ -43,6 +44,8 @@ export function MainNav() {
           </Link>
         ))}
       </nav>
+
+      <NavSearch />
 
       <div className="md:hidden">
         <Sheet open={open} onOpenChange={setOpen}>
@@ -74,6 +77,6 @@ export function MainNav() {
           </SheetContent>
         </Sheet>
       </div>
-    </>
+    </div>
   );
 }

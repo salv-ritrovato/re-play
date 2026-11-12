@@ -67,6 +67,12 @@ verso Supabase). Le server action accettano body fino a 12 MB (`serverActions.bo
   filtra a ogni tasto, l'URL si aggiorna dopo 300 ms. `filterLibrary` rispecchia la funzione SQL (stessi criteri e
   stessi ordinamenti, a parità di voto vince il più recente): un test lo confronta con il database per ogni
   ordinamento e per i filtri principali.
+- **Ricerca nella navbar** (`src/components/layout/nav-search.tsx`): al primo clic scarica `/search-index`
+  (route handler, `getSearchIndex()` in cache: slug, titolo, sviluppatore, publisher, anno, voto, copertina di
+  ogni gioco; non indicizzata da `robots`) e la tiene per tutta la visita. `searchEntries`
+  (`src/lib/search-index.ts`) filtra mentre si scrive: ogni parola deve comparire in titolo, sviluppatore o
+  publisher (senza badare a maiuscole e accenti); prima i titoli che iniziano con la ricerca, poi quelli che la
+  contengono. È un pannello (`Sheet`, dall'alto) con ruoli ARIA di combobox/listbox.
 - Home e pagina Reviews continuano a usare la funzione SQL `library_search` (vedi
   [03-database.md](03-database.md)), pilotata dai parametri URL con una navigazione del server a ogni cambio.
 - `parseLibraryParams` (`src/lib/library-params.ts`) è difensivo: UUID non validi, numeri non numerici,

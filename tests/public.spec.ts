@@ -193,6 +193,45 @@ test.describe("public navigation", () => {
     await expect(page.getByRole("heading", { name: /isn't in the archive/ })).toBeVisible();
   });
 
+  test("the navbar search finds a game by title from any page", async ({ page, request }) => {
+    // The list it loads is public and light: one entry per game.
+    const res = await request.get("/search-index");
+    expect(res.status()).toBe(200);
+    const index: { slug: string; title: string }[] = await res.json();
+    test.skip(index.length === 0, "needs at least one game in the archive");
+    const target = index[0];
+
+    await page.goto("/about");
+    await page.getByRole("button", { name: "Search games" }).click();
+    const box = page.getByRole("combobox", { name: "Search by title or developer" });
+    await expect(box).toBeFocused();
+
+    // Typing a piece of the title lists the game; Enter opens the best match.
+    await box.fill(target.title.slice(0, 5).toLowerCase());
+    const results = page.getByRole("listbox", { name: "Results" });
+    await expect(results.getByRole("option", { name: new RegExp(target.title.slice(0, 5), "i") }).first()).toBeVisible();
+    await box.fill(target.title);
+    await expect(results.getByRole("option").first()).toContainText(target.title);
+    await box.press("Enter");
+    await expect(page).toHaveURL(new RegExp("/games/" + target.slug + "$"));
+    await expect(page.getByRole("combobox", { name: "Search by title or developer" })).toHaveCount(0);
+
+    // "/" opens it from anywhere; a query with no match says so, and Enter falls back to the library.
+    await page.keyboard.press("/");
+    await expect(box).toBeFocused();
+    await box.fill("zzzz nothing is called this");
+    await expect(page.getByText("No game matches")).toBeVisible();
+    await box.press("Enter");
+    await expect(page).toHaveURL(/library\?q=zzzz/);
+    await expect(page.getByText("No games match these filters")).toBeVisible();
+
+    // Escape closes it.
+    await page.keyboard.press("Control+k");
+    await expect(box).toBeVisible();
+    await page.keyboard.press("Escape");
+    await expect(box).toHaveCount(0);
+  });
+
   test("an unknown developer renders the not-found page", async ({ page }) => {
     await page.goto("/developers/nobody-ever-made-this");
     await expect(page.getByRole("heading", { name: /isn't in the archive/ })).toBeVisible();

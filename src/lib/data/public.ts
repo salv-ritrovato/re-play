@@ -2,6 +2,7 @@ import { cacheLife, cacheTag } from "next/cache";
 import { splitDevelopers } from "@/lib/developers";
 import { slugify } from "@/lib/format";
 import { createPublicClient } from "@/lib/supabase/public";
+import type { SearchEntry } from "@/lib/search-index";
 import type {
   GameDetail,
   GameSummary,
@@ -95,6 +96,24 @@ export async function getLibraryGames(): Promise<LibraryRecord[]> {
       platforms: g.platforms,
     }),
   );
+}
+
+/** Every title with a few details, for the navbar search. */
+export async function getSearchIndex(): Promise<SearchEntry[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(TAGS.games);
+
+  return (await getLibraryGames()).map((g) => ({
+    slug: g.slug,
+    title: g.title,
+    developer: g.developer,
+    publisher: g.publisher,
+    year: g.release_date ? Number(g.release_date.slice(0, 4)) : null,
+    rating: g.rating,
+    cover_path: g.cover_path,
+    cover_blur: null, // the thumbnails are tiny: no placeholder needed, and the list stays light
+  }));
 }
 
 export async function getFilterOptions() {

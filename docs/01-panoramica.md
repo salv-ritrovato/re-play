@@ -35,6 +35,10 @@ integrato sotto `/admin`.
   stessi giochi di "Highest rated"). Nell'intestazione c'è anche **"Surprise me"**, che apre un gioco a caso
   (`/random`), e in fondo una striscia "Who's behind the reviews" con il link all'About. Non c'è più "Playing now": i giochi si aggiungono
   quando sono finiti.
+- **Ricerca nella navbar** (icona a lente, in ogni pagina; si apre anche con `/` o Ctrl/Cmd+K): si scrive un
+  titolo, uno sviluppatore o un publisher e compaiono subito i primi sei giochi con copertina, anno e voto.
+  Frecce per scegliere, Invio apre il gioco evidenziato (o la Library filtrata se nulla corrisponde),
+  "Show all N results" porta alla Library con la stessa ricerca.
 - **Library** (`/library`): tutti i giochi in vista griglia o lista, con ricerca, filtri combinabili
   (genere, piattaforma, anno, stato, completamento, voto, tipo solo/online), ordinamenti e paginazione.
   Filtri e ordinamento vivono nell'URL, quindi ogni vista è condivisibile. Tutto avviene **subito, nel
@@ -74,7 +78,7 @@ eliminazione, upload della copertina, creazione al volo di generi e piattaforme.
   tenere il modello semplice. Resta la sola data di completamento (opzionale).
 - **Nelle card** compare "anno · sviluppatore" invece della piattaforma.
 - **Identità visiva**: tema scuro monocromatico, logo "Re:Play" (`public/brand/replay-logo.png`) da `md` in su,
-  testo "Re" sotto, favicon a triangolo "play" (`src/app/icon.svg`).
+  versione contratta "Re:" + triangolo play (`public/brand/replay-logo-compact.png`) sotto, favicon a triangolo "play" (`src/app/icon.svg`).
 - **Un solo amministratore**: il primo utente creato in Supabase diventa `owner`; le registrazioni pubbliche
   vanno disattivate.
 
