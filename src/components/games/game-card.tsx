@@ -31,7 +31,7 @@ export function GameCard({
         blur={game.cover_blur}
         priority={priority}
         badge={game.is_online ? <OnlineBadge /> : undefined}
-        className="transition-colors group-hover:border-muted-foreground/40"
+        className="transition-[transform,box-shadow,border-color] duration-300 group-hover:-translate-y-1 group-hover:border-muted-foreground/40 group-hover:shadow-xl group-hover:shadow-black/50 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
       />
       <div className="mt-3 flex items-start justify-between gap-3">
         <div className="min-w-0">

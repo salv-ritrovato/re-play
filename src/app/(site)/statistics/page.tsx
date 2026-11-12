@@ -2,7 +2,7 @@ import { ChartColumn, Clock, Gamepad2, Star, type LucideIcon } from "lucide-reac
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { IconLabel } from "@/components/ui/icon-label";
-import { BarList, Columns } from "@/components/stats/charts";
+import { BarList, Columns, Donut } from "@/components/stats/charts";
 import { EmptyState } from "@/components/layout/empty-state";
 import { Container, PageHeader, Section } from "@/components/layout/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -45,6 +45,7 @@ async function StatsContent() {
   // Fill gaps so the distribution always shows 0-10.
   const ratingBuckets = Array.from({ length: 10 }, (_, i) => ({
     label: `${i}-${i + 1}`,
+    tone: (i >= 9 ? "high" : i < 5 ? "low" : "mid") as "high" | "low" | "mid",
     value: ratings.find((r) => r.bucket === i)?.games ?? 0,
   }));
 
@@ -77,10 +78,10 @@ async function StatsContent() {
 
       <div className="grid gap-16 lg:grid-cols-3">
         <Section eyebrow="Where" title="Games by launcher">
-          <BarList items={launchers.map((l) => ({ label: l.name, value: l.games }))} emptyLabel="No games yet." />
+          <Donut items={launchers.map((l) => ({ label: l.name, value: l.games }))} emptyLabel="No games yet." />
         </Section>
         <Section eyebrow="Style" title="Single-player and online">
-          <BarList
+          <Donut
             items={[
               { label: "Single-player", value: types.solo },
               { label: "Online / competitive", value: types.online },

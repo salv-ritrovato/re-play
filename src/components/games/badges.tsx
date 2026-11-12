@@ -8,7 +8,7 @@ import {
   type LauncherId,
   type PlayStatus,
 } from "@/lib/types";
-import { formatRating } from "@/lib/format";
+import { formatRating, ratingTier } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 const DOT: Record<PlayStatus, string> = {
@@ -62,6 +62,9 @@ export function CompletionBadge({ status }: { status: CompletionStatus }) {
   return <span className="text-xs text-muted-foreground">{COMPLETION_LABEL[status]}</span>;
 }
 
+/** Text colour of a rating number, by tier (see `ratingTier`). */
+export const RATING_TEXT = { high: "text-rating-high", low: "text-rating-low", mid: undefined } as const;
+
 export function Rating({
   value,
   size = "md",
@@ -82,7 +85,7 @@ export function Rating({
       className={cn("inline-flex items-baseline gap-0.5 font-semibold tabular-nums tracking-tight", sizes[size], className)}
       aria-label={value === null ? "Not rated" : `Rated ${formatRating(value)} out of 10`}
     >
-      <span className={value === null ? "text-subtle" : undefined}>{formatRating(value)}</span>
+      <span className={value === null ? "text-subtle" : RATING_TEXT[ratingTier(value)]}>{formatRating(value)}</span>
       {value !== null && size !== "sm" && (
         <span className="text-[0.5em] font-normal text-subtle">/10</span>
       )}

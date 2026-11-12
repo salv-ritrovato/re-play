@@ -32,6 +32,13 @@ export function formatRating(value: number | null | undefined): string {
   return text === "10.0" ? "10" : text;
 }
 
+/** How a rating reads at a glance: 9 and above stands out, below 5 is a warning, the rest is neutral. */
+export function ratingTier(value: number | null | undefined): "high" | "low" | "mid" {
+  if (value === null || value === undefined) return "mid";
+  const n = Number(value);
+  return n >= 9 ? "high" : n < 5 ? "low" : "mid";
+}
+
 export function formatPlaytime(hours: number | null | undefined): string | null {
   if (hours === null || hours === undefined) return null;
   const h = Number(hours);

@@ -19,6 +19,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CompletionBadge, LauncherIcons, OnlineBadge, Rating, StatusBadge } from "@/components/games/badges";
 import { GenreLinks } from "@/components/games/genre-links";
+import { coverTint } from "@/lib/cover-tint";
 import { DeveloperLinks } from "@/components/games/developer-links";
 import { GameCard } from "@/components/games/game-card";
 import { GameCover } from "@/components/games/game-cover";
@@ -60,14 +61,25 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
   if (!game) notFound();
 
   const year = yearOf(game.release_date);
+  const tint = await coverTint(game.cover_blur);
   const hasPersonal =
     Boolean(game.review_en) || game.pros.length > 0 || game.cons.length > 0;
 
   return (
     <article>
       {/* Hero ------------------------------------------------------------ */}
-      <div className="border-b border-border bg-surface">
-        <Container className="grid gap-10 py-10 sm:py-16 md:grid-cols-[minmax(0,18rem)_1fr] md:gap-14 lg:grid-cols-[minmax(0,22rem)_1fr]">
+      <div className="relative overflow-hidden border-b border-border bg-surface">
+        {/* A soft glow in the main colour of the cover, so every game has its own atmosphere. */}
+        {tint && (
+          <div
+            aria-hidden
+            className="pointer-events-none absolute inset-0"
+            style={{
+              backgroundImage: `radial-gradient(60% 130% at 12% 35%, rgb(${tint.r} ${tint.g} ${tint.b} / 0.26), transparent 70%), radial-gradient(45% 90% at 100% 0%, rgb(${tint.r} ${tint.g} ${tint.b} / 0.12), transparent 70%)`,
+            }}
+          />
+        )}
+        <Container className="relative grid gap-10 py-10 sm:py-16 md:grid-cols-[minmax(0,18rem)_1fr] md:gap-14 lg:grid-cols-[minmax(0,22rem)_1fr]">
           <div className="mx-auto w-full max-w-[18rem] md:max-w-none">
             <GameCover
               title={game.title}

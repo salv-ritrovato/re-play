@@ -260,6 +260,34 @@ test.describe("public navigation", () => {
     expect([...hours].sort((a, b) => b - a)).toEqual(hours);
   });
 
+  test("the look: ratings are coloured by tier, the hero wall is decoration, cards fade in only if motion is welcome", async ({ page }) => {
+    // The wall of covers behind the hero is hidden from assistive technology and has no alternative text.
+    await page.goto("/");
+    const wall = page.locator("section [aria-hidden='true'] img");
+    test.skip((await wall.count()) === 0, "needs at least six covers");
+    expect(await wall.count()).toBeGreaterThanOrEqual(6);
+    for (const alt of await wall.evaluateAll((imgs) => imgs.map((i) => i.getAttribute("alt")))) expect(alt).toBe("");
+
+    // In the library, a rating of 9 or more is gold and one under 5 is red; the others keep the normal colour.
+    await page.goto("/library");
+    const tone = (value: string) => page.locator("main li [aria-label^='Rated " + value + "'] span").first();
+    const cards = page.locator("main li [aria-label^='Rated']");
+    const labels = await cards.evaluateAll((els) => els.map((el) => el.getAttribute("aria-label") ?? ""));
+    const rated = labels.map((l) => Number(/Rated ([0-9.]+)/.exec(l)?.[1]));
+    const high = rated.find((n) => n >= 9);
+    const low = rated.find((n) => n < 5);
+    const mid = rated.find((n) => n >= 5 && n < 9);
+    if (high !== undefined) await expect(tone(high === 10 ? "10" : high.toFixed(1))).toHaveClass(/text-rating-high/);
+    if (low !== undefined) await expect(tone(low.toFixed(1))).toHaveClass(/text-rating-low/);
+    if (mid !== undefined) await expect(tone(mid.toFixed(1))).not.toHaveClass(/text-rating-(high|low)/);
+
+    // With reduced motion asked for, the cards simply appear (no animation on them).
+    await page.emulateMedia({ reducedMotion: "reduce" });
+    await page.goto("/library");
+    const animation = await page.locator("main ul li").first().evaluate((el) => getComputedStyle(el).animationName);
+    expect(animation).toBe("none");
+  });
+
   test("the sitemap lists every public page, and the reviews have an RSS feed", async ({ page, request }) => {
     // Sitemap: sections, every game, and it is announced in robots.txt.
     const robots = await (await request.get("/robots.txt")).text();

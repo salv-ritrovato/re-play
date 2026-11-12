@@ -94,6 +94,23 @@ verso Supabase). Le server action accettano body fino a 12 MB (`serverActions.bo
   grande); la home ne mostra i primi dieci. `GenreLinks` rende i nomi dei generi link a `/library?genre=<id>`.
 - La pagina Reviews usa gli stessi parametri con opzioni di ordinamento dedicate (`REVIEW_SORT_OPTIONS`).
 
+## Aspetto (rifiniture)
+
+- **Voti a colori**: `ratingTier` (`src/lib/format.ts`: "high" da 9, "low" sotto 5, "mid" il resto) e i token
+  `--rating-high` / `--rating-low` in `globals.css` (classi `text-rating-high`, `bg-rating-high`...). `Rating`, la
+  ricerca nella navbar e le colonne dei voti nelle statistiche li usano.
+- **Parete di copertine** (`hero-covers.tsx`): `getHomeData().heroCovers` (le 18 copertine dei giochi meglio votati),
+  inclinata, a bassa opacità e sfumata con una maschera; `aria-hidden`, immagini senza testo alternativo, nascosta
+  sotto `lg`.
+- **Alone della copertina** (`src/lib/cover-tint.ts`, solo server): il colore medio del segnaposto sfocato già salvato con
+  il gioco (`cover_blur`), con la saturazione alzata e schiarito se la copertina è scura; due gradienti radiali a bassa
+  opacità dietro l'intestazione della scheda. Niente richieste in più.
+- **Movimento** (`src/lib/motion.ts`): `REVEAL` e `revealDelay` (dissolvenza con piccolo scatto verso l'alto, ritardo
+  scaglionato fino a 12 elementi) con il prefisso `motion-safe`; le card della libreria e degli scaffali si sollevano
+  all'hover, tranne con `prefers-reduced-motion`.
+- **Statistiche**: il componente `Donut` (SVG puro, in `components/stats/charts.tsx`) mostra launcher e solo/online con
+  legenda (quota e numero).
+
 ## Immagini di anteprima (Open Graph)
 
 Quando si condivide un link (chat, social), compare un'immagine 1200×630 generata dal sito, con lo stile del

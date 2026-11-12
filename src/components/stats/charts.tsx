@@ -42,7 +42,7 @@ export function Columns({
   emptyLabel = "No data yet",
   className,
 }: {
-  items: { label: string; value: number }[];
+  items: { label: string; value: number; /** Colours the bar: the best ratings in gold, the weakest in red. */ tone?: "high" | "low" | "mid" }[];
   highlight?: string;
   emptyLabel?: string;
   className?: string;
@@ -66,6 +66,8 @@ export function Columns({
                 aria-hidden
                 className={cn(
                   "relative w-full rounded-t-sm bg-foreground/80 transition-colors",
+                  item.tone === "high" && "bg-rating-high/90",
+                  item.tone === "low" && "bg-rating-low/80",
                   item.label === highlight && "bg-violet",
                   item.value === 0 && "bg-elevated",
                 )}
@@ -78,6 +80,74 @@ export function Columns({
             </div>
             <span className="text-xs text-subtle">{item.label}</span>
             <span className="sr-only">{item.value} games</span>
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+const DONUT_COLORS = ["var(--chart-1)", "var(--chart-3)", "var(--chart-2)", "var(--chart-4)", "var(--chart-5)"];
+
+/**
+ * A ring split in proportion to each value, with the legend beside it (label, share, count). Pure SVG, no
+ * client code. The centre shows the total unless `centre` says otherwise.
+ */
+export function Donut({
+  items,
+  centre,
+  unit = "games",
+  emptyLabel = "No data yet",
+}: {
+  items: { label: string; value: number }[];
+  centre?: number;
+  unit?: string;
+  emptyLabel?: string;
+}) {
+  const shown = items.filter((i) => i.value > 0);
+  const total = shown.reduce((sum, i) => sum + i.value, 0);
+  if (total === 0) return <p className="text-sm text-subtle">{emptyLabel}</p>;
+
+  const radius = 40;
+  const circumference = 2 * Math.PI * radius;
+  const gap = shown.length > 1 ? 1.5 : 0;
+  const lengths = shown.map((item) => (item.value / total) * circumference);
+  const starts = lengths.map((_, i) => lengths.slice(0, i).reduce((sum, n) => sum + n, 0));
+
+  return (
+    <div className="flex items-center gap-6">
+      <div className="relative size-32 shrink-0">
+        <svg viewBox="0 0 100 100" className="size-full -rotate-90" role="img" aria-label={shown.map((i) => `${i.label}: ${i.value}`).join(", ")}>
+          <circle cx="50" cy="50" r={radius} fill="none" stroke="var(--elevated)" strokeWidth="14" />
+          {shown.map((item, i) => {
+            const dash = Math.max(lengths[i] - gap, 0.5);
+            return (
+              <circle
+                key={item.label}
+                cx="50"
+                cy="50"
+                r={radius}
+                fill="none"
+                stroke={DONUT_COLORS[i % DONUT_COLORS.length]}
+                strokeWidth="14"
+                strokeDasharray={`${dash} ${circumference - dash}`}
+                strokeDashoffset={-starts[i]}
+              />
+            );
+          })}
+        </svg>
+        <div className="absolute inset-0 flex flex-col items-center justify-center">
+          <span className="text-2xl font-semibold tabular-nums">{centre ?? total}</span>
+          <span className="text-[0.6875rem] tracking-wide text-subtle uppercase">{unit}</span>
+        </div>
+      </div>
+      <ul className="min-w-0 flex-1 space-y-2.5 text-sm">
+        {shown.map((item, i) => (
+          <li key={item.label} className="flex items-center gap-2">
+            <span aria-hidden className="size-2.5 shrink-0 rounded-full" style={{ background: DONUT_COLORS[i % DONUT_COLORS.length] }} />
+            <span className="min-w-0 flex-1 truncate text-muted-foreground">{item.label}</span>
+            <span className="text-xs tabular-nums text-subtle">{Math.round((item.value / total) * 100)}%</span>
+            <span className="w-7 text-right tabular-nums">{item.value}</span>
           </li>
         ))}
       </ul>

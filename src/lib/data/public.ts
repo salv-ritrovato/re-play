@@ -399,7 +399,7 @@ export async function getHomeData() {
   const search = (sort: string, extra: Record<string, unknown> = {}, limit = 8) =>
     supabase.rpc("library_search", { p_sort: sort, p_limit: limit, p_offset: 0, ...extra });
 
-  const [totals, added, top, featured, lowest, genreCounts, standout, developerNames] = await Promise.all([
+  const [totals, added, top, featured, lowest, genreCounts, standout, developerNames, library] = await Promise.all([
     supabase.from("stats_totals").select("*").maybeSingle(),
     search("added"),
     search("rating_desc", { p_min_rating: 0 }),
@@ -414,6 +414,7 @@ export async function getHomeData() {
     supabase.from("genres").select("id, name, game_genres(count)"),
     search("rating_desc", { p_min_rating: STANDOUT_MIN_RATING, p_reviewed_only: true }, STANDOUT_MAX),
     supabase.from("filter_developers").select("name"),
+    getLibraryGames(),
   ]);
   for (const r of [totals, added, top, featured, lowest, genreCounts, standout, developerNames]) {
     if (r.error) fail("getHomeData", r.error);
@@ -436,6 +437,13 @@ export async function getHomeData() {
   // The ten biggest genres, for the "Browse by genre" tiles (the Genres page lists them all).
   const genreTiles = toGenreList(genreCounts.data).slice(0, 10);
 
+  // The covers of the best rated games, for the wall behind the hero.
+  const heroCovers = library
+    .filter((g) => g.cover_path && g.rating !== null)
+    .sort((a, b) => (b.rating ?? 0) - (a.rating ?? 0) || a.title.localeCompare(b.title))
+    .slice(0, 18)
+    .map((g) => g.cover_path as string);
+
   const recentSince = Date.now() - RECENT_DAYS * 24 * 60 * 60 * 1000;
   const recent = ((added.data ?? []) as GameSummary[]).filter((g) => new Date(g.created_at).getTime() >= recentSince);
 
@@ -446,6 +454,7 @@ export async function getHomeData() {
     lowestRated,
     genreTiles,
     studioCount: studios.size,
+    heroCovers,
     standout: ((standout.data ?? []) as GameSummary[]).filter((g) => g.rating !== null),
     featured: featured.data
       ? normalizeDetail(featured.data as unknown as RawDetail)

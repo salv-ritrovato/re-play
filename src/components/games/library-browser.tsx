@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/layout/empty-state";
 import { Pagination } from "@/components/layout/pagination";
 import { ButtonLink } from "@/components/ui/button-link";
 import { useQueryParams } from "@/hooks/use-query-params";
+import { REVEAL, revealDelay } from "@/lib/motion";
 import { countActiveFilters, parseLibraryParams } from "@/lib/library-params";
 import { filterLibrary } from "@/lib/library-filter";
 import type { LibraryRecord } from "@/lib/types";
@@ -83,7 +84,7 @@ export function LibraryBrowser({ games, options }: { games: LibraryRecord[]; opt
       ) : (
         <ul className="grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 md:grid-cols-4 xl:grid-cols-6">
           {items.map((game, i) => (
-            <li key={game.id}>
+            <li key={game.id} className={REVEAL} style={revealDelay(i)}>
               <GameCard game={game} priority={i < 6} />
             </li>
           ))}

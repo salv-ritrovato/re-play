@@ -3,6 +3,7 @@ import { ArrowRight, Building2, Clock, Gamepad2, Shuffle, Star, type LucideIcon 
 import { Rating } from "@/components/games/badges";
 import { DeveloperLinks } from "@/components/games/developer-links";
 import { GameCard } from "@/components/games/game-card";
+import { HeroCovers } from "@/components/games/hero-covers";
 import { StandoutCarousel, type StandoutSlide } from "@/components/games/standout-carousel";
 import { GameCover } from "@/components/games/game-cover";
 import { EmptyState } from "@/components/layout/empty-state";
@@ -11,6 +12,7 @@ import { TAGLINE, Wordmark } from "@/components/layout/wordmark";
 import { ButtonLink } from "@/components/ui/button-link";
 import { IconLabel } from "@/components/ui/icon-label";
 import { getHomeData } from "@/lib/data/public";
+import { REVEAL, revealDelay } from "@/lib/motion";
 import { excerpt, formatRating, yearOf } from "@/lib/format";
 import type { GameSummary } from "@/lib/types";
 import { Suspense } from "react";
@@ -25,7 +27,7 @@ export default function HomePage() {
 }
 
 async function HomeContent() {
-  const { totals, recentlyAdded, topRated, lowestRated, genreTiles, studioCount, featured, standout } = await getHomeData();
+  const { totals, recentlyAdded, topRated, lowestRated, genreTiles, studioCount, heroCovers, featured, standout } = await getHomeData();
   const slides: StandoutSlide[] = standout.map((g) => ({
     slug: g.slug,
     title: g.title,
@@ -41,8 +43,9 @@ async function HomeContent() {
   return (
     <>
       {/* Hero -------------------------------------------------------------- */}
-      <section className="border-b border-border">
-        <Container className="grid gap-12 pt-16 pb-14 sm:pt-24 sm:pb-20 lg:grid-cols-[1fr_auto] lg:items-end">
+      <section className="relative overflow-hidden border-b border-border">
+        <HeroCovers covers={heroCovers} />
+        <Container className="relative grid gap-12 pt-16 pb-14 sm:pt-24 sm:pb-20 lg:grid-cols-[1fr_auto] lg:items-end">
           <div className="space-y-8">
             <div className="space-y-3">
               <Wordmark size="xl" asLink={false} />
@@ -115,8 +118,8 @@ async function HomeContent() {
                 }
               >
                 <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-                  {genreTiles.map((g) => (
-                    <li key={g.id}>
+                  {genreTiles.map((g, i) => (
+                    <li key={g.id} className={REVEAL} style={revealDelay(i)}>
                       <Link
                         href={`/library?genre=${g.id}`}
                         className="flex items-baseline justify-between gap-3 rounded-md border border-border px-4 py-3 transition-colors outline-none hover:border-muted-foreground/50 hover:bg-surface focus-visible:ring-3 focus-visible:ring-ring/50"
@@ -217,8 +220,8 @@ function Shelf({
       }
     >
       <ul className="grid grid-cols-2 gap-x-5 gap-y-9 sm:grid-cols-3 lg:grid-cols-6">
-        {games.map((g) => (
-          <li key={g.id}>
+        {games.map((g, i) => (
+          <li key={g.id} className={REVEAL} style={revealDelay(i)}>
             <GameCard game={g} />
           </li>
         ))}

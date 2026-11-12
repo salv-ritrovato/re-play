@@ -7,7 +7,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { GameCover } from "@/components/games/game-cover";
 import { Button } from "@/components/ui/button";
 import { Sheet, SheetContent, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { formatRating } from "@/lib/format";
+import { formatRating, ratingTier } from "@/lib/format";
+import { RATING_TEXT } from "@/components/games/badges";
 import { searchEntries, type SearchEntry } from "@/lib/search-index";
 import { cn } from "@/lib/utils";
 
@@ -166,7 +167,9 @@ export function NavSearch() {
                           </span>
                         </span>
                         {game.rating !== null && (
-                          <span className="shrink-0 text-sm tabular-nums text-muted-foreground">{formatRating(game.rating)}</span>
+                          <span className={cn("shrink-0 text-sm tabular-nums text-muted-foreground", RATING_TEXT[ratingTier(game.rating)])}>
+                            {formatRating(game.rating)}
+                          </span>
                         )}
                       </Link>
                     </li>

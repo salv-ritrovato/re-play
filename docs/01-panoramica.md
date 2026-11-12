@@ -82,6 +82,12 @@ eliminazione, upload della copertina, creazione al volo di generi e piattaforme.
 - **Nelle card** compare "anno · sviluppatore" invece della piattaforma.
 - **Identità visiva**: tema scuro monocromatico, logo "Re:Play" (`public/brand/replay-logo.png`) da `md` in su,
   versione contratta "Re:" + triangolo play (`public/brand/replay-logo-compact.png`) sotto, favicon a triangolo "play" (`src/app/icon.svg`).
+- **Colore dei voti**: sono l'unico tocco caldo del sito. Da 9 in su il voto è oro, sotto 5 è rosso spento, in mezzo
+  resta neutro (card, liste, scheda del gioco, ricerca, istogramma dei voti nelle statistiche).
+- **Atmosfera**: dietro l'intestazione della home c'è una parete inclinata con le copertine dei giochi meglio votati
+  (solo da `lg` in su, decorativa); nella scheda di ogni gioco un alone morbido del colore principale della
+  copertina; le card compaiono con una breve dissolvenza e si sollevano al passaggio del mouse (niente
+  animazioni per chi ha chiesto di ridurle).
 - **Un solo amministratore**: il primo utente creato in Supabase diventa `owner`; le registrazioni pubbliche
   vanno disattivate.
 
