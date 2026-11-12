@@ -298,6 +298,13 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByRole("button", { name: "Steam", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("button", { name: "Ubisoft Connect", exact: true })).toHaveAttribute("aria-pressed", "true");
     await expect(page.getByRole("button", { name: "Battle.net", exact: true })).toHaveAttribute("aria-pressed", "false");
+    // Decimals are written with a dot: a comma (the Italian keyboard) turns into one as soon as it is typed.
+    await page.locator("#rating").pressSequentially("8,5");
+    await expect(page.locator("#rating")).toHaveValue("8.5");
+    await page.locator("#playtime_hours").pressSequentially("12,5");
+    await expect(page.locator("#playtime_hours")).toHaveValue("12.5");
+    await page.locator("#rating").fill("");
+    await page.locator("#playtime_hours").fill("");
     // Nothing personal is copied.
     for (const field of ["#title", "#slug", "#rating", "#review_en", "#review_it", "#release_date"]) {
       await expect(page.locator(field)).toHaveValue("");

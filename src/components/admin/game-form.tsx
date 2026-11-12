@@ -14,7 +14,7 @@ import { OptionSelect } from "@/components/ui/option-select";
 import { Switch } from "@/components/ui/switch";
 import { Textarea } from "@/components/ui/textarea";
 import { slugify } from "@/lib/format";
-import { stripAsterisks } from "@/lib/text";
+import { decimalPoint, stripAsterisks } from "@/lib/text";
 import {
   COMPLETION_LABEL,
   COMPLETION_STATUSES,
@@ -125,6 +125,19 @@ export function GameForm({
         const removedBeforeCaret = el.value.slice(0, caret).replace(/[^*]/g, "").length;
         setValue(name, stripAsterisks(el.value), { shouldDirty: true, shouldValidate: formState.isSubmitted });
         el.setSelectionRange(caret - removedBeforeCaret, caret - removedBeforeCaret);
+      },
+    };
+  }
+
+  /** A comma typed or pasted into a number field turns into a dot at once (8,5 -> 8.5), keeping the cursor in place. */
+  function decimalDot(name: "rating" | "playtime_hours") {
+    return {
+      onChange: (e: React.ChangeEvent<HTMLInputElement>) => {
+        const el = e.target;
+        if (!el.value.includes(",")) return;
+        const caret = el.selectionStart ?? el.value.length;
+        setValue(name, decimalPoint(el.value), { shouldDirty: true, shouldValidate: formState.isSubmitted });
+        el.setSelectionRange(caret, caret);
       },
     };
   }
@@ -352,10 +365,10 @@ export function GameForm({
       {/* Personal ------------------------------------------------------------ */}
       <FormSection title="Personal" description="Your experience with the game.">
         <Field id="rating" label="Rating (0-10)" error={err("rating")} hint="Decimals allowed, e.g. 8.5">
-          <Input id="rating" type="number" inputMode="decimal" step="0.1" min="0" max="10" {...register("rating")} {...aria("rating")} />
+          <Input id="rating" type="text" inputMode="decimal" autoComplete="off" {...register("rating", decimalDot("rating"))} {...aria("rating")} />
         </Field>
-        <Field id="playtime_hours" label="Total playtime (hours)" error={err("playtime_hours")}>
-          <Input id="playtime_hours" type="number" inputMode="decimal" step="0.1" min="0" {...register("playtime_hours")} {...aria("playtime_hours")} />
+        <Field id="playtime_hours" label="Total playtime (hours)" error={err("playtime_hours")} hint="Decimals allowed, e.g. 12.5">
+          <Input id="playtime_hours" type="text" inputMode="decimal" autoComplete="off" {...register("playtime_hours", decimalDot("playtime_hours"))} {...aria("playtime_hours")} />
         </Field>
         <Field id="play_status" label="Playing status">
           <Controller

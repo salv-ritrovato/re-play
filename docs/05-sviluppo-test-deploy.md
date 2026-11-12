@@ -32,7 +32,7 @@
 ## Test end-to-end (Playwright)
 
 - File: `tests/{auth,cms,public,responsive}.spec.ts` e gli unit test senza browser (`image-formats`,
-  `validation`, `format`, `library-filter`, quest'ultimo anche a confronto con il database), con `helpers.ts` e `cleanup.ts`. In tutto 72 test (desktop, mobile e tablet).
+  `validation`, `format`, `library-filter`, quest'ultimo anche a confronto con il database), con `helpers.ts` e `cleanup.ts`. In tutto 73 test (desktop, mobile e tablet).
 - Il materiale promozionale (video di presentazione) sta in `promo/`, ignorato da git perché pesante.
 - Tre progetti: **desktop** (tutti i test tranne `responsive`), **mobile** (Pixel 7) e **tablet** (iPad,
   su Chromium), questi ultimi due solo per `responsive.spec.ts`.

@@ -29,6 +29,9 @@ Comportamenti da conoscere:
 - **Reset dopo il salvataggio e su "Cancel"**: `resetForm({ values })`. Senza, Next riutilizzerebbe lo stato
   del gioco precedente (le pagine visitate restano in memoria).
 - **Protezione dalle perdite di dati**: `beforeunload` avvisa se ci sono modifiche non salvate.
+- **Decimali sempre col punto** (voto 8.5, ore 12.5): i campi sono di testo e non "numerici", perché il browser
+  italiano mostrerebbe la virgola. Una virgola digitata o incollata diventa subito un punto (`decimalPoint`,
+  `src/lib/text.ts`), e il server fa lo stesso al salvataggio. Il sito mostra già ovunque il punto.
 - **Asterischi tolti in automatico**: nei campi di testo (descrizioni, recensioni in inglese e italiano, pro e
   contro) gli asterischi, residui del grassetto del testo incollato (`**così**`), spariscono appena incollati
   nel form, e il server li toglie comunque al salvataggio (`stripAsterisks` in `src/lib/text.ts`, usata da

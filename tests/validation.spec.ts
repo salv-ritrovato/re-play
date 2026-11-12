@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { stripAsterisks } from "../src/lib/text";
+import { decimalPoint, stripAsterisks } from "../src/lib/text";
 import { gameSchema } from "../src/lib/validation";
 
 // The rules the server applies to a game before saving it, without a browser.
@@ -57,5 +57,14 @@ test.describe("pasted asterisks", () => {
     expect(gameSchema.parse({ ...base, review_en: "**", review_it: "*" }).review_en).toBeNull();
     const result = gameSchema.safeParse({ ...base, review_en: "**Only English**" });
     expect(result.success).toBe(false); // the Italian version is still required
+  });
+
+  test("decimals use a dot: a comma is turned into one, and nothing else changes", () => {
+    const parsed = gameSchema.parse({ ...base, rating: "8,5", playtime_hours: "12,25" });
+    expect(parsed.rating).toBe(8.5);
+    expect(parsed.playtime_hours).toBe(12.3); // one decimal, like the rating
+    expect(gameSchema.parse({ ...base, rating: "9.5", playtime_hours: "100" }).playtime_hours).toBe(100);
+    expect(decimalPoint("1,5")).toBe("1.5");
+    expect(gameSchema.safeParse({ ...base, rating: "8,5,1" }).success).toBe(false);
   });
 });

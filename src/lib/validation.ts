@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { stripAsterisks } from "@/lib/text";
+import { decimalPoint, stripAsterisks } from "@/lib/text";
 import { COMPLETION_STATUSES, LAUNCHER_IDS, PLAY_STATUSES } from "@/lib/types";
 
 const text = (max: number) =>
@@ -23,6 +23,7 @@ const numberString = (min: number, max: number, label: string) =>
   z
     .string()
     .trim()
+    .transform(decimalPoint)
     .refine((v) => v === "" || !Number.isNaN(Number(v)), `${label} must be a number`)
     .refine(
       (v) => v === "" || (Number(v) >= min && Number(v) <= max),
