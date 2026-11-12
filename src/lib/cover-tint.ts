@@ -24,3 +24,9 @@ export async function coverTint(blur: string | null | undefined): Promise<{ r: n
     return null; // a damaged placeholder just means no glow
   }
 }
+
+/** The soft two-spot glow behind a game's header or a carousel slide, in the colour of its cover. */
+export function glowBackground(tint: { r: number; g: number; b: number }, strength = 1): string {
+  const rgb = `${tint.r} ${tint.g} ${tint.b}`;
+  return `radial-gradient(60% 130% at 12% 35%, rgb(${rgb} / ${(0.26 * strength).toFixed(2)}), transparent 70%), radial-gradient(45% 90% at 100% 0%, rgb(${rgb} / ${(0.12 * strength).toFixed(2)}), transparent 70%)`;
+}

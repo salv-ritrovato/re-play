@@ -36,9 +36,16 @@ export function ReviewTabs({ en, it, title }: { en: string; it: string; title: s
         role="tabpanel"
         aria-labelledby={`review-tab-${lang}`}
         lang={lang}
-        className="prose-review mt-6 max-w-2xl text-pretty whitespace-pre-line"
+        className="prose-review mt-6 max-w-[66ch] text-pretty"
       >
-        {text}
+        {/* One paragraph per line of the text; the first one reads as a lead-in. */}
+        {text
+          .split(/\n+/)
+          .map((paragraph) => paragraph.trim())
+          .filter(Boolean)
+          .map((paragraph, i) => (
+            <p key={i}>{paragraph}</p>
+          ))}
       </div>
     </div>
   );

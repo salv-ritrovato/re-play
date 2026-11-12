@@ -88,6 +88,12 @@ eliminazione, upload della copertina, creazione al volo di generi e piattaforme.
   (solo da `lg` in su, decorativa); nella scheda di ogni gioco un alone morbido del colore principale della
   copertina; le card compaiono con una breve dissolvenza e si sollevano al passaggio del mouse (niente
   animazioni per chi ha chiesto di ridurle).
+- **Dettagli di lettura e di contesto**: il carosello e la scheda del gioco hanno l'alone del colore della copertina;
+  nella libreria, passando il mouse su una card, sulla copertina scorrono generi e ore giocate (non sul tocco);
+  nelle statistiche il calendario "When I finished games" mostra, per ogni mese di ogni anno, quanti giochi hai
+  finito; le recensioni si leggono a paragrafi con il primo in evidenza; aprendo un gioco dalla libreria la copertina
+  si trasforma in quella della pagina (dove il browser lo supporta); il sito si può aggiungere alla schermata Home
+  del telefono, con l'icona "Re:▶".
 - **Un solo amministratore**: il primo utente creato in Supabase diventa `owner`; le registrazioni pubbliche
   vanno disattivate.
 

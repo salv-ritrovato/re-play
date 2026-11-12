@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { yearOf } from "@/lib/format";
+import { formatPlaytime, yearOf } from "@/lib/format";
 import type { LibraryGame } from "@/lib/types";
 import { cn } from "@/lib/utils";
 import { LauncherIcons, OnlineBadge, Rating, StatusBadge } from "./badges";
@@ -15,11 +15,14 @@ export function GameCard({
   className,
   priority,
   showStatus = true,
+  morph = false,
 }: {
   game: LibraryGame;
   className?: string;
   priority?: boolean;
   showStatus?: boolean;
+  /** The cover morphs into the one on the game page when opened (only where each game appears once). */
+  morph?: boolean;
 }) {
   const year = yearOf(game.release_date);
 
@@ -30,7 +33,16 @@ export function GameCard({
         path={game.cover_path}
         blur={game.cover_blur}
         priority={priority}
+        transitionName={morph ? `cover-${game.slug}` : undefined}
         badge={game.is_online ? <OnlineBadge /> : undefined}
+        details={
+          game.genres.length > 0 || game.playtime_hours ? (
+            <>
+              {game.genres.length > 0 && <p className="line-clamp-2">{game.genres.map((g) => g.name).join(" · ")}</p>}
+              {formatPlaytime(game.playtime_hours) && <p className="mt-0.5 text-white/60">{formatPlaytime(game.playtime_hours)} played</p>}
+            </>
+          ) : undefined
+        }
         className="transition-[transform,box-shadow,border-color] duration-300 group-hover:-translate-y-1 group-hover:border-muted-foreground/40 group-hover:shadow-xl group-hover:shadow-black/50 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
       />
       <div className="mt-3 flex items-start justify-between gap-3">

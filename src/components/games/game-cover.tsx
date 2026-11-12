@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { ViewTransition } from "react";
 import { mediaUrl } from "@/lib/media";
 import { cn } from "@/lib/utils";
 
@@ -13,6 +14,13 @@ interface GameCoverProps {
   zoom?: boolean;
   /** Small label pinned to the top-left corner of the artwork. */
   badge?: React.ReactNode;
+  /** A line of details that slides up over the bottom of the artwork when the parent (class `group`) is hovered or focused. */
+  details?: React.ReactNode;
+  /**
+   * Gives the cover a name so it can morph into the same cover on another page (the browser's view transitions).
+   * The name must be unique on the page, so only use it where each game appears once.
+   */
+  transitionName?: string;
 }
 
 /** 3:4 cover with blur placeholder; falls back to a typographic plate when there is no artwork. */
@@ -25,10 +33,12 @@ export function GameCover({
   priority,
   zoom = true,
   badge,
+  details,
+  transitionName,
 }: GameCoverProps) {
   const src = mediaUrl(path);
 
-  return (
+  const cover = (
     <div
       className={cn(
         "relative aspect-[3/4] w-full overflow-hidden rounded-md border border-border bg-card",
@@ -36,6 +46,15 @@ export function GameCover({
       )}
     >
       {badge && <div className="absolute top-2 left-2 z-10">{badge}</div>}
+      {details && (
+        // Decorative and never in the way of clicks; only where there is a real hover (not on touch screens).
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-x-0 bottom-0 z-10 translate-y-1 bg-gradient-to-t from-black/90 via-black/60 to-transparent px-3 pt-12 pb-3 text-xs leading-snug text-white/90 opacity-0 transition duration-300 group-focus-within:translate-y-0 group-focus-within:opacity-100 group-hover:translate-y-0 group-hover:opacity-100 motion-reduce:transition-none"
+        >
+          {details}
+        </div>
+      )}
       {src ? (
         <Image
           src={src}
@@ -64,5 +83,13 @@ export function GameCover({
         </div>
       )}
     </div>
+  );
+
+  return transitionName ? (
+    <ViewTransition name={transitionName} share="morph" default="none">
+      {cover}
+    </ViewTransition>
+  ) : (
+    cover
   );
 }

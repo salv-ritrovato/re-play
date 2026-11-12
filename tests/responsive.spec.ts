@@ -99,6 +99,33 @@ test.describe("responsive layouts", () => {
     await expect(page).toHaveURL(/\/library$/);
   });
 
+  test("the month calendar keeps readable squares and the hero wall stays out of small screens", async ({ page }) => {
+    await page.goto("/statistics");
+    await page.waitForLoadState("networkidle");
+    const squares = page.getByRole("table", { name: "Games finished per month" }).locator("tbody td div");
+    if ((await squares.count()) > 0) {
+      const widths = await squares.evaluateAll((els) => els.map((el) => el.getBoundingClientRect().width));
+      expect(Math.min(...widths), "calendar squares are too small to see").toBeGreaterThanOrEqual(14);
+      await expectNoHorizontalScroll(page);
+    }
+
+    // The tilted wall of covers is for large screens only: on a phone or tablet it is not even shown.
+    await page.goto("/");
+    await page.waitForLoadState("networkidle");
+    const wall = page.locator("section [aria-hidden='true'] img");
+    for (let i = 0; i < (await wall.count()); i++) await expect(wall.nth(i)).toBeHidden();
+    await expectNoHorizontalScroll(page);
+  });
+
+  test("on a touch screen nothing slides over the covers (no hover details to get stuck)", async ({ page, isMobile }) => {
+    test.skip(!isMobile, "phones only");
+    await page.goto("/library");
+    const card = page.locator("main li").first();
+    await card.locator("a").first().waitFor();
+    const opacities = await card.locator("div[aria-hidden='true']").evaluateAll((els) => els.map((el) => getComputedStyle(el).opacity));
+    for (const opacity of opacities) expect(opacity).toBe("0");
+  });
+
   test("library toolbar and filter sheet fit the viewport", async ({ page, viewport }) => {
     await page.goto("/library");
     await expect(page.getByRole("searchbox", { name: "Search" })).toBeVisible();

@@ -2,7 +2,7 @@ import { ChartColumn, Clock, Gamepad2, Star, type LucideIcon } from "lucide-reac
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { IconLabel } from "@/components/ui/icon-label";
-import { BarList, Columns, Donut } from "@/components/stats/charts";
+import { BarList, Columns, Donut, MonthGrid } from "@/components/stats/charts";
 import { EmptyState } from "@/components/layout/empty-state";
 import { Container, PageHeader, Section } from "@/components/layout/page-header";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -30,7 +30,7 @@ export default function StatisticsPage() {
 }
 
 async function StatsContent() {
-  const { totals, genres, platforms, ratings, years, launchers, types, mostPlayed } = await getStats();
+  const { totals, genres, platforms, ratings, years, launchers, types, mostPlayed, completions } = await getStats();
 
   if (!totals || totals.total_games === 0) {
     return (
@@ -107,6 +107,12 @@ async function StatsContent() {
           />
         </Section>
       </div>
+
+      {completions.length > 0 && (
+        <Section eyebrow="Rhythm" title="When I finished games">
+          <MonthGrid cells={completions} />
+        </Section>
+      )}
     </div>
   );
 }

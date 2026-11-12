@@ -154,3 +154,69 @@ export function Donut({
     </div>
   );
 }
+
+const MONTHS = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+/** Opacity steps of the accent colour, from one game to four or more in a month. */
+const MONTH_STEPS = ["bg-violet/25", "bg-violet/50", "bg-violet/75", "bg-violet"];
+
+/**
+ * One row per year, one square per month: the darker the square, the more games were finished that month.
+ * A real table (a screen reader reads the counts), pure CSS, and it fits a phone: the squares shrink with the width.
+ */
+export function MonthGrid({ cells }: { cells: { year: number; month: number; games: number }[] }) {
+  if (cells.length === 0) return null;
+  const counts = new Map(cells.map((c) => [`${c.year}-${c.month}`, c.games]));
+  const first = cells[0].year;
+  const last = cells[cells.length - 1].year;
+  const years = Array.from({ length: last - first + 1 }, (_, i) => first + i);
+
+  return (
+    <div className="max-w-2xl">
+      <table className="w-full table-fixed border-separate border-spacing-[3px] sm:border-spacing-1">
+        <caption className="sr-only">Games finished per month</caption>
+        <thead>
+          <tr>
+            <td className="w-10 sm:w-14" />
+            {MONTHS.map((m) => (
+              <th key={m} scope="col" className="pb-1 text-center text-[0.625rem] font-normal text-subtle sm:text-xs">
+                <abbr title={m} className="no-underline">
+                  <span className="sm:hidden" aria-hidden>{m[0]}</span>
+                  <span className="hidden sm:inline" aria-hidden>{m.slice(0, 3)}</span>
+                  <span className="sr-only">{m}</span>
+                </abbr>
+              </th>
+            ))}
+          </tr>
+        </thead>
+        <tbody>
+          {years.map((year) => (
+            <tr key={year}>
+              <th scope="row" className="pr-1 text-right text-xs font-normal tabular-nums text-subtle sm:text-sm">{year}</th>
+              {MONTHS.map((m, i) => {
+                const games = counts.get(`${year}-${i + 1}`) ?? 0;
+                return (
+                  <td key={m} className="p-0">
+                    <div
+                      title={`${m} ${year}: ${games} ${games === 1 ? "game" : "games"}`}
+                      className={cn("aspect-square w-full rounded-[3px]", games === 0 ? "bg-elevated/70" : MONTH_STEPS[Math.min(games, 4) - 1])}
+                    >
+                      <span className="sr-only">{games}</span>
+                    </div>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div className="mt-4 flex items-center justify-end gap-2 text-xs text-subtle" aria-hidden>
+        Fewer
+        <span className="size-3 rounded-[3px] bg-elevated/70" />
+        {MONTH_STEPS.map((step) => (
+          <span key={step} className={cn("size-3 rounded-[3px]", step)} />
+        ))}
+        More
+      </div>
+    </div>
+  );
+}

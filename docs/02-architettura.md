@@ -108,6 +108,22 @@ verso Supabase). Le server action accettano body fino a 12 MB (`serverActions.bo
 - **Movimento** (`src/lib/motion.ts`): `REVEAL` e `revealDelay` (dissolvenza con piccolo scatto verso l'alto, ritardo
   scaglionato fino a 12 elementi) con il prefisso `motion-safe`; le card della libreria e degli scaffali si sollevano
   all'hover, tranne con `prefers-reduced-motion`.
+- **Alone condiviso**: `glowBackground()` (`src/lib/cover-tint.ts`) genera lo sfondo per la scheda del gioco e per ogni
+  slide del carosello (`StandoutSlide.glow`, calcolato sul server).
+- **Dettagli sulle card**: `GameCover` accetta `details`, uno strato decorativo (`aria-hidden`, mai sopra ai clic)
+  che compare con `group-hover`/`group-focus-within`; la variante `hover:` di Tailwind v4 vale solo dove esiste un vero
+  hover, quindi sul tocco non compare e non resta "bloccato".
+- **Transizione della copertina**: `<ViewTransition name="cover-<slug>" share="morph" default="none">` (React 19.3,
+  nessuna configurazione in Next) attorno alla copertina della card della libreria (`GameCard morph`) e a quella della
+  scheda del gioco. Il nome deve essere unico nella pagina, quindi si usa solo dove ogni gioco compare una volta (non negli
+  scaffali della home). CSS in `globals.css`, spento con `prefers-reduced-motion`; senza supporto del browser non cambia nulla.
+- **Calendario dei completamenti**: `MonthGrid` (`components/stats/charts.tsx`), una vera `<table>` (un anno per riga, un mese per
+  colonna, quadrati più scuri con più giochi, 4 livelli), dati da `getStats().completions` (conteggio per mese delle `completed_on`).
+  Larghezza massima `max-w-2xl`; su telefono i mesi sono una lettera e i quadrati restano di almeno 14 px.
+- **Recensioni**: `ReviewTabs` rende un paragrafo per riga di testo; `.prose-review > p:first-child` è più grande e più
+  chiaro (apertura), larghezza massima 66 caratteri.
+- **App sul telefono**: `src/app/manifest.ts` (nome, colori, `display: standalone`), icone in `public/icons/` (192, 512 e
+  una "maskable" con margine di sicurezza) e `src/app/apple-icon.png`, tutte con il logo contratto su fondo scuro.
 - **Statistiche**: il componente `Donut` (SVG puro, in `components/stats/charts.tsx`) mostra launcher e solo/online con
   legenda (quota e numero).
 

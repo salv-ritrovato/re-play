@@ -17,6 +17,8 @@ export interface StandoutSlide {
   rating: number;
   cover_path: string | null;
   cover_blur: string | null;
+  /** CSS background of the soft glow in the colour of the cover (null: none). */
+  glow: string | null;
   /** Start of the review in each language (Italian is null when the game has no review in it). */
   excerpt: { en: string; it: string | null };
 }
@@ -113,9 +115,12 @@ export function StandoutCarousel({ slides, label }: { slides: StandoutSlide[]; l
               role="group"
               aria-roledescription="slide"
               aria-label={`${i + 1} of ${slides.length}`}
-              className="w-full shrink-0 snap-center"
+              className="relative w-full shrink-0 snap-center"
             >
-              <div className="grid gap-8 p-5 sm:grid-cols-[12rem_1fr] sm:gap-12 sm:p-8 lg:grid-cols-[15rem_1fr] lg:p-10">
+              {slide.glow && (
+                <div aria-hidden className="pointer-events-none absolute inset-0" style={{ backgroundImage: slide.glow }} />
+              )}
+              <div className="relative grid gap-8 p-5 sm:grid-cols-[12rem_1fr] sm:gap-12 sm:p-8 lg:grid-cols-[15rem_1fr] lg:p-10">
                 <GameCover
                   title={slide.title}
                   path={slide.cover_path}

@@ -11,6 +11,7 @@ import { Container, Section } from "@/components/layout/page-header";
 import { TAGLINE, Wordmark } from "@/components/layout/wordmark";
 import { ButtonLink } from "@/components/ui/button-link";
 import { IconLabel } from "@/components/ui/icon-label";
+import { coverTint, glowBackground } from "@/lib/cover-tint";
 import { getHomeData } from "@/lib/data/public";
 import { REVEAL, revealDelay } from "@/lib/motion";
 import { excerpt, formatRating, yearOf } from "@/lib/format";
@@ -28,7 +29,8 @@ export default function HomePage() {
 
 async function HomeContent() {
   const { totals, recentlyAdded, topRated, lowestRated, genreTiles, studioCount, heroCovers, featured, standout } = await getHomeData();
-  const slides: StandoutSlide[] = standout.map((g) => ({
+  const tints = await Promise.all(standout.map((g) => coverTint(g.cover_blur)));
+  const slides: StandoutSlide[] = standout.map((g, i) => ({
     slug: g.slug,
     title: g.title,
     year: yearOf(g.release_date),
@@ -36,6 +38,7 @@ async function HomeContent() {
     rating: Number(g.rating),
     cover_path: g.cover_path,
     cover_blur: g.cover_blur,
+    glow: tints[i] ? glowBackground(tints[i]!, 0.9) : null,
     excerpt: { en: excerpt(g.review_en, 300), it: g.review_it ? excerpt(g.review_it, 300) : null },
   }));
   const isEmpty = !totals || totals.total_games === 0;

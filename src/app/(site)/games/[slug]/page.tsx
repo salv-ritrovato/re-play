@@ -19,7 +19,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CompletionBadge, LauncherIcons, OnlineBadge, Rating, StatusBadge } from "@/components/games/badges";
 import { GenreLinks } from "@/components/games/genre-links";
-import { coverTint } from "@/lib/cover-tint";
+import { coverTint, glowBackground } from "@/lib/cover-tint";
 import { DeveloperLinks } from "@/components/games/developer-links";
 import { GameCard } from "@/components/games/game-card";
 import { GameCover } from "@/components/games/game-cover";
@@ -74,9 +74,7 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
           <div
             aria-hidden
             className="pointer-events-none absolute inset-0"
-            style={{
-              backgroundImage: `radial-gradient(60% 130% at 12% 35%, rgb(${tint.r} ${tint.g} ${tint.b} / 0.26), transparent 70%), radial-gradient(45% 90% at 100% 0%, rgb(${tint.r} ${tint.g} ${tint.b} / 0.12), transparent 70%)`,
-            }}
+            style={{ backgroundImage: glowBackground(tint) }}
           />
         )}
         <Container className="relative grid gap-10 py-10 sm:py-16 md:grid-cols-[minmax(0,18rem)_1fr] md:gap-14 lg:grid-cols-[minmax(0,22rem)_1fr]">
@@ -87,6 +85,7 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
               blur={game.cover_blur}
               priority
               zoom={false}
+              transitionName={`cover-${game.slug}`}
               sizes="(min-width: 1024px) 352px, (min-width: 768px) 288px, 288px"
               className="shadow-2xl shadow-black/60"
             />

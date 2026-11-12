@@ -527,6 +527,16 @@ export async function getStats() {
     .map(([name, games]) => ({ name, games }))
     .sort((a, b) => b.games - a.games || a.name.localeCompare(b.name));
   const online = library.filter((g) => g.is_online).length;
+  // How many games were finished in each month (only the games that have a completion date).
+  const perMonth = new Map<string, number>();
+  for (const g of library) {
+    if (!g.completed_on) continue;
+    const key = g.completed_on.slice(0, 7); // YYYY-MM
+    perMonth.set(key, (perMonth.get(key) ?? 0) + 1);
+  }
+  const completions = [...perMonth.entries()]
+    .map(([key, games]) => ({ year: Number(key.slice(0, 4)), month: Number(key.slice(5, 7)), games }))
+    .sort((a, b) => a.year - b.year || a.month - b.month);
   const mostPlayed = library
     .filter((g) => (g.playtime_hours ?? 0) > 0)
     .sort((a, b) => (b.playtime_hours ?? 0) - (a.playtime_hours ?? 0))
@@ -546,6 +556,7 @@ export async function getStats() {
     years: (years.data ?? []) as { year: number; games: number }[],
     launchers,
     types: { solo: library.length - online, online },
+    completions,
     mostPlayed,
   };
 }

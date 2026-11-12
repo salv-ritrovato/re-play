@@ -288,6 +288,87 @@ test.describe("public navigation", () => {
     expect(animation).toBe("none");
   });
 
+  test("polish: carousel glow, hover details, month calendar, reading layout, app manifest, cover morph", async ({ page, request }) => {
+    const errors: string[] = [];
+    page.on("console", (msg) => {
+      if (msg.type() === "error") errors.push(msg.text());
+    });
+    page.on("pageerror", (error) => errors.push(error.message));
+
+    // Carousel: each slide has a soft glow in the colour of its cover (only decoration).
+    await page.goto("/");
+    const glow = page.getByRole("region", { name: "Standout reviews" }).locator("li[role=group] > div[aria-hidden='true']");
+    if ((await page.getByRole("region", { name: "Standout reviews" }).count()) > 0) {
+      expect(await glow.count()).toBeGreaterThan(0);
+      expect(await glow.first().evaluate((el) => getComputedStyle(el).backgroundImage)).toContain("radial-gradient");
+    }
+
+    // Library: hovering a card slides up the genres and hours over the cover.
+    await page.goto("/library");
+    const card = page.locator("main li").first();
+    const details = card.locator("div[aria-hidden='true']").filter({ hasText: /./ }).first();
+    if ((await details.count()) > 0) {
+      await expect(details).toHaveCSS("opacity", "0");
+      await card.hover();
+      await expect(details).toHaveCSS("opacity", "1");
+      await page.mouse.move(0, 0);
+    }
+
+    // The cover morph names the cover on both pages: opening a game and coming back raises no error.
+    await page.locator("main h3 a").first().click();
+    await expect(page).toHaveURL(/\/games\//);
+    await page.goBack();
+    await expect(page.locator("main h3").first()).toBeVisible();
+
+    // Statistics: the month calendar counts every game that has a completion date.
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+    if (url && key) {
+      const { data } = await createClient(url, key).from("games").select("completed_on").not("completed_on", "is", null);
+      const dated = data?.length ?? 0;
+      await page.goto("/statistics");
+      const table = page.getByRole("table", { name: "Games finished per month" });
+      if (dated > 0) {
+        await expect(table).toBeVisible();
+        const counts = await table.locator("tbody td").allInnerTexts();
+        expect(counts.length % 12).toBe(0); // whole years, twelve months each
+        expect(counts.reduce((sum, t) => sum + Number(t.trim() || 0), 0)).toBe(dated);
+      } else {
+        await expect(table).toHaveCount(0);
+      }
+    }
+
+    // A written review reads as paragraphs, the first one as a lead-in.
+    await page.goto("/reviews");
+    const first = page.locator("main article h2 a").first();
+    if ((await first.count()) > 0) {
+      await first.click();
+      const paragraphs = page.locator("#review-panel p");
+      await expect(paragraphs.first()).toBeVisible();
+      if ((await paragraphs.count()) > 1) {
+        const size = (index: number) => paragraphs.nth(index).evaluate((el) => parseFloat(getComputedStyle(el).fontSize));
+        expect(await size(0)).toBeGreaterThan(await size(1));
+      }
+    }
+
+    // The site can be added to a phone's home screen: manifest, icons and the touch icon exist.
+    const manifest = await request.get("/manifest.webmanifest");
+    expect(manifest.status()).toBe(200);
+    const parsed = await manifest.json();
+    expect(parsed.short_name).toBe("Re:Play");
+    expect(parsed.display).toBe("standalone");
+    expect(parsed.icons.map((i: { purpose: string }) => i.purpose)).toEqual(expect.arrayContaining(["any", "maskable"]));
+    for (const icon of parsed.icons as { src: string }[]) {
+      const res = await request.get(icon.src);
+      expect(res.status(), icon.src).toBe(200);
+      expect(res.headers()["content-type"]).toContain("image/png");
+    }
+    await page.goto("/");
+    await expect(page.locator('link[rel="apple-touch-icon"]')).toHaveCount(1);
+
+    expect(errors, "the pages raised console errors").toEqual([]);
+  });
+
   test("the sitemap lists every public page, and the reviews have an RSS feed", async ({ page, request }) => {
     // Sitemap: sections, every game, and it is announced in robots.txt.
     const robots = await (await request.get("/robots.txt")).text();

@@ -133,10 +133,27 @@
   .eyebrow {
     @apply text-[0.6875rem] font-medium uppercase tracking-[0.14em] text-subtle;
   }
+  /* The cover morphing from a card to the game page: a little slower than the default, and none of it for people
+     who asked for reduced motion. */
+  ::view-transition-group(.morph) {
+    animation-duration: 380ms;
+    animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    ::view-transition-group(*),
+    ::view-transition-old(*),
+    ::view-transition-new(*) {
+      animation: none !important;
+    }
+  }
   .prose-review {
     @apply text-[1.0625rem] leading-[1.8] text-foreground/90;
   }
   .prose-review p + p {
-    @apply mt-5;
+    @apply mt-6;
+  }
+  /* The first paragraph is a little larger and brighter, like the lead of an article. */
+  .prose-review > p:first-child {
+    @apply text-[1.1875rem] leading-[1.7] text-foreground sm:text-[1.3125rem];
   }
 }
