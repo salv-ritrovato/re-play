@@ -1,7 +1,7 @@
 import { sniffImageType, SUPPORTED_LABEL } from "@/lib/image-formats";
 
-export const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
-export const MAX_INPUT_BYTES = 25 * 1024 * 1024; // what we accept to even try to decode
+const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
+const MAX_INPUT_BYTES = 25 * 1024 * 1024; // what we accept to even try to decode
 
 export class ClientImageError extends Error {}
 

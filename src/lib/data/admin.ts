@@ -5,7 +5,7 @@ import type { GameDetail, PlayStatus, Taxonomy } from "@/lib/types";
 
 export const ADMIN_PAGE_SIZE = 20;
 
-export interface AdminGameRow {
+interface AdminGameRow {
   id: string;
   slug: string;
   title: string;
@@ -95,8 +95,7 @@ export async function getGameForEdit(id: string): Promise<GameDetail | null> {
     .eq("id", id)
     .maybeSingle();
   if (error) throw new Error(`[getGameForEdit] ${error.message}`);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  return data ? normalizeDetail(data as any) : null;
+  return data ? normalizeDetail(data as unknown as Parameters<typeof normalizeDetail>[0]) : null;
 }
 
 export async function getTaxonomies(): Promise<{ genres: Taxonomy[]; platforms: Taxonomy[] }> {

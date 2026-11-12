@@ -10,7 +10,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { GameTemplate } from "@/lib/types";
 import { gameSchema, taxonomyNameSchema } from "@/lib/validation";
 
-export type ActionResult<T = object> =
+type ActionResult<T = object> =
   | ({ ok: true } & T)
   | { ok: false; error: string; fieldErrors?: Record<string, string> };
 
@@ -149,9 +149,10 @@ export async function saveGame(
 
   } catch (e) {
     console.error("[saveGame] post-write step failed", e);
+    // Nothing after the cover row update can throw, so a failure means the new file is not in use: drop it.
+    await removeObjects(supabase, uploaded);
     if (!isEdit) {
       // Don't leave a half-created record behind.
-      await removeObjects(supabase, uploaded);
       await supabase.from("games").delete().eq("id", gameId);
     }
     return { ok: false, error: "The game was saved only partially. Please try again." };

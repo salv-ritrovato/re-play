@@ -146,6 +146,22 @@ test.describe("public navigation", () => {
     expect(new Set(images).size).toBe(paths.length);
   });
 
+  test("responses carry basic security headers, and crawlers are kept out of the private routes", async ({ page, request }) => {
+    const res = await request.get("/");
+    const headers = res.headers();
+    expect(headers["x-content-type-options"]).toBe("nosniff");
+    expect(headers["x-frame-options"]).toBe("DENY");
+    expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
+    expect(headers["permissions-policy"]).toContain("camera=()");
+
+    const robots = await (await request.get("/robots.txt")).text();
+    for (const path of ["/admin", "/login", "/random"]) expect(robots).toContain(`Disallow: ${path}`);
+
+    // The sign-in page is not meant for search engines either.
+    await page.goto("/login");
+    await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
+  });
+
   test("an unknown developer renders the not-found page", async ({ page }) => {
     await page.goto("/developers/nobody-ever-made-this");
     await expect(page.getByRole("heading", { name: /isn't in the archive/ })).toBeVisible();

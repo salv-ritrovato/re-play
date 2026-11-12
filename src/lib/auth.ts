@@ -7,7 +7,7 @@ import { createClient } from "@/lib/supabase/server";
  * Verified owner session. Checks the JWT with the Auth server AND the `owner` role
  * in `profiles`; RLS enforces the same rule again at the database level.
  */
-export const getOwner = cache(async () => {
+const getOwner = cache(async () => {
   const supabase = await createClient();
   const { data: auth } = await supabase.auth.getUser();
   if (!auth.user) return null;

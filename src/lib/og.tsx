@@ -52,7 +52,7 @@ export async function coverUris(paths: (string | null | undefined)[], max: numbe
   return all.filter((c): c is string => c !== null).slice(0, max);
 }
 
-export type OgPanel =
+type OgPanel =
   | { kind: "covers"; covers: string[] }
   | { kind: "cover"; cover: string }
   | { kind: "stats"; items: { label: string; value: string }[] };

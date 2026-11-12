@@ -32,7 +32,7 @@ import {
 } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
-export interface FilterOptions {
+interface FilterOptions {
   genres: Taxonomy[];
   platforms: Taxonomy[];
   years: { year: number; games: number }[];

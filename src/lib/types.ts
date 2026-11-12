@@ -16,7 +16,7 @@ export const LAUNCHER_IDS = LAUNCHERS.map((l) => l.id) as [LauncherId, ...Launch
 export const LAUNCHER_NAME = Object.fromEntries(LAUNCHERS.map((l) => [l.id, l.name])) as Record<LauncherId, string>;
 
 /** Rank reached in an online game is free text; these are the quick picks offered in the form. */
-export const NO_RANK = "None";
+const NO_RANK = "None";
 export const RANK_SUGGESTIONS = [
   NO_RANK,
   "Bronze",

@@ -260,11 +260,11 @@ export async function getOgOverview() {
 // Home
 // ---------------------------------------------------------------------------
 /** The home page carousel shows the reviews of games rated at least this much, at most STANDOUT_MAX of them. */
-export const STANDOUT_MIN_RATING = 9;
-export const STANDOUT_MAX = 5;
+const STANDOUT_MIN_RATING = 9;
+const STANDOUT_MAX = 5;
 
 /** The home page "Recently added" shelf only shows games added within this many days. */
-export const RECENT_DAYS = 7;
+const RECENT_DAYS = 7;
 
 export async function getHomeData() {
   "use cache";
@@ -328,7 +328,7 @@ export async function getHomeData() {
 // ---------------------------------------------------------------------------
 // Statistics
 // ---------------------------------------------------------------------------
-export interface StatsTotals {
+interface StatsTotals {
   total_games: number;
   completed: number;
   dropped: number;

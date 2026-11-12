@@ -2,9 +2,9 @@ import "server-only";
 import sharp from "sharp";
 import { isAcceptedFormat, unsupportedMessage } from "@/lib/image-formats";
 
-export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // raw input, before compression
+const MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // raw input, before compression
 
-export interface ProcessedImage {
+interface ProcessedImage {
   buffer: Buffer;
   blur: string;
   width: number;

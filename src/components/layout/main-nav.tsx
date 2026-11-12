@@ -9,7 +9,7 @@ import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/co
 import { cn } from "@/lib/utils";
 import { Wordmark, TAGLINE } from "./wordmark";
 
-export const NAV_ITEMS = [
+const NAV_ITEMS = [
   { href: "/", label: "Overview" },
   { href: "/library", label: "Library" },
   { href: "/reviews", label: "Reviews" },
