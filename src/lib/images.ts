@@ -1,8 +1,8 @@
 import "server-only";
 import sharp from "sharp";
+import { isAcceptedFormat, unsupportedMessage } from "@/lib/image-formats";
 
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // raw input, before compression
-const ALLOWED_FORMATS = new Set(["jpeg", "png", "webp", "avif", "gif", "tiff"]);
 
 export interface ProcessedImage {
   buffer: Buffer;
@@ -32,13 +32,14 @@ export async function processImage(file: File): Promise<ProcessedImage> {
 
   // Trust the actual bytes, not the declared MIME type.
   let format: string | undefined;
+  let compression: string | undefined;
   try {
-    format = (await sharp(input, { limitInputPixels: 80_000_000 }).metadata()).format;
+    ({ format, compression } = await sharp(input, { limitInputPixels: 80_000_000 }).metadata());
   } catch {
     throw new ImageError("The file is not a valid image.");
   }
-  if (!format || !ALLOWED_FORMATS.has(format)) {
-    throw new ImageError("Unsupported format. Use JPEG, PNG, WebP or AVIF.");
+  if (!isAcceptedFormat(format, compression)) {
+    throw new ImageError(unsupportedMessage(format, compression));
   }
 
   const { data, info } = await sharp(input, { limitInputPixels: 80_000_000 })

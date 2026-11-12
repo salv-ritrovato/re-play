@@ -39,11 +39,19 @@ Altri punti:
 Le copertine sono compresse **due volte**:
 
 1. **Browser** (`src/lib/client-image.ts`): ridimensionamento e conversione WebP su canvas prima dell'upload,
-   per non inviare file enormi.
+   per non inviare file enormi. Il tipo del file si legge dai **primi byte** (`sniffImageType`), non dal nome: un
+   file scaricato senza estensione, o rinominato, viene riconosciuto lo stesso. Se la conversione non rende il
+   file più piccolo (tipico degli AVIF, già molto compressi) il file originale viene inviato così com'è.
 2. **Server** (`src/lib/images.ts`, `sharp`): rotazione EXIF, rimozione metadati, ritaglio 3:4 a
    900×1200, WebP qualità 80, e calcolo di un **blur placeholder** salvato in `games.cover_blur`. Il ritaglio
    tiene la parte più interessante dell'immagine (`sharp.strategy.attention`), ma una grafica con proporzioni
    molto diverse da 3:4 perde i bordi.
+
+**Formati accettati** (`src/lib/image-formats.ts`, regole condivise da browser e server): JPEG, PNG, WebP e
+AVIF (più GIF e TIFF, non proposti). Attenzione: `sharp` chiama **"heif"** un file AVIF (con compressione
+"av1"), mai "avif"; le foto HEIC degli iPhone sono anch'esse "heif" ma con compressione "hevc" e non si
+possono leggere. `isAcceptedFormat` tiene conto di questo, e `unsupportedMessage` dà un messaggio chiaro per
+HEIC, SVG e il resto.
 
 In lettura, `next/image` serve AVIF/WebP alla dimensione giusta (`qualities` 60/75/85, `remotePatterns`
 verso Supabase). Le server action accettano body fino a 12 MB (`serverActions.bodySizeLimit`).

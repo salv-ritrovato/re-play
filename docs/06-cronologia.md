@@ -89,6 +89,14 @@ another"** e **"Parti da un gioco esistente"** (vedi [04-cms-admin.md](04-cms-ad
 - **Header e footer duplicati nel 404 dentro `(site)`**: `(site)/not-found.tsx` separato + `NotFoundView`.
 - **Footer troppo largo su telefono dopo aver aggiunto l'icona di Steam**: i test responsive hanno segnalato lo
   scorrimento orizzontale; la riga dei link ora va a capo (`flex-wrap`).
+- **"Unsupported format" caricando una copertina (AVIF, o file senza estensione)**: `sharp` chiama "heif" i
+  file AVIF e l'elenco dei formati consentiti conteneva "avif", che non compare mai, quindi ogni AVIF che
+  arrivava al server veniva respinto. Di solito il browser lo converte prima in WebP e non si vede, ma un AVIF
+  già piccolo viene inviato com'è. Ora il controllo (`image-formats.ts`) riconosce AVIF come "heif" con
+  compressione "av1", il browser legge il tipo reale dai primi byte (un file senza estensione va bene) e i file
+  non supportati (HEIC, SVG) hanno un messaggio chiaro. Test: regole sui formati, e dal form un file senza
+  estensione, un AVIF che arriva al server e un SVG rifiutato (il test dell'AVIF fallisce con il vecchio
+  controllo).
 - **Home che scorreva di lato con due o più recensioni nel carosello**: i testi nascosti (`sr-only`) della
   seconda slide sono posizionati in modo assoluto e il contenitore scorrevole, non essendo `relative`, non li
   tratteneva. Stessa causa dei grafici delle statistiche; ora il contenitore è `relative`. Il test del

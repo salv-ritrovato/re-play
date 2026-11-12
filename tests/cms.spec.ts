@@ -1,6 +1,6 @@
 import { expect, test, type Page } from "@playwright/test";
 import { cleanupE2E } from "./cleanup";
-import { expectPreviewImage, login, makeImage, owner, uniqueTitle } from "./helpers";
+import { expectPreviewImage, login, makeImage, makeNoisyAvif, owner, uniqueTitle } from "./helpers";
 
 test.skip(!owner.username || !owner.password, "E2E_USERNAME / E2E_PASSWORD not set");
 
@@ -445,6 +445,30 @@ test.describe.serial("CMS end to end", () => {
     // "Read the full review" opens the game.
     await slides.first().getByRole("link", { name: /Read the full review/ }).click();
     await expect(page).toHaveURL(new RegExp(`/games/${slug}$`));
+  });
+
+  test("covers without an extension or in AVIF are accepted; other files get a clear message", async ({ page }) => {
+    await page.goto(`/admin/games?q=${encodeURIComponent(title)}`);
+    await page.getByRole("link", { name: `Edit ${title}` }).click();
+    const input = page.locator('input[type="file"]');
+
+    // A download without an extension (the browser has no idea what it is): the content tells.
+    const png = await makeImage(900, 1200, "#3f7f4b", "png");
+    await input.setInputFiles({ name: "bPXMfRCtjGgvIS0BxOWqVsn94MAMLMkE", mimeType: "", buffer: png.buffer });
+    await expect(page.getByText(/Cover ready/)).toBeVisible();
+
+    // An AVIF the browser keeps as it is (already smaller than any WebP) goes to the server as AVIF.
+    await input.setInputFiles(await makeNoisyAvif(600, 800));
+    // Same size before and after ("26 KB → 26 KB"): the browser kept the AVIF as it is. This also waits for the
+    // AVIF itself, not for the confirmation of the previous file still on screen.
+    await expect(page.getByText(/Cover ready · (\d+ KB) → \1(?!\d)/)).toBeVisible();
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page).toHaveURL(/\/admin\/games$/); // the server accepted it
+
+    // Something that is not a supported image says so, naming the formats.
+    await page.getByRole("link", { name: `Edit ${title}` }).click();
+    await input.setInputFiles({ name: "drawing.svg", mimeType: "image/svg+xml", buffer: Buffer.from("<svg xmlns='http://www.w3.org/2000/svg'/>") });
+    await expect(page.getByText(/is not a JPEG, PNG, WebP or AVIF image/)).toBeVisible();
   });
 
   test("replace and remove the cover", async ({ page }) => {

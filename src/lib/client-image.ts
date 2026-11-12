@@ -1,3 +1,5 @@
+import { sniffImageType, SUPPORTED_LABEL } from "@/lib/image-formats";
+
 export const ACCEPTED_TYPES = ["image/jpeg", "image/png", "image/webp", "image/avif"];
 export const MAX_INPUT_BYTES = 25 * 1024 * 1024; // what we accept to even try to decode
 
@@ -11,8 +13,12 @@ export async function compressForUpload(
   file: File,
   { maxSide, quality = 0.86 }: { maxSide: number; quality?: number },
 ): Promise<File> {
-  if (!ACCEPTED_TYPES.includes(file.type)) {
-    throw new ClientImageError(`“${file.name}” is not a JPEG, PNG, WebP or AVIF image.`);
+  // Trust the content, not the name: a download without an extension (or a renamed file) has no usable type.
+  const type = ACCEPTED_TYPES.includes(file.type)
+    ? file.type
+    : sniffImageType(new Uint8Array(await file.slice(0, 16).arrayBuffer()));
+  if (!type) {
+    throw new ClientImageError(`“${file.name}” is not a ${SUPPORTED_LABEL} image.`);
   }
   if (file.size > MAX_INPUT_BYTES) {
     throw new ClientImageError(`“${file.name}” is larger than 25 MB.`);
@@ -44,7 +50,9 @@ export async function compressForUpload(
   if (!blob) throw new ClientImageError(`“${file.name}” could not be compressed.`);
 
   // Never make things worse: keep the original if re-encoding didn't help.
-  if (blob.size >= file.size && scale === 1) return file;
+  if (blob.size >= file.size && scale === 1) {
+    return file.type ? file : new File([file], file.name || "cover", { type });
+  }
 
   const name = file.name.replace(/\.[^.]+$/, "") || "image";
   return new File([blob], `${name}.webp`, { type: "image/webp" });

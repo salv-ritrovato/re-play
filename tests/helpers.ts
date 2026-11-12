@@ -40,3 +40,14 @@ export async function expectPreviewImage(page: Page, request: APIRequestContext)
   expect([png.format, png.width, png.height]).toEqual(["png", 1200, 630]);
   return new URL(og!).pathname;
 }
+
+/**
+ * An AVIF of noise: AVIF compresses it better than the WebP the browser would make, so the form keeps the
+ * original file and sends the AVIF itself to the server (which sharp calls "heif").
+ */
+export async function makeNoisyAvif(width: number, height: number) {
+  const noise = Buffer.alloc(width * height * 3);
+  for (let i = 0; i < noise.length; i++) noise[i] = Math.floor(Math.random() * 256);
+  const buffer = await sharp(noise, { raw: { width, height, channels: 3 } }).avif({ quality: 20 }).toBuffer();
+  return { name: "cover.avif", mimeType: "image/avif", buffer };
+}
