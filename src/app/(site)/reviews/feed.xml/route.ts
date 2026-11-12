@@ -1,6 +1,6 @@
 import { connection } from "next/server";
-import { getReviewEntries } from "@/lib/data/public";
-import { formatRating } from "@/lib/format";
+import { getFeedReviews } from "@/lib/data/public";
+import { excerpt, formatRating } from "@/lib/format";
 
 const SITE_URL = (process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000").replace(/\/$/, "");
 const ITEMS = 20;
@@ -8,10 +8,19 @@ const ITEMS = 20;
 const escapeXml = (text: string) =>
   text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
 
-/** RSS feed with the latest reviews (English), newest first: the start of each text and a link to the full one. */
+/** One paragraph per line of the review, as HTML for the feed readers that show `content:encoded`. */
+const toHtml = (text: string) =>
+  text
+    .split(/\n+/)
+    .map((p) => p.trim())
+    .filter(Boolean)
+    .map((p) => `<p>${escapeXml(p)}</p>`)
+    .join("");
+
+/** RSS feed with the latest reviews (English), newest first: each one with its full text and a link to the game. */
 export async function GET() {
   await connection();
-  const reviews = (await getReviewEntries()).slice(0, ITEMS);
+  const reviews = await getFeedReviews(ITEMS);
 
   const items = reviews
     .map((r) => {
@@ -23,7 +32,8 @@ export async function GET() {
         `      <link>${link}</link>`,
         `      <guid isPermaLink="true">${link}</guid>`,
         `      <pubDate>${new Date(r.created_at).toUTCString()}</pubDate>`,
-        `      <description>${escapeXml(r.excerpt_en)}</description>`,
+        `      <description>${escapeXml(excerpt(r.review, 360))}</description>`,
+        `      <content:encoded><![CDATA[${toHtml(r.review)}]]></content:encoded>`,
         "    </item>",
       ].join("\n");
     })
@@ -31,7 +41,7 @@ export async function GET() {
 
   const lastBuild = reviews[0] ? new Date(reviews[0].created_at).toUTCString() : new Date().toUTCString();
   const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Re:Play - Reviews</title>
     <link>${SITE_URL}/reviews</link>

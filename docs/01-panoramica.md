@@ -58,7 +58,7 @@ integrato sotto `/admin`.
   la pagina con tutti i giochi che ha pubblicato (numero di giochi e voto medio).
 - **Reviews** (`/reviews`): solo i giochi recensiti, con anteprima e selezione lingua (`?lang=it`). Come la
   Library, ricerca, ordinamento, lingua e pagine cambiano **subito, nel browser**. Il pulsante "RSS" apre il
-  feed delle ultime 20 recensioni (`/reviews/feed.xml`, in inglese).
+  feed delle ultime 20 recensioni (`/reviews/feed.xml`, in inglese, con il **testo completo**).
 - **Statistics** (`/statistics`): totali, generi, piattaforme, launcher, solo/online, i cinque giochi con più
   ore, distribuzione dei voti, giochi per anno.
 - **About** (`/about`): presentazione personale in italiano e inglese, riquadro "In breve" e link al

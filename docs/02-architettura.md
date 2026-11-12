@@ -79,7 +79,7 @@ verso Supabase). Le server action accettano body fino a 12 MB (`serverActions.bo
 - La funzione SQL `library_search` (vedi [03-database.md](03-database.md)) alimenta ormai solo i dati caricati
   dal server: `getLibraryGames`, `getReviewEntries`, il carosello e gli scaffali della home.
 - **Sitemap e SEO**: `src/app/sitemap.ts` elenca sezioni, giochi (con `lastModified`), sviluppatori e publisher
-  (`getSitemapData`); `robots.ts` la annuncia. Il feed RSS è un route handler (`(site)/reviews/feed.xml`) e la pagina
+  (`getSitemapData`); `robots.ts` la annuncia. Il feed RSS è un route handler (`(site)/reviews/feed.xml`, `getFeedReviews`: ogni voce ha una breve `description` e la recensione intera in `content:encoded`, a paragrafi) e la pagina
   Reviews lo dichiara con `alternates`. L'indirizzo base viene da `NEXT_PUBLIC_SITE_URL`.
 - **Backup**: `/admin/export` (route handler, solo owner: sessione verificata con `assertOwner`, e il proxy rimanda
   gli anonimi al login) restituisce tutti i giochi con ogni campo (recensioni, pro e contro, generi e piattaforme

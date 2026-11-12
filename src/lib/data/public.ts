@@ -102,6 +102,30 @@ export async function getReviewEntries(): Promise<ReviewEntry[]> {
   }));
 }
 
+/** The latest reviews with their full English text, for the RSS feed. */
+export async function getFeedReviews(limit = 20) {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(TAGS.games);
+
+  const supabase = createPublicClient();
+  const { data, error } = await supabase.rpc("library_search", {
+    p_reviewed_only: true,
+    p_sort: "added",
+    p_limit: limit,
+    p_offset: 0,
+  });
+  if (error) fail("getFeedReviews", error);
+
+  return ((data ?? []) as GameSummary[]).map((g) => ({
+    slug: g.slug,
+    title: g.title,
+    rating: g.rating === null ? null : Number(g.rating),
+    created_at: g.created_at,
+    review: g.review_en ?? "",
+  }));
+}
+
 /** Everything the sitemap lists: the games (with their last change) and the pages of developers and publishers. */
 export async function getSitemapData() {
   "use cache";

@@ -283,7 +283,13 @@ test.describe("public navigation", () => {
     expect(rss).toContain("<channel>");
     expect(rss.match(/<item>/g)?.length ?? 0).toBeGreaterThan(0);
     expect(rss).toMatch(/<item>[\s\S]*<title>[^<]+<\/title>[\s\S]*<link>[^<]+\/games\/[a-z0-9-]+<\/link>[\s\S]*<pubDate>/);
-    expect(rss).not.toMatch(/&(?!amp;|lt;|gt;|quot;)/); // every ampersand is escaped
+    // Each item carries the whole review (not just the start) next to a short description.
+    const item = rss.split("<item>")[1];
+    const description = /<description>([^<]*)<\/description>/.exec(item)?.[1] ?? "";
+    const full = /<content:encoded><!\[CDATA\[([\s\S]*?)\]\]><\/content:encoded>/.exec(item)?.[1] ?? "";
+    expect(full).toContain("<p>");
+    expect(full.length).toBeGreaterThanOrEqual(description.length);
+    expect(rss).not.toMatch(/&(?!amp;|lt;|gt;|quot;|#)/); // every ampersand is escaped
     await page.goto("/reviews");
     await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute("href", /\/reviews\/feed\.xml$/); // (made absolute from the site address)
     await expect(page.getByRole("link", { name: "RSS" })).toHaveAttribute("href", "/reviews/feed.xml");
