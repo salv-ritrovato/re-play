@@ -47,3 +47,6 @@ next-env.d.ts
 # playwright
 /test-results/
 /playwright-report/
+
+# Promo material (videos), too big for git
+/promo/

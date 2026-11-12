@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Clock, Gamepad2, Shuffle, Star, Trophy, type LucideIcon } from "lucide-react";
+import { ArrowRight, Clock, Gamepad2, Layers, Shuffle, Star, type LucideIcon } from "lucide-react";
 import { Rating } from "@/components/games/badges";
 import { DeveloperLinks } from "@/components/games/developer-links";
 import { GameCard } from "@/components/games/game-card";
@@ -70,7 +70,7 @@ async function HomeContent() {
             <Stat icon={Gamepad2} label="Games" value={totals?.total_games ?? 0} />
             <Stat icon={Clock} label="Hours played" value={Number((totals?.total_playtime_hours ?? 0).toFixed(1))} />
             <Stat icon={Star} label="Average rating" value={formatRating(totals?.average_rating ?? null)} />
-            <Stat icon={Trophy} label="Highest rating" value={formatRating(topRated[0]?.rating ?? null)} />
+            <Stat icon={Layers} label="Favourite genre" value={genreTiles[0]?.name ?? "-"} />
           </dl>
         </Container>
       </section>
@@ -183,7 +183,7 @@ function Stat({ icon, label, value }: { icon: LucideIcon; label: string; value: 
       <dt className="eyebrow">
         <IconLabel icon={icon}>{label}</IconLabel>
       </dt>
-      <dd className="text-4xl font-semibold tracking-tight tabular-nums">{value}</dd>
+      <dd className="text-4xl font-semibold tracking-tight break-words tabular-nums">{value}</dd>
     </div>
   );
 }

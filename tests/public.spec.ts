@@ -75,6 +75,11 @@ test.describe("public navigation", () => {
     const genres = page.locator("section").filter({ has: page.getByRole("heading", { name: "Browse by genre" }) });
     const tiles = genres.getByRole("list").getByRole("link"); // (the section header has its own "All games" link)
     await expect(tiles.first()).toBeVisible();
+
+    // The key figures name the genre played the most, which is the first tile (no "highest rating": it is always 10).
+    const favourite = page.locator("dt", { hasText: "Favourite genre" }).locator("xpath=following-sibling::dd");
+    await expect(tiles.first()).toContainText((await favourite.innerText()).trim());
+    await expect(page.getByText("Highest rating")).toHaveCount(0);
     await tiles.first().click();
     await expect(page).toHaveURL(/\/library\?genre=[0-9a-f-]{36}$/);
 
