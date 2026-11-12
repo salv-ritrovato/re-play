@@ -1,4 +1,5 @@
 import { getDeveloperGames } from "@/lib/data/public";
+import { formatRating } from "@/lib/format";
 import { coverUris, ogContentType, ogSize, renderOg } from "@/lib/og";
 
 export const alt = "Games by a developer, rated on Re:Play";
@@ -19,7 +20,7 @@ export default async function Image({ params }: { params: Promise<{ slug: string
     title: name,
     subtitle:
       `${games.length} ${games.length === 1 ? "game" : "games"} in the archive` +
-      (average !== null ? ` · average rating ${average.toFixed(1)}` : ""),
+      (average !== null ? ` · average rating ${formatRating(average)}` : ""),
     panel: covers.length > 0 ? { kind: "covers", covers } : null,
   });
 }

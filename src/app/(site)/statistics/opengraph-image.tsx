@@ -1,3 +1,4 @@
+import { formatRating } from "@/lib/format";
 import { ogContentType, ogSize, renderOg } from "@/lib/og";
 import { getOgOverview } from "@/lib/data/public";
 
@@ -16,7 +17,7 @@ export default async function Image() {
       items: [
         { label: "Games", value: String(games) },
         { label: "Hours played", value: String(Number(hours.toFixed(1))) },
-        { label: "Average rating", value: average === null ? "-" : average.toFixed(1) },
+        { label: "Average rating", value: formatRating(average) },
       ],
     },
   });

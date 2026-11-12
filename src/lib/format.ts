@@ -27,7 +27,9 @@ export function yearOf(value: string | null | undefined): number | null {
 
 export function formatRating(value: number | null | undefined): string {
   if (value === null || value === undefined) return "-";
-  return Number(value).toFixed(1);
+  const text = Number(value).toFixed(1);
+  // 10 is the top of the scale: "10", not "10.0".
+  return text === "10.0" ? "10" : text;
 }
 
 export function formatPlaytime(hours: number | null | undefined): string | null {

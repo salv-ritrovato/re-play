@@ -414,13 +414,18 @@ test.describe.serial("CMS end to end", () => {
     expect(count).toBeGreaterThanOrEqual(1);
     expect(count).toBeLessThanOrEqual(5);
 
-    // Every slide is rated 9 or more, best first: the test game (9.5) opens the carousel.
+    // Every slide is rated 9 or more, best first (10 comes before 9.5, which comes before 9).
     const labels = await carousel
       .locator('[aria-label^="Rated"]')
       .evaluateAll((els) => els.map((e) => e.getAttribute("aria-label") ?? ""));
-    for (const label of labels) expect(Number(label.match(/Rated ([\d.]+)/)![1])).toBeGreaterThanOrEqual(9);
-    await expect(slides.first()).toContainText(title);
-    await expect(slides.first()).toContainText("Updated English review.");
+    const ratings = labels.map((label) => Number(label.match(/Rated ([\d.]+)/)![1]));
+    for (const rating of ratings) expect(rating).toBeGreaterThanOrEqual(9);
+    expect(ratings).toEqual([...ratings].sort((a, b) => b - a));
+
+    // The test game (9.5) is in it, whatever else is rated higher in the real archive.
+    const mine = slides.filter({ hasText: title });
+    await expect(mine).toHaveCount(1);
+    await expect(mine).toContainText("Updated English review.");
 
     // The slides sit side by side inside the carousel: they must never widen the page itself.
     if (count > 1) {
@@ -430,8 +435,8 @@ test.describe.serial("CMS end to end", () => {
 
     // The same review can be read in Italian.
     await carousel.getByRole("button", { name: "Italiano" }).click();
-    await expect(slides.first()).toContainText("Recensione italiana aggiornata.");
-    await expect(slides.first().getByRole("link", { name: /Leggi la recensione completa/ })).toBeVisible();
+    await expect(mine).toContainText("Recensione italiana aggiornata.");
+    await expect(mine.getByRole("link", { name: /Leggi la recensione completa/ })).toBeVisible();
     await carousel.getByRole("button", { name: "English" }).click();
 
     // With more than one review, arrows and dots move between them.
@@ -443,7 +448,7 @@ test.describe.serial("CMS end to end", () => {
     }
 
     // "Read the full review" opens the game.
-    await slides.first().getByRole("link", { name: /Read the full review/ }).click();
+    await mine.getByRole("link", { name: /Read the full review/ }).click();
     await expect(page).toHaveURL(new RegExp(`/games/${slug}$`));
   });
 
