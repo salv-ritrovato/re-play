@@ -92,6 +92,8 @@ export interface GameSummary {
 export type LibraryGame = Omit<GameSummary, "review_en" | "review_it" | "short_description" | "total_count">;
 /** A library entry as the browser filters it (see `filterLibrary`). */
 export type LibraryRecord = LibraryGame & { completed_on: string | null };
+/** A reviewed game as the Reviews page filters it: the start of each review is ready, not the whole text. */
+export type ReviewEntry = LibraryRecord & { excerpt_en: string; excerpt_it: string | null };
 
 export interface GameDetail {
   id: string;
@@ -135,7 +137,6 @@ export interface LibraryFilters {
   completion?: CompletionStatus[];
   developer?: string;
   publisher?: string;
-  reviewedOnly?: boolean;
   /** undefined = everything, true = online/competitive only, false = single-player only */
   online?: boolean;
   launchers?: LauncherId[];

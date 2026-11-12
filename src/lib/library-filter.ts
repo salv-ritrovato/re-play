@@ -6,7 +6,7 @@ import type { LibraryFilters, LibraryRecord } from "@/lib/types";
  * group any match counts, across groups all must; same sort keys, ties broken by "recently added"). The
  * SQL function still serves the home page and the reviews page, so keep the two in step.
  */
-export function filterLibrary(games: readonly LibraryRecord[], f: LibraryFilters): LibraryRecord[] {
+export function filterLibrary<T extends LibraryRecord>(games: readonly T[], f: LibraryFilters): T[] {
   const q = f.q?.trim().toLowerCase() || null;
   const genres = f.genres?.length ? new Set(f.genres) : null;
   const platforms = f.platforms?.length ? new Set(f.platforms) : null;
@@ -15,7 +15,7 @@ export function filterLibrary(games: readonly LibraryRecord[], f: LibraryFilters
   const completion = f.completion?.length ? new Set<string>(f.completion) : null;
   const launchers = f.launchers?.length ? f.launchers : null;
 
-  const matches = (g: LibraryRecord) => {
+  const matches = (g: T) => {
     if (
       q &&
       !g.title.toLowerCase().includes(q) &&
@@ -70,7 +70,7 @@ const SORTS: Record<LibraryFilters["sort"], Cmp> = {
   release_asc: byOptional((g) => g.release_date, 1),
 };
 
-export function sortLibrary(games: LibraryRecord[], sort: LibraryFilters["sort"]): LibraryRecord[] {
-  const primary = SORTS[sort] ?? byAdded;
+export function sortLibrary<T extends LibraryRecord>(games: T[], sort: LibraryFilters["sort"]): T[] {
+  const primary: (a: LibraryRecord, b: LibraryRecord) => number = SORTS[sort] ?? byAdded;
   return [...games].sort((a, b) => primary(a, b) || byAdded(a, b));
 }

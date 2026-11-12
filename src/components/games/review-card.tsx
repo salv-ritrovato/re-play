@@ -1,10 +1,10 @@
 import Link from "next/link";
-import { excerpt, yearOf } from "@/lib/format";
-import { reviewFor, type GameSummary, type Lang } from "@/lib/types";
+import { yearOf } from "@/lib/format";
+import type { Lang, ReviewEntry } from "@/lib/types";
 import { OnlineBadge, Rating } from "./badges";
 import { GameCover } from "./game-cover";
 
-export function ReviewCard({ game, lang }: { game: GameSummary; lang: Lang }) {
+export function ReviewCard({ game, lang }: { game: ReviewEntry; lang: Lang }) {
   const year = yearOf(game.release_date);
 
   return (
@@ -38,7 +38,7 @@ export function ReviewCard({ game, lang }: { game: GameSummary; lang: Lang }) {
           lang={lang}
           className="mt-4 line-clamp-4 text-[0.9375rem] leading-relaxed text-muted-foreground sm:line-clamp-5"
         >
-          {excerpt(reviewFor(game, lang), 360)}
+          {lang === "it" ? game.excerpt_it : game.excerpt_en}
         </p>
 
         <p className="mt-auto pt-4 text-xs text-subtle">

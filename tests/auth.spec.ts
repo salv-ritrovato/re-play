@@ -37,6 +37,34 @@ test.describe("authentication & route protection", () => {
     await expect(page).toHaveURL(/\/login\?next=/);
   });
 
+  test("the backup download is for the owner only, and holds every game", async ({ page, request }) => {
+    // Anonymous: sent to the login page, nothing is served.
+    const anonymous = await request.get("/admin/export", { maxRedirects: 0 });
+    expect(anonymous.status()).toBe(307);
+    expect(anonymous.headers()["location"]).toContain("/login");
+
+    // Signed in: a JSON file with the games, their reviews and their genres by name.
+    await login(page);
+    const res = await page.request.get("/admin/export");
+    expect(res.status()).toBe(200);
+    expect(res.headers()["content-disposition"]).toMatch(/attachment; filename="replay-backup-\d{4}-\d{2}-\d{2}\.json"/);
+    expect(res.headers()["cache-control"]).toContain("no-store");
+    const backup = await res.json();
+    expect(backup.app).toBe("Re:Play");
+    expect(backup.games.length).toBe(backup.counts.games);
+    expect(backup.games.length).toBeGreaterThan(0);
+    const game = backup.games[0];
+    for (const field of ["slug", "title", "rating", "review_en", "review_it", "pros", "cons", "launchers"]) {
+      expect(game).toHaveProperty(field);
+    }
+    expect(Array.isArray(game.genres)).toBe(true);
+    expect(typeof (game.genres[0] ?? "")).toBe("string");
+
+    // The button on the games list points to it.
+    await page.goto("/admin/games");
+    await expect(page.getByRole("link", { name: "Backup" })).toHaveAttribute("href", "/admin/export");
+  });
+
   test("anonymous visitors cannot write through the public API (RLS)", async ({ request }) => {
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
     const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY!;

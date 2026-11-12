@@ -8,6 +8,7 @@
     "start": "next start",
     "lint": "eslint",
     "test:e2e": "playwright test",
+    "test:unit": "playwright test -c playwright.unit.config.ts",
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {

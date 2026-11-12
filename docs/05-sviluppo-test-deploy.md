@@ -29,10 +29,18 @@
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run test:e2e` | Suite Playwright |
 
+## Controlli automatici (GitHub Actions)
+
+`.github/workflows/ci.yml` gira a ogni push su `master` e a ogni pull request: lint, controllo dei tipi
+(`next typegen` + `npm run typecheck`) e `npm run test:unit`, cioè i test che non usano browser, server né
+database (`playwright.unit.config.ts`: format, image-formats, library-filter, search-index, validation). Il test
+"contro il database vero" salta da solo se mancano le variabili Supabase. La suite completa (`npm run test:e2e`)
+usa il database reale e resta sul computer del proprietario.
+
 ## Test end-to-end (Playwright)
 
 - File: `tests/{auth,cms,public,responsive}.spec.ts` e gli unit test senza browser (`image-formats`,
-  `validation`, `format`, `library-filter`, `search-index`; `library-filter` anche a confronto con il database), con `helpers.ts` e `cleanup.ts`. In tutto 78 test (desktop, mobile e tablet).
+  `validation`, `format`, `library-filter`, `search-index`; `library-filter` anche a confronto con il database), con `helpers.ts` e `cleanup.ts`. In tutto 82 test (desktop, mobile e tablet).
 - Il materiale promozionale (video di presentazione) sta in `promo/`, ignorato da git perché pesante.
 - Tre progetti: **desktop** (tutti i test tranne `responsive`), **mobile** (Pixel 7) e **tablet** (iPad,
   su Chromium), questi ultimi due solo per `responsive.spec.ts`.

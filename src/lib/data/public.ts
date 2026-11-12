@@ -1,18 +1,16 @@
 import { cacheLife, cacheTag } from "next/cache";
 import { splitDevelopers } from "@/lib/developers";
-import { slugify } from "@/lib/format";
+import { excerpt, slugify } from "@/lib/format";
 import { createPublicClient } from "@/lib/supabase/public";
+import { LAUNCHER_NAME } from "@/lib/types";
 import type { SearchEntry } from "@/lib/search-index";
 import type {
   GameDetail,
   GameSummary,
-  LibraryFilters,
   LibraryRecord,
+  ReviewEntry,
   Taxonomy,
 } from "@/lib/types";
-
-export const PAGE_SIZE = 24;
-export const REVIEWS_PAGE_SIZE = 12;
 
 /** Cache tags, invalidated by the CMS server actions. */
 export const TAGS = { games: "games", taxonomy: "taxonomy" } as const;
@@ -24,39 +22,6 @@ function fail(scope: string, error: { message: string }): never {
 // ---------------------------------------------------------------------------
 // Library / reviews
 // ---------------------------------------------------------------------------
-export async function searchGames(
-  filters: LibraryFilters,
-  pageSize: number = PAGE_SIZE,
-): Promise<{ items: GameSummary[]; total: number }> {
-  "use cache";
-  cacheLife("minutes");
-  cacheTag(TAGS.games, TAGS.taxonomy);
-
-  const supabase = createPublicClient();
-  const { data, error } = await supabase.rpc("library_search", {
-    p_query: filters.q || null,
-    p_genres: filters.genres?.length ? filters.genres : null,
-    p_platforms: filters.platforms?.length ? filters.platforms : null,
-    p_years: filters.years?.length ? filters.years : null,
-    p_min_rating: filters.minRating ?? null,
-    p_max_rating: filters.maxRating ?? null,
-    p_play_status: filters.status?.length ? filters.status : null,
-    p_completion: filters.completion?.length ? filters.completion : null,
-    p_developer: filters.developer || null,
-    p_publisher: filters.publisher || null,
-    p_reviewed_only: filters.reviewedOnly ?? false,
-    p_sort: filters.sort,
-    p_limit: pageSize,
-    p_offset: (Math.max(filters.page, 1) - 1) * pageSize,
-    p_online: filters.online ?? null,
-    p_launchers: filters.launchers?.length ? filters.launchers : null,
-  });
-  if (error) fail("searchGames", error);
-
-  const items = (data ?? []) as GameSummary[];
-  return { items, total: items[0] ? Number(items[0].total_count) : 0 };
-}
-
 /** The library is small enough to ship whole to the browser, which then filters it instantly. */
 const LIBRARY_MAX = 1000;
 
@@ -96,6 +61,68 @@ export async function getLibraryGames(): Promise<LibraryRecord[]> {
       platforms: g.platforms,
     }),
   );
+}
+
+/** Every reviewed game with the start of its reviews (in both languages), for the Reviews page. */
+export async function getReviewEntries(): Promise<ReviewEntry[]> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(TAGS.games, TAGS.taxonomy);
+
+  const supabase = createPublicClient();
+  const { data, error } = await supabase.rpc("library_search", {
+    p_reviewed_only: true,
+    p_sort: "added",
+    p_limit: LIBRARY_MAX,
+    p_offset: 0,
+  });
+  if (error) fail("getReviewEntries", error);
+
+  return ((data ?? []) as (GameSummary & { completed_on: string | null })[]).map((g) => ({
+    id: g.id,
+    slug: g.slug,
+    title: g.title,
+    release_date: g.release_date,
+    developer: g.developer,
+    publisher: g.publisher,
+    rating: g.rating === null ? null : Number(g.rating),
+    play_status: g.play_status,
+    completion_status: g.completion_status,
+    playtime_hours: g.playtime_hours === null ? null : Number(g.playtime_hours),
+    cover_path: g.cover_path,
+    cover_blur: g.cover_blur,
+    created_at: g.created_at,
+    completed_on: g.completed_on ?? null,
+    is_online: g.is_online,
+    launchers: g.launchers,
+    genres: g.genres,
+    platforms: g.platforms,
+    excerpt_en: excerpt(g.review_en, 360),
+    excerpt_it: g.review_it ? excerpt(g.review_it, 360) : null,
+  }));
+}
+
+/** Everything the sitemap lists: the games (with their last change) and the pages of developers and publishers. */
+export async function getSitemapData() {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(TAGS.games);
+
+  const supabase = createPublicClient();
+  const [games, developers, publishers] = await Promise.all([
+    supabase.from("games").select("slug, updated_at"),
+    supabase.from("filter_developers").select("name"),
+    supabase.from("filter_publishers").select("name"),
+  ]);
+  for (const r of [games, developers, publishers]) if (r.error) fail("getSitemapData", r.error);
+
+  const slugsOf = (rows: { name: unknown }[] | null) =>
+    [...new Set((rows ?? []).flatMap((r) => splitDevelopers(r.name as string).map((n) => slugify(n))))].filter(Boolean);
+  return {
+    games: (games.data ?? []) as { slug: string; updated_at: string | null }[],
+    developers: slugsOf(developers.data),
+    publishers: slugsOf(publishers.data),
+  };
 }
 
 /** Every title with a few details, for the navbar search. */
@@ -445,16 +472,33 @@ export async function getStats() {
   cacheTag(TAGS.games, TAGS.taxonomy);
 
   const supabase = createPublicClient();
-  const [totals, genres, platforms, ratings, years] = await Promise.all([
+  const [totals, genres, platforms, ratings, years, library] = await Promise.all([
     supabase.from("stats_totals").select("*").maybeSingle(),
     supabase.from("stats_genres").select("name, games"),
     supabase.from("stats_platforms").select("name, games"),
     supabase.from("stats_rating_distribution").select("bucket, games"),
     supabase.from("stats_games_by_year").select("year, games"),
+    getLibraryGames(),
   ]);
   for (const r of [totals, genres, platforms, ratings, years]) {
     if (r.error) fail("getStats", r.error);
   }
+
+  // The figures that need no view of their own: counted from the games themselves.
+  const launcherCounts = new Map<string, number>();
+  for (const g of library) {
+    if (g.launchers.length === 0) launcherCounts.set("Console / none", (launcherCounts.get("Console / none") ?? 0) + 1);
+    for (const id of g.launchers) launcherCounts.set(LAUNCHER_NAME[id] ?? id, (launcherCounts.get(LAUNCHER_NAME[id] ?? id) ?? 0) + 1);
+  }
+  const launchers = [...launcherCounts.entries()]
+    .map(([name, games]) => ({ name, games }))
+    .sort((a, b) => b.games - a.games || a.name.localeCompare(b.name));
+  const online = library.filter((g) => g.is_online).length;
+  const mostPlayed = library
+    .filter((g) => (g.playtime_hours ?? 0) > 0)
+    .sort((a, b) => (b.playtime_hours ?? 0) - (a.playtime_hours ?? 0))
+    .slice(0, 5)
+    .map((g) => ({ title: g.title, hours: g.playtime_hours ?? 0 }));
 
   const t = totals.data as StatsTotals | null;
   return {
@@ -467,5 +511,8 @@ export async function getStats() {
     platforms: (platforms.data ?? []) as { name: string; games: number }[],
     ratings: (ratings.data ?? []) as { bucket: number; games: number }[],
     years: (years.data ?? []) as { year: number; games: number }[],
+    launchers,
+    types: { solo: library.length - online, online },
+    mostPlayed,
   };
 }

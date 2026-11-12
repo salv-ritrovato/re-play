@@ -63,6 +63,7 @@ Cosa è stato fatto, nell'ordine, e i problemi incontrati con le relative soluzi
 | Il voto 10 non deve avere decimali (10, non 10.0) | `formatRating` mostra "10" quando il voto è 10 (anche se una media arrotondata arriva a 10); gli altri voti restano con un decimale (9.0, 9.5). Vale per tutto il sito, comprese le immagini di anteprima. Test sulle regole di formato. |
 | Asterischi (refusi di grassetto da copia e incolla) nelle recensioni | Trovati 4 asterischi in un solo gioco (Crash Bandicoot 4, recensione inglese) e tolti dal database. Da ora il form li toglie appena incolli, con il cursore che resta al suo posto, e il server li toglie al salvataggio in descrizioni, recensioni, pro e contro. Test sulle regole e sul form. |
 | Carosello: provarlo da telefono, e frecce che ricominciano da capo | Frecce circolari (dopo l'ultima si torna alla prima, indietro dalla prima si va all'ultima), anche con i tasti freccia, e visibili su telefono accanto ai puntini. Test su telefono e tablet con un vero scorrimento col dito (eventi di tocco). |
+| "Procedi con tutto": sitemap, controlli automatici, backup, Reviews istantanea, RSS, statistiche più ricche | **Sitemap** (`sitemap.xml`, annunciata in `robots.txt`). **GitHub Actions**: lint, tipi e test senza browser a ogni push. **Backup** dall'admin (pulsante "Backup", file JSON con tutti i giochi, solo per l'owner). **Reviews istantanea** come la Library (ricerca, ordine, lingua e pagine nel browser; `searchGames` e le costanti delle pagine lato server sono state rimosse perché non servono più). **Feed RSS** delle ultime 20 recensioni, con pulsante e link nell'intestazione della pagina. **Statistiche**: giochi per launcher, solo/online, i cinque più giocati. Test per ognuno (compreso: l'anonimo non scarica il backup; la sitemap contiene ogni gioco; nessuna richiesta al server mentre si usa Reviews). |
 | Una barra di ricerca per andare direttamente a un titolo, nella navbar | Icona a lente in ogni pagina (anche su mobile, accanto al menu) che apre un pannello di ricerca: risultati mentre si scrive (titolo, sviluppatore, publisher, senza badare ad accenti), frecce + Invio, "/" o Ctrl/Cmd+K per aprirla, ripiego sulla Library filtrata. L'elenco dei titoli si scarica una volta al primo uso. Test sull'ordinamento dei risultati e sul percorso completo. |
 | Un logo "contratto" per il mobile, ricavato da quello desktop | `public/brand/replay-logo-compact.png`: "Re:" ritagliato dal logo originale (stesse lettere, stesso grigio della "e") seguito da un triangolo play arrotondato, come quello della favicon, al posto di "Play"; centrato sui due punti. `Wordmark` lo mostra sotto `md` (header e hero) al posto del vecchio testo "Re". |
 | Ore di gioco (e voto) con il punto decimale, mai la virgola | Controllo di tutto il sito: ovunque si *mostrano* voti e ore (card, righe, scheda, home, statistiche, immagini di anteprima) c'era già il punto. Il problema era nel form, dove i campi "numerici" mostravano la virgola con il browser in italiano. Ora voto e ore sono campi di testo, una virgola diventa un punto appena scritta e il server la converte comunque. Test sulla regola e sul form. |
@@ -125,13 +126,12 @@ another"** e **"Parti da un gioco esistente"** (vedi [04-cms-admin.md](04-cms-ad
 
 ## 5. Stato attuale
 
-- Typecheck, lint, build e suite Playwright (78 test su desktop, mobile e tablet) passano.
+- Typecheck, lint, build e suite Playwright (82 test su desktop, mobile e tablet) passano.
 - Il database contiene i giochi reali di Salvatore, con copertine; nessun dato di test residuo.
 - Ogni push su `master` genera un deploy su Vercel.
 
 ## 6. Idee non richieste (disponibili se servono)
 
-- GitHub Actions per eseguire lint, typecheck e test a ogni push.
 - Una foto nella pagina About.
-- Statistiche separate per i giochi online.
 - Rendere il repository privato.
+- Statistiche ancora più ricche (ore per anno di completamento, ore per genere).

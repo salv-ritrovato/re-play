@@ -1,20 +1,18 @@
-import { PenLine } from "lucide-react";
+import { Rss } from "lucide-react";
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { LibraryToolbar } from "@/components/games/library-toolbar";
-import { ReviewCard } from "@/components/games/review-card";
-import { EmptyState } from "@/components/layout/empty-state";
+import { ReviewsBrowser } from "@/components/games/reviews-browser";
 import { Container, PageHeader } from "@/components/layout/page-header";
-import { Pagination } from "@/components/layout/pagination";
-import { ButtonLink } from "@/components/ui/button-link";
+import { buttonVariants } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { REVIEWS_PAGE_SIZE, getFilterOptions, searchGames } from "@/lib/data/public";
-import { parseLibraryParams } from "@/lib/library-params";
-import type { Lang } from "@/lib/types";
+import { getFilterOptions, getReviewEntries } from "@/lib/data/public";
+import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "Reviews",
   description: "Personal reviews and scores for the games I've played.",
+  // Feed readers and browsers find the RSS feed from here.
+  alternates: { types: { "application/rss+xml": "/reviews/feed.xml" } },
 };
 
 export default function ReviewsPage({ searchParams }: PageProps<"/reviews">) {
@@ -24,6 +22,15 @@ export default function ReviewsPage({ searchParams }: PageProps<"/reviews">) {
         eyebrow="Reviews"
         title="What I thought"
         description="Honest, personal write-ups of the games I've finished, dropped or can't stop thinking about."
+        actions={
+          <a
+            href="/reviews/feed.xml"
+            className={cn(buttonVariants({ variant: "outline" }), "gap-2")}
+            title="Follow the latest reviews in a feed reader"
+          >
+            <Rss /> RSS
+          </a>
+        }
       />
       <Suspense fallback={<ReviewsSkeleton />}>
         <ReviewsContent searchParams={searchParams} />
@@ -33,56 +40,11 @@ export default function ReviewsPage({ searchParams }: PageProps<"/reviews">) {
 }
 
 async function ReviewsContent({ searchParams }: { searchParams: PageProps<"/reviews">["searchParams"] }) {
-  const raw = await searchParams;
-  const filters = parseLibraryParams(raw, "reviews");
-  const lang: Lang = (Array.isArray(raw.lang) ? raw.lang[0] : raw.lang) === "it" ? "it" : "en";
-  const [options, { items, total }] = await Promise.all([
-    getFilterOptions(),
-    searchGames(filters, REVIEWS_PAGE_SIZE),
-  ]);
-
-  return (
-    <>
-      <LibraryToolbar options={options} mode="reviews" total={total} />
-
-      <p className="text-sm text-muted-foreground" aria-live="polite">
-        {total} {total === 1 ? "review" : "reviews"}
-      </p>
-
-      {items.length === 0 ? (
-        <EmptyState
-          icon={PenLine}
-          title="No reviews yet"
-          description={
-            filters.q
-              ? "No review matches your search."
-              : "Reviews appear here as soon as a game has a written review."
-          }
-          action={
-            filters.q ? (
-              <ButtonLink variant="outline" href="/reviews">
-                Clear search
-              </ButtonLink>
-            ) : undefined
-          }
-        />
-      ) : (
-        <div className="border-t border-border">
-          {items.map((game) => (
-            <ReviewCard key={game.id} game={game} lang={lang} />
-          ))}
-        </div>
-      )}
-
-      <Pagination
-        basePath="/reviews"
-        params={raw}
-        page={filters.page}
-        total={total}
-        pageSize={REVIEWS_PAGE_SIZE}
-      />
-    </>
-  );
+  // The data does not depend on the URL (the browser filters it), but reading it keeps the page dynamic, so a
+  // shared link arrives already filtered.
+  await searchParams;
+  const [options, reviews] = await Promise.all([getFilterOptions(), getReviewEntries()]);
+  return <ReviewsBrowser reviews={reviews} options={options} />;
 }
 
 function ReviewsSkeleton() {

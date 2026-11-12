@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Gamepad2, Pencil, Plus } from "lucide-react";
+import { Download, Gamepad2, Pencil, Plus } from "lucide-react";
 import { Suspense } from "react";
 import { AdminGamesFilters } from "@/components/admin/admin-games-filters";
 import { DeleteGameButton } from "@/components/admin/delete-game-button";
@@ -9,7 +9,9 @@ import { GameCover } from "@/components/games/game-cover";
 import { EmptyState } from "@/components/layout/empty-state";
 import { PageHeader } from "@/components/layout/page-header";
 import { Pagination } from "@/components/layout/pagination";
+import { buttonVariants } from "@/components/ui/button";
 import { ButtonLink } from "@/components/ui/button-link";
+import { cn } from "@/lib/utils";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ADMIN_PAGE_SIZE, listAdminGames } from "@/lib/data/admin";
@@ -25,9 +27,20 @@ export default function AdminGamesPage({ searchParams }: PageProps<"/admin/games
         eyebrow="Admin"
         title="Games"
         actions={
-          <ButtonLink href="/admin/games/new" className="gap-2">
-            <Plus /> Add game
-          </ButtonLink>
+          <>
+            {/* A plain link: the answer is a file to save, not a page. */}
+            <a
+              href="/admin/export"
+              download
+              className={cn(buttonVariants({ variant: "outline" }), "gap-2")}
+              title="Download every game as one JSON file"
+            >
+              <Download /> Backup
+            </a>
+            <ButtonLink href="/admin/games/new" className="gap-2">
+              <Plus /> Add game
+            </ButtonLink>
+          </>
         }
       />
       <AdminGamesFilters />

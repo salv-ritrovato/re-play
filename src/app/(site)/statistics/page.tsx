@@ -30,7 +30,7 @@ export default function StatisticsPage() {
 }
 
 async function StatsContent() {
-  const { totals, genres, platforms, ratings, years } = await getStats();
+  const { totals, genres, platforms, ratings, years, launchers, types, mostPlayed } = await getStats();
 
   if (!totals || totals.total_games === 0) {
     return (
@@ -72,6 +72,26 @@ async function StatsContent() {
         </Section>
         <Section eyebrow="Hardware" title="Games by platform">
           <BarList items={platforms.map((p) => ({ label: p.name, value: p.games }))} emptyLabel="Assign platforms to your games to see this." />
+        </Section>
+      </div>
+
+      <div className="grid gap-16 lg:grid-cols-3">
+        <Section eyebrow="Where" title="Games by launcher">
+          <BarList items={launchers.map((l) => ({ label: l.name, value: l.games }))} emptyLabel="No games yet." />
+        </Section>
+        <Section eyebrow="Style" title="Single-player and online">
+          <BarList
+            items={[
+              { label: "Single-player", value: types.solo },
+              { label: "Online / competitive", value: types.online },
+            ]}
+          />
+        </Section>
+        <Section eyebrow="Devotion" title="Most hours played">
+          <BarList
+            items={mostPlayed.map((g) => ({ label: g.title, value: Math.round(g.hours) }))}
+            emptyLabel="Add playtime to your games to see this."
+          />
         </Section>
       </div>
 

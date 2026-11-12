@@ -56,15 +56,18 @@ integrato sotto `/admin`.
   studio ha il suo link e la sua pagina.
 - **Publisher** (`/publishers/[slug]`): come lo sviluppatore. Il nome del publisher nella scheda del gioco apre
   la pagina con tutti i giochi che ha pubblicato (numero di giochi e voto medio).
-- **Reviews** (`/reviews`): solo i giochi recensiti, con anteprima e selezione lingua (`?lang=it`).
-- **Statistics** (`/statistics`): totali, generi, piattaforme, distribuzione dei voti, giochi per anno.
+- **Reviews** (`/reviews`): solo i giochi recensiti, con anteprima e selezione lingua (`?lang=it`). Come la
+  Library, ricerca, ordinamento, lingua e pagine cambiano **subito, nel browser**. Il pulsante "RSS" apre il
+  feed delle ultime 20 recensioni (`/reviews/feed.xml`, in inglese).
+- **Statistics** (`/statistics`): totali, generi, piattaforme, launcher, solo/online, i cinque giochi con più
+  ore, distribuzione dei voti, giochi per anno.
 - **About** (`/about`): presentazione personale in italiano e inglese, riquadro "In breve" e link al
   profilo Steam (presente anche nel footer).
 - **404** dedicate (sito e admin) che mantengono header e footer.
 
 ### Parte privata (`/admin`)
 
-Accesso con username e password su `/login`. Elenco giochi con ricerca e filtri, creazione, modifica ed
+Accesso con username e password su `/login`. Elenco giochi con ricerca e filtri, **backup** (pulsante "Backup": scarica tutti i giochi in un unico file JSON), creazione, modifica ed
 eliminazione, upload della copertina, creazione al volo di generi e piattaforme. Dettagli in
 [04-cms-admin.md](04-cms-admin.md).
 

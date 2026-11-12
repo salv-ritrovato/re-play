@@ -1,0 +1,28 @@
+name: Checks
+
+# On every push and pull request: style, types and the tests that need no browser. The full browser suite
+# runs against the real database, so it stays on the owner's machine (npm run test:e2e).
+on:
+  push:
+    branches: [master]
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Types
+        run: |
+          npx next typegen
+          npm run typecheck
+      - name: Rules and helpers (no browser)
+        run: npm run test:unit

@@ -232,6 +232,63 @@ test.describe("public navigation", () => {
     await expect(box).toHaveCount(0);
   });
 
+  test("statistics also show where games are played, single-player vs online, and the most played", async ({ page, request }) => {
+    const index: { slug: string }[] = await (await request.get("/search-index")).json();
+    test.skip(index.length === 0, "needs at least one game in the archive");
+    await page.goto("/statistics");
+
+    const section = (title: string) =>
+      page.locator("section").filter({ has: page.getByRole("heading", { name: title, exact: true }) });
+    const rows = (title: string) => section(title).getByRole("listitem");
+    const counts = async (title: string) =>
+      (await rows(title).allInnerTexts()).map((t) => Number(t.trim().split(/\s+/).at(-1))).filter((n) => !Number.isNaN(n));
+
+    // Single-player and online add up to every game in the archive.
+    await expect(rows("Single-player and online")).toHaveCount(2);
+    const [solo, online] = await counts("Single-player and online");
+    expect(solo + online).toBe(index.length);
+
+    // A game can be on several launchers, so the launcher counts need only be sane, biggest first.
+    await expect(section("Games by launcher")).toBeVisible();
+    const launchers = await counts("Games by launcher");
+    expect(launchers.length).toBeGreaterThan(0);
+    expect([...launchers].sort((a, b) => b - a)).toEqual(launchers);
+
+    // The most played are in hours, biggest first, at most five.
+    const hours = await counts("Most hours played");
+    expect(hours.length).toBeLessThanOrEqual(5);
+    expect([...hours].sort((a, b) => b - a)).toEqual(hours);
+  });
+
+  test("the sitemap lists every public page, and the reviews have an RSS feed", async ({ page, request }) => {
+    // Sitemap: sections, every game, and it is announced in robots.txt.
+    const robots = await (await request.get("/robots.txt")).text();
+    expect(robots).toMatch(/Sitemap: https?:\/\/[^\s]+\/sitemap\.xml/);
+    const sitemap = await request.get("/sitemap.xml");
+    expect(sitemap.status()).toBe(200);
+    expect(sitemap.headers()["content-type"]).toContain("xml");
+    const xml = await sitemap.text();
+    for (const path of ["/library", "/reviews", "/genres", "/statistics", "/about"]) expect(xml).toContain(path + "</loc>");
+    const index: { slug: string }[] = await (await request.get("/search-index")).json();
+    test.skip(index.length === 0, "needs at least one game in the archive");
+    for (const { slug } of index) expect(xml).toContain("/games/" + slug + "</loc>");
+    expect(xml).not.toContain("/admin");
+
+    // RSS: valid enough for a reader (channel, items with title, link, date), and found from the reviews page.
+    const feed = await request.get("/reviews/feed.xml");
+    expect(feed.status()).toBe(200);
+    expect(feed.headers()["content-type"]).toContain("application/rss+xml");
+    const rss = await feed.text();
+    expect(rss).toContain('<rss version="2.0"');
+    expect(rss).toContain("<channel>");
+    expect(rss.match(/<item>/g)?.length ?? 0).toBeGreaterThan(0);
+    expect(rss).toMatch(/<item>[\s\S]*<title>[^<]+<\/title>[\s\S]*<link>[^<]+\/games\/[a-z0-9-]+<\/link>[\s\S]*<pubDate>/);
+    expect(rss).not.toMatch(/&(?!amp;|lt;|gt;|quot;)/); // every ampersand is escaped
+    await page.goto("/reviews");
+    await expect(page.locator('link[rel="alternate"][type="application/rss+xml"]')).toHaveAttribute("href", /\/reviews\/feed\.xml$/); // (made absolute from the site address)
+    await expect(page.getByRole("link", { name: "RSS" })).toHaveAttribute("href", "/reviews/feed.xml");
+  });
+
   test("an unknown developer renders the not-found page", async ({ page }) => {
     await page.goto("/developers/nobody-ever-made-this");
     await expect(page.getByRole("heading", { name: /isn't in the archive/ })).toBeVisible();
@@ -312,6 +369,48 @@ test.describe("public navigation", () => {
     await expect(page.locator("main h3", { hasText: firstTitle }).first()).toBeVisible();
     await expect(summary).toHaveText(/matches? your search/);
     await expect(search).toHaveValue(firstTitle);
+  });
+
+  test("the reviews search, sort and language switch work in the browser, without asking the server", async ({ page }) => {
+    const trips: string[] = [];
+    page.on("request", (req) => {
+      if (new URL(req.url()).pathname === "/reviews") trips.push(req.url());
+    });
+
+    await page.goto("/reviews");
+    const summary = page.locator("p[aria-live=polite]");
+    await expect(summary).toHaveText(/^\d+ reviews?$/);
+    const total = Number((await summary.innerText()).match(/\d+/)![0]);
+    test.skip(total < 2, "needs a few reviewed games");
+    const firstTitle = (await page.locator("main article h2").first().innerText()).trim();
+    trips.length = 0;
+
+    // Typing narrows the list on the spot.
+    const search = page.getByRole("searchbox", { name: "Search" });
+    await search.fill(firstTitle);
+    await expect(page.locator("main article h2", { hasText: firstTitle }).first()).toBeVisible();
+    await expect(page).toHaveURL(/q=/);
+    await search.fill("zzzz no review has this");
+    await expect(page.getByText("No review matches your search.")).toBeVisible();
+    await search.fill("");
+    await expect(summary).toHaveText(new RegExp("^" + total + " reviews?$"));
+
+    // Another order, and the Italian texts, with no round trip either.
+    await page.getByRole("combobox", { name: "Sort by" }).click();
+    await page.getByRole("option", { name: "Alphabetical" }).click();
+    await expect(page).toHaveURL(/sort=title/);
+    const titles = (await page.locator("main article h2").allInnerTexts()).map((t) => t.trim().toLowerCase());
+    expect([...titles].sort((a, b) => a.localeCompare(b, "en"))).toEqual(titles);
+    await page.getByRole("button", { name: "Leggi le recensioni in italiano" }).click();
+    await expect(page).toHaveURL(/lang=it/);
+    await expect(page.locator("main article p[lang=it]").first()).toBeVisible();
+    await expect(page.getByText("Leggi la recensione completa").first()).toBeVisible();
+
+    expect(trips, "the reviews page asked the server for something").toEqual([]);
+
+    // A shared link still arrives in the right language and order.
+    await page.goto("/reviews?lang=it&sort=title");
+    await expect(page.locator("main article p[lang=it]").first()).toBeVisible();
   });
 
   test("genres lead to the games of that genre, and every genre has its place", async ({ page }) => {

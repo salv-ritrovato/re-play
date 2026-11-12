@@ -62,8 +62,8 @@ export function LibraryToolbar({
   /** Called on every keystroke, before the URL catches up (the library filters as you type). */
   onQueryChange?: (query: string) => void;
 }) {
-  // The library holds all its data in the browser, so its filters never leave the page.
-  const { searchParams, update, toggle, getList, clear, isPending } = useQueryParams({ shallow: mode === "library" });
+  // The library and the reviews hold all their data in the browser, so their filters never leave the page.
+  const { searchParams, update, toggle, getList, clear, isPending } = useQueryParams({ shallow: true });
 
   // Search: local state for instant typing, debounced into the URL.
   const urlQuery = searchParams.get("q") ?? "";

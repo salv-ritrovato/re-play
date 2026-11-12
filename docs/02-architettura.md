@@ -73,8 +73,18 @@ verso Supabase). Le server action accettano body fino a 12 MB (`serverActions.bo
   (`src/lib/search-index.ts`) filtra mentre si scrive: ogni parola deve comparire in titolo, sviluppatore o
   publisher (senza badare a maiuscole e accenti); prima i titoli che iniziano con la ricerca, poi quelli che la
   contengono. È un pannello (`Sheet`, dall'alto) con ruoli ARIA di combobox/listbox.
-- Home e pagina Reviews continuano a usare la funzione SQL `library_search` (vedi
-  [03-database.md](03-database.md)), pilotata dai parametri URL con una navigazione del server a ogni cambio.
+- **Reviews: anche nel browser.** `getReviewEntries()` (in cache) manda al browser i giochi recensiti con
+  l'inizio dei testi in inglese e italiano (`ReviewEntry`, 360 caratteri ciascuno, non i testi interi);
+  `ReviewsBrowser` usa lo stesso `filterLibrary` (generico) e il parametro `lang` dell'URL. 12 per pagina.
+- La funzione SQL `library_search` (vedi [03-database.md](03-database.md)) alimenta ormai solo i dati caricati
+  dal server: `getLibraryGames`, `getReviewEntries`, il carosello e gli scaffali della home.
+- **Sitemap e SEO**: `src/app/sitemap.ts` elenca sezioni, giochi (con `lastModified`), sviluppatori e publisher
+  (`getSitemapData`); `robots.ts` la annuncia. Il feed RSS è un route handler (`(site)/reviews/feed.xml`) e la pagina
+  Reviews lo dichiara con `alternates`. L'indirizzo base viene da `NEXT_PUBLIC_SITE_URL`.
+- **Backup**: `/admin/export` (route handler, solo owner: sessione verificata con `assertOwner`, e il proxy rimanda
+  gli anonimi al login) restituisce tutti i giochi con ogni campo (recensioni, pro e contro, generi e piattaforme
+  per nome) più gli elenchi di generi e piattaforme, come file `replay-backup-AAAA-MM-GG.json`. Le copertine
+  restano in Storage: il file riporta i percorsi.
 - `parseLibraryParams` (`src/lib/library-params.ts`) è difensivo: UUID non validi, numeri non numerici,
   ordinamenti sconosciuti o pagine negative vengono ignorati senza errori.
 - `useQueryParams` (`src/hooks/use-query-params.ts`) tiene l'ultima query in un `ref` per non perdere
@@ -143,6 +153,8 @@ gioco a caso già in anticipo.
 - I **publisher** funzionano allo stesso modo: `publisherHref` costruisce `/publishers/<slug>`, `getPublisherGames` e
   `getDeveloperGames` condividono la stessa logica (`companyGames`, che usa `filter_publishers` o
   `filter_developers`) e `DeveloperLinks` con `kind="publisher"` rende i link nella scheda del gioco.
+- Le **Statistiche** nuove (launcher, solo/online, più giocati) si calcolano da `getLibraryGames()` dentro
+  `getStats()`, senza viste SQL aggiuntive.
 - `getDeveloperGames(slug)` (`src/lib/data/public.ts`, in cache e con tag `games`) cerca tra i valori distinti
   di `filter_developers` il nome che corrisponde allo slug, poi legge i giochi con `ilike` e tiene solo
   quelli in cui quel nome è davvero uno degli studi. Nessuna modifica al database. Se non trova nulla, la

@@ -53,7 +53,6 @@ export function parseLibraryParams(
     ),
     developer: first(raw.developer)?.slice(0, 120) || undefined,
     publisher: first(raw.publisher)?.slice(0, 120) || undefined,
-    reviewedOnly: mode === "reviews",
     online: first(raw.type) === "online" ? true : first(raw.type) === "solo" ? false : undefined,
     launchers: list(raw.launcher).filter((l): l is LauncherId =>
       (LAUNCHER_IDS as readonly string[]).includes(l),
