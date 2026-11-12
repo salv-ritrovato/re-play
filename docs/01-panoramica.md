@@ -50,6 +50,8 @@ integrato sotto `/admin`.
   gioco in evidenza e scheda del gioco) si apre la pagina con tutti i suoi giochi, dal più recente, con
   numero di giochi e voto medio. Se il campo ne elenca più d'uno ("2K Australia, Gearbox Software") ogni
   studio ha il suo link e la sua pagina.
+- **Publisher** (`/publishers/[slug]`): come lo sviluppatore. Il nome del publisher nella scheda del gioco apre
+  la pagina con tutti i giochi che ha pubblicato (numero di giochi e voto medio).
 - **Reviews** (`/reviews`): solo i giochi recensiti, con anteprima e selezione lingua (`?lang=it`).
 - **Statistics** (`/statistics`): totali, generi, piattaforme, distribuzione dei voti, giochi per anno.
 - **About** (`/about`): presentazione personale in italiano e inglese, riquadro "In breve" e link al

@@ -28,6 +28,12 @@ export function splitDevelopers(value: string | null | undefined): string[] {
   });
 }
 
+/** Address of the page that lists everything released by this publisher (null when the name has no letters). */
+export function publisherHref(name: string): string | null {
+  const slug = slugify(name);
+  return slug ? `/publishers/${slug}` : null;
+}
+
 /** Address of the page that lists everything made by this developer (null when the name has no letters). */
 export function developerHref(name: string): string | null {
   const slug = slugify(name);

@@ -63,6 +63,7 @@ Cosa è stato fatto, nell'ordine, e i problemi incontrati con le relative soluzi
 | Il voto 10 non deve avere decimali (10, non 10.0) | `formatRating` mostra "10" quando il voto è 10 (anche se una media arrotondata arriva a 10); gli altri voti restano con un decimale (9.0, 9.5). Vale per tutto il sito, comprese le immagini di anteprima. Test sulle regole di formato. |
 | Asterischi (refusi di grassetto da copia e incolla) nelle recensioni | Trovati 4 asterischi in un solo gioco (Crash Bandicoot 4, recensione inglese) e tolti dal database. Da ora il form li toglie appena incolli, con il cursore che resta al suo posto, e il server li toglie al salvataggio in descrizioni, recensioni, pro e contro. Test sulle regole e sul form. |
 | Carosello: provarlo da telefono, e frecce che ricominciano da capo | Frecce circolari (dopo l'ultima si torna alla prima, indietro dalla prima si va all'ultima), anche con i tasti freccia, e visibili su telefono accanto ai puntini. Test su telefono e tablet con un vero scorrimento col dito (eventi di tocco). |
+| Cliccando un publisher deve succedere come con lo sviluppatore | Pagina `/publishers/[slug]` (stessa struttura di quella dello sviluppatore: giochi dal più recente, numero e voto medio, immagine di anteprima, 404 se sconosciuto). Il publisher nella scheda del gioco è un link; la logica di ricerca è condivisa con gli sviluppatori. Test dedicato. |
 | Filtri e ricerca della libreria in tempo reale, senza ricaricamenti | Prima ogni modifica era una navigazione del server (e i filtri sembravano lenti). Ora l'intero archivio arriva una volta al browser (`getLibraryGames`, senza i testi delle recensioni) e `filterLibrary` cerca, filtra, ordina e impagina sul posto; l'URL si aggiorna con `history.replaceState`, quindi i link condivisi funzionano ancora. La ricerca risponde a ogni tasto. Test: nessuna richiesta al server per /library mentre si cerca, si filtra, si ordina e si cambia pagina; un test confronta il filtro con `library_search` per ogni ordinamento. La pagina Reviews resta lato server (servono i testi). |
 | Cliccando un genere si apre la pagina con tutti i giochi di quel genere; "All games" nella home dovrebbe essere "All genres" | Nuova pagina `/genres` con tutti i generi e il numero di giochi; la home mostra i primi dieci e "All genres" porta alla pagina completa. Ogni genere apre la libreria filtrata (già istantanea); i nomi dei generi sono link anche nella scheda del gioco e nelle righe della lista. |
 | "Highest rating" in home non ha senso (ci saranno sempre più 10), e nemmeno il genere preferito (Action vince quasi sempre) | Il quarto numero della home ora è **"Studios"**: quanti studi diversi sono nell'archivio (un campo con più studi, "A, B", li conta entrambi). Il voto più alto si vede già nel carosello e nello scaffale dei meglio votati. |
@@ -121,7 +122,7 @@ another"** e **"Parti da un gioco esistente"** (vedi [04-cms-admin.md](04-cms-ad
 
 ## 5. Stato attuale
 
-- Typecheck, lint, build e suite Playwright (71 test su desktop, mobile e tablet) passano.
+- Typecheck, lint, build e suite Playwright (72 test su desktop, mobile e tablet) passano.
 - Il database contiene i giochi reali di Salvatore, con copertine; nessun dato di test residuo.
 - Ogni push su `master` genera un deploy su Vercel.
 

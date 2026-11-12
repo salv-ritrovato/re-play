@@ -93,6 +93,7 @@ copertine o numeri. Ogni sezione ha la sua, con i file `opengraph-image.tsx` del
 | About | `(site)/about/opengraph-image.tsx`: solo testo |
 | Gioco | `(site)/games/[slug]/opengraph-image.tsx`: copertina, titolo, sviluppatore/anno e voto |
 | Sviluppatore | `(site)/developers/[slug]/opengraph-image.tsx`: nome, numero di giochi, voto medio e copertine |
+| Publisher | `(site)/publishers/[slug]/opengraph-image.tsx`: come lo sviluppatore |
 
 Il disegno comune sta in `src/lib/og.tsx` (`renderOg`); i dati in `getOgOverview()`. Le copertine, salvate in
 WebP, vengono lette e ridotte a piccoli JPEG con `sharp` prima di entrare nell'immagine. Le immagini sono
@@ -133,6 +134,9 @@ gioco a caso già in anticipo.
   `splitDevelopers` (`src/lib/developers.ts`) lo scompone in nomi singoli (senza doppioni; "Inc.", "Ltd" e
   simili restano attaccati al nome che li precede) e `developerHref` costruisce l'indirizzo
   `/developers/<slug>`, dove lo slug è `slugify(nome)`.
+- I **publisher** funzionano allo stesso modo: `publisherHref` costruisce `/publishers/<slug>`, `getPublisherGames` e
+  `getDeveloperGames` condividono la stessa logica (`companyGames`, che usa `filter_publishers` o
+  `filter_developers`) e `DeveloperLinks` con `kind="publisher"` rende i link nella scheda del gioco.
 - `getDeveloperGames(slug)` (`src/lib/data/public.ts`, in cache e con tag `games`) cerca tra i valori distinti
   di `filter_developers` il nome che corrisponde allo slug, poi legge i giochi con `ilike` e tiene solo
   quelli in cui quel nome è davvero uno degli studi. Nessuna modifica al database. Se non trova nulla, la

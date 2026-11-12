@@ -1,4 +1,5 @@
 import { expect, test } from "@playwright/test";
+import { createClient } from "@supabase/supabase-js";
 import { expectPreviewImage } from "./helpers";
 
 test.describe("public navigation", () => {
@@ -169,6 +170,29 @@ test.describe("public navigation", () => {
     await expect(page.locator('meta[name="robots"]')).toHaveAttribute("content", /noindex/);
   });
 
+  test("a publisher works like a developer: its name opens the page with its games", async ({ page, request }) => {
+    const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
+    test.skip(!url || !key, "needs the Supabase variables from .env.local");
+    const { data } = await createClient(url!, key!).from("games").select("slug, publisher").not("publisher", "is", null).limit(50);
+    // A game whose publisher is a single name (no comma): the link text is the whole field.
+    const game = (data ?? []).find((g) => g.publisher && !/[,;]/.test(g.publisher));
+    test.skip(!game, "needs a game with a publisher");
+
+    await page.goto(`/games/${game!.slug}`);
+    const link = page.locator("dd a[href^='/publishers/']").first();
+    await expect(link).toHaveText(game!.publisher);
+    await link.click();
+    await expect(page).toHaveURL(/\/publishers\/[a-z0-9-]+$/);
+    await expect(page.getByRole("heading", { level: 1, name: game!.publisher })).toBeVisible();
+    await expect(page.getByText(/\d+ games? in the archive/)).toBeVisible();
+    await expect(page.locator("p.eyebrow", { hasText: "Publisher" })).toBeVisible();
+    await expectPreviewImage(page, request);
+
+    await page.goto("/publishers/nobody-ever-published-this");
+    await expect(page.getByRole("heading", { name: /isn't in the archive/ })).toBeVisible();
+  });
+
   test("an unknown developer renders the not-found page", async ({ page }) => {
     await page.goto("/developers/nobody-ever-made-this");
     await expect(page.getByRole("heading", { name: /isn't in the archive/ })).toBeVisible();
@@ -261,7 +285,8 @@ test.describe("public navigation", () => {
     await home.getByRole("link", { name: "All genres" }).click();
     await expect(page).toHaveURL(/\/genres$/);
     await expect(page.getByRole("heading", { level: 1, name: "All the genres" })).toBeVisible();
-    const tiles = page.getByRole("list").getByRole("link");
+    const tiles = page.locator("main").getByRole("list").getByRole("link");
+    await expect(tiles.first()).toBeVisible();
     expect(await tiles.count()).toBeGreaterThanOrEqual(onHome);
 
     // A genre opens the library with only its games.

@@ -156,7 +156,11 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
                 label="Developer"
                 value={game.developer ? <DeveloperLinks value={game.developer} /> : null}
               />
-              <Detail icon={Store} label="Publisher" value={game.publisher} />
+              <Detail
+                icon={Store}
+                label="Publisher"
+                value={game.publisher ? <DeveloperLinks value={game.publisher} kind="publisher" /> : null}
+              />
               <Detail icon={Layers} label="Genres" value={game.genres.length > 0 ? <GenreLinks genres={game.genres} /> : null} />
               <Detail icon={Monitor} label="Platforms" value={game.platforms.map((p) => p.name).join(", ") || null} />
               {/* With a written take, where it was played lives next to the review instead. */}

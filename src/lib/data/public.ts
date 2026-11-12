@@ -203,20 +203,32 @@ const SUMMARY_SELECT = `
   platforms:game_platforms(platform:platforms(id, name, slug))
 `;
 
-export async function getDeveloperGames(
-  slug: string,
-): Promise<{ name: string; games: GameSummary[] } | null> {
+type CompanyGames = { name: string; games: GameSummary[] } | null;
+
+/** Everything one developer made (null when the slug matches nobody). */
+export async function getDeveloperGames(slug: string): Promise<CompanyGames> {
   "use cache";
   cacheLife("minutes");
   cacheTag(TAGS.games);
+  return companyGames("developer", slug);
+}
 
+/** Everything one publisher released (null when the slug matches nobody). */
+export async function getPublisherGames(slug: string): Promise<CompanyGames> {
+  "use cache";
+  cacheLife("minutes");
+  cacheTag(TAGS.games);
+  return companyGames("publisher", slug);
+}
+
+async function companyGames(field: "developer" | "publisher", slug: string): Promise<CompanyGames> {
   const supabase = createPublicClient();
 
-  // 1. The developer field lists one or several studios, so find the name behind this slug.
+  // 1. The field lists one or several companies, so find the name behind this slug.
   const { data: options, error: optionsError } = await supabase
-    .from("filter_developers")
+    .from(field === "developer" ? "filter_developers" : "filter_publishers")
     .select("name, games");
-  if (optionsError) fail("getDeveloperGames", optionsError);
+  if (optionsError) fail("companyGames", optionsError);
 
   const spellings = new Map<string, number>();
   for (const option of options ?? []) {
@@ -232,8 +244,8 @@ export async function getDeveloperGames(
   const { data, error } = await supabase
     .from("games")
     .select(SUMMARY_SELECT)
-    .ilike("developer", pattern);
-  if (error) fail("getDeveloperGames", error);
+    .ilike(field, pattern);
+  if (error) fail("companyGames", error);
 
   type Row = Omit<GameSummary, "genres" | "platforms" | "total_count" | "rating" | "playtime_hours"> & {
     rating: number | string | null;
@@ -243,7 +255,7 @@ export async function getDeveloperGames(
   };
   const byName = (a: Taxonomy, b: Taxonomy) => a.name.localeCompare(b.name);
   const games = ((data ?? []) as unknown as Row[])
-    .filter((g) => splitDevelopers(g.developer).some((n) => slugify(n) === slug))
+    .filter((g) => splitDevelopers(g[field]).some((n) => slugify(n) === slug))
     .map<GameSummary>((g) => ({
       ...g,
       rating: g.rating === null ? null : Number(g.rating),
