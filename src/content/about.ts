@@ -57,6 +57,7 @@ export const about: Record<Lang, AboutContent> = {
         paragraphs: [
           "I usually play only complete games, DLC and expansions included, so I get the whole experience, from every angle, and can review the game in its entirety.",
           "If a review talks about DLC, it's because they earned a paragraph of their own. Otherwise they're folded into the review of the base game.",
+          "In 99% of cases I only review games I've finished. I rarely drop a game, and the games in my backlog aren't even added to the site.",
           "On PC, the only clients I use are Steam, Ubisoft Connect, Battle.net and the EA app.",
         ],
         launchers: ["steam", "ubisoft-connect", "battle-net", "ea-app"],
@@ -116,6 +117,7 @@ export const about: Record<Lang, AboutContent> = {
         paragraphs: [
           "Di solito gioco solo a giochi completi, quindi comprensivi di DLC ed espansioni, per un'esperienza completa a 360° e poter recensire il gioco nella sua interezza.",
           "Se nelle recensioni parlo dei DLC è perché hanno meritato un paragrafo a parte; altrimenti integro tutto nella recensione del gioco base.",
+          "Nel 99% dei casi recensisco solo giochi finiti. Difficilmente droppo i giochi, e quelli nel backlog non vengono nemmeno inseriti sul sito.",
           "Su PC gli unici client che utilizzo sono Steam, Ubisoft Connect, Battle.net e EA app.",
         ],
         launchers: ["steam", "ubisoft-connect", "battle-net", "ea-app"],

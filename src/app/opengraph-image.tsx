@@ -6,15 +6,13 @@ export const size = ogSize;
 export const contentType = ogContentType;
 
 export default async function Image() {
-  const { topCovers, games } = await getOgOverview();
+  const { topCovers } = await getOgOverview();
   const covers = await coverUris(topCovers, 4);
   return renderOg({
     eyebrow: "Video game archive",
     title: "A quiet record of every world I've wandered through",
-    subtitle:
-      games > 0
-        ? `Ratings, reviews and a visual history of ${games} games I've played.`
-        : "Ratings, reviews and a visual history of every game I've played.",
+    // No counts here: a shared preview is kept by chats and social networks for days, so a number would go stale.
+    subtitle: "Ratings, reviews and a visual history of every game I've played.",
     panel: covers.length > 0 ? { kind: "covers", covers } : null,
   });
 }

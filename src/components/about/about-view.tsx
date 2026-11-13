@@ -124,18 +124,19 @@ export function AboutView({ content }: { content: Record<Lang, AboutContent> }) 
             })}
           </ol>
 
-          <blockquote className="relative mt-16 overflow-hidden rounded-md border border-border bg-surface px-6 py-8 sm:px-10 sm:py-10">
+          <blockquote className="relative mt-16 overflow-hidden rounded-md border border-border bg-surface px-7 py-9 sm:px-12 sm:py-12">
             <div
               aria-hidden
               className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,color-mix(in_oklab,var(--accent-violet)_16%,transparent),transparent_65%)]"
             />
-            <span
-              aria-hidden
-              className="pointer-events-none absolute -top-3 left-4 font-serif text-[7rem] leading-none text-violet/25 select-none sm:left-8"
-            >
+            {/* The quotation marks are decoration, kept small and well inside the frame. */}
+            <span aria-hidden className="relative block h-7 font-serif text-5xl leading-none text-violet/40 select-none">
               “
             </span>
             <p className="relative text-xl leading-relaxed text-pretty text-foreground/90 sm:text-[1.375rem]">{c.closing}</p>
+            <span aria-hidden className="relative mt-1 block h-7 text-right font-serif text-5xl leading-none text-violet/40 select-none">
+              ”
+            </span>
           </blockquote>
         </article>
 
