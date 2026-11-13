@@ -3,7 +3,7 @@ import type { Lang } from "@/lib/types";
 export const STEAM_URL = "https://steamcommunity.com/profiles/76561198066959401/";
 
 /** Which icon goes in front of each fact (the page maps these names to icons). */
-export type FactIcon = "games" | "heart" | "console" | "pc" | "story";
+export type FactIcon = "games" | "heart" | "console" | "pc" | "story" | "complete" | "launchers";
 
 export interface AboutContent {
   eyebrow: string;
@@ -48,6 +48,14 @@ export const about: Record<Lang, AboutContent> = {
         ],
       },
       {
+        heading: "How I play and review",
+        paragraphs: [
+          "I usually play only complete games, DLC and expansions included, so I get the whole experience, from every angle, and can review the game in its entirety.",
+          "If a review talks about DLC, it's because they earned a paragraph of their own. Otherwise they're folded into the review of the base game.",
+          "On PC, the only clients I use are Steam, Ubisoft Connect, Battle.net and the EA app.",
+        ],
+      },
+      {
         heading: "Beyond the games",
         paragraphs: [
           "My interests are wide-ranging, and most of them live in the nerd world: anime, manga, comics, TV series, fantasy books and, of course, video games.",
@@ -65,6 +73,8 @@ export const about: Record<Lang, AboutContent> = {
       { icon: "console", label: "Consoles owned", value: "Every Nintendo console, every PlayStation up to the PS3" },
       { icon: "pc", label: "Then", value: "PC gaming, aiming at competitive play" },
       { icon: "story", label: "Games that made my story", value: "World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege" },
+      { icon: "complete", label: "How I play", value: "Complete games only: DLC and expansions included" },
+      { icon: "launchers", label: "PC clients", value: "Steam, Ubisoft Connect, Battle.net, EA app" },
     ],
     steam: { label: "Find me on", cta: "My Steam profile" },
   },
@@ -96,6 +106,14 @@ export const about: Record<Lang, AboutContent> = {
         ],
       },
       {
+        heading: "Come gioco e recensisco",
+        paragraphs: [
+          "Di solito gioco solo a giochi completi, quindi comprensivi di DLC ed espansioni, per un'esperienza completa a 360° e poter recensire il gioco nella sua interezza.",
+          "Se nelle recensioni parlo dei DLC è perché hanno meritato un paragrafo a parte; altrimenti integro tutto nella recensione del gioco base.",
+          "Su PC gli unici client che utilizzo sono Steam, Ubisoft Connect, Battle.net e EA app.",
+        ],
+      },
+      {
         heading: "Oltre i videogiochi",
         paragraphs: [
           "I miei interessi sono molto ampi e per la maggior parte vivono nel mondo nerd: anime, manga, fumetti, serie TV, libri fantasy e, naturalmente, i videogiochi.",
@@ -113,6 +131,8 @@ export const about: Record<Lang, AboutContent> = {
       { icon: "console", label: "Console possedute", value: "Tutte le Nintendo, tutte le PlayStation fino alla 3" },
       { icon: "pc", label: "Poi", value: "PC gaming, con il sogno del competitivo" },
       { icon: "story", label: "I giochi che hanno fatto la mia storia", value: "World of Warcraft, Hearthstone, League of Legends, Rainbow Six: Siege" },
+      { icon: "complete", label: "Come gioco", value: "Solo giochi completi: DLC ed espansioni inclusi" },
+      { icon: "launchers", label: "Client su PC", value: "Steam, Ubisoft Connect, Battle.net, EA app" },
     ],
     steam: { label: "Trovami su", cta: "Il mio profilo Steam" },
   },

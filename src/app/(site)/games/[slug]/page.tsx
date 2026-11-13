@@ -139,7 +139,7 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
                 )
               ) : (
                 <Fact icon={Trophy} label="Completion">
-                  <CompletionBadge status={game.completion_status} />
+                  <CompletionBadge status={game.completion_status} className="text-sm text-foreground" />
                 </Fact>
               )}
               <Fact icon={Clock} label="Playtime">

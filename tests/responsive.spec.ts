@@ -112,7 +112,7 @@ test.describe("responsive layouts", () => {
     // The tilted wall of covers is for large screens only: on a phone or tablet it is not even shown.
     await page.goto("/");
     await page.waitForLoadState("networkidle");
-    const wall = page.locator("section [aria-hidden='true'] img");
+    const wall = page.locator("div[aria-hidden='true'] img");
     for (let i = 0; i < (await wall.count()); i++) await expect(wall.nth(i)).toBeHidden();
     await expectNoHorizontalScroll(page);
   });

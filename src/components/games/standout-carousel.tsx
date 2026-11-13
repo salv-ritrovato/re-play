@@ -121,16 +121,32 @@ export function StandoutCarousel({ slides, label }: { slides: StandoutSlide[]; l
                 <div aria-hidden className="pointer-events-none absolute inset-0" style={{ backgroundImage: slide.glow }} />
               )}
               <div className="relative grid gap-8 p-5 sm:grid-cols-[12rem_1fr] sm:gap-12 sm:p-8 lg:grid-cols-[15rem_1fr] lg:p-10">
-                <GameCover
-                  title={slide.title}
-                  path={slide.cover_path}
-                  blur={slide.cover_blur}
-                  sizes="(min-width: 1024px) 240px, (min-width: 640px) 192px, 70vw"
-                  zoom={false}
-                  className="mx-auto max-w-56 shadow-xl shadow-black/50 sm:max-w-none"
-                />
+                {/* The cover opens the game too. The title next to it is the link that screen readers and the keyboard use,
+                    so this one is left out of the tab order and of the accessibility tree (same destination). */}
+                <Link
+                  href={`/games/${slide.slug}`}
+                  tabIndex={-1}
+                  aria-hidden
+                  className="group mx-auto block w-full max-w-56 rounded-md outline-none sm:max-w-none"
+                >
+                  <GameCover
+                    title={slide.title}
+                    path={slide.cover_path}
+                    blur={slide.cover_blur}
+                    sizes="(min-width: 1024px) 240px, (min-width: 640px) 192px, 70vw"
+                    zoom={false}
+                    className="shadow-xl shadow-black/50 transition-transform duration-300 group-hover:-translate-y-1 motion-reduce:transition-none motion-reduce:group-hover:translate-y-0"
+                  />
+                </Link>
                 <div className="flex min-w-0 flex-col justify-center">
-                  <h3 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">{slide.title}</h3>
+                  <h3 className="text-3xl font-semibold tracking-tight text-balance sm:text-4xl">
+                    <Link
+                      href={`/games/${slide.slug}`}
+                      className="underline-offset-4 outline-none hover:underline focus-visible:underline"
+                    >
+                      {slide.title}
+                    </Link>
+                  </h3>
                   <p className="mt-2 text-sm text-subtle">
                     {slide.year}
                     {slide.year && slide.developer ? " · " : null}

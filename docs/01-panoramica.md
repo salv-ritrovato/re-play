@@ -62,7 +62,9 @@ integrato sotto `/admin`.
 - **Statistics** (`/statistics`): totali, generi, piattaforme, launcher, solo/online, i cinque giochi con più
   ore, distribuzione dei voti, giochi per anno.
 - **About** (`/about`): presentazione personale in italiano e inglese, riquadro "In breve" e link al
-  profilo Steam (presente anche nel footer).
+  profilo Steam (presente anche nel footer). Una sezione spiega il metodo ("Come gioco e recensisco": giochi completi
+  con DLC ed espansioni, DLC trattati a parte solo se meritano un paragrafo) e quali client PC usa (Steam, Ubisoft
+  Connect, Battle.net, EA app).
 - **404** dedicate (sito e admin) che mantengono header e footer.
 
 ### Parte privata (`/admin`)

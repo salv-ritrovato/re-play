@@ -58,8 +58,8 @@ export function LauncherIcons({ launchers, className }: { launchers: LauncherId[
   );
 }
 
-export function CompletionBadge({ status }: { status: CompletionStatus }) {
-  return <span className="text-xs text-muted-foreground">{COMPLETION_LABEL[status]}</span>;
+export function CompletionBadge({ status, className }: { status: CompletionStatus; className?: string }) {
+  return <span className={cn("text-xs text-muted-foreground", className)}>{COMPLETION_LABEL[status]}</span>;
 }
 
 /** Text colour of a rating number, by tier (see `ratingTier`). */

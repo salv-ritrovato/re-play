@@ -1,6 +1,6 @@
 "use client";
 
-import { ArrowUpRight, Gamepad2, Heart, Joystick, Monitor, Trophy, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, Gamepad2, Heart, Joystick, Layers, Library, Monitor, Trophy, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { IconLabel } from "@/components/ui/icon-label";
 import { SteamIcon } from "@/components/ui/launcher-icon";
@@ -14,6 +14,8 @@ const FACT_ICONS: Record<FactIcon, LucideIcon> = {
   console: Joystick,
   pc: Monitor,
   story: Trophy,
+  complete: Layers,
+  launchers: Library,
 };
 
 /** About page body with an English / Italian switch (both versions ship with the page). */

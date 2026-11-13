@@ -34,6 +34,12 @@ test.describe("public navigation", () => {
     await expect(page.getByText("AI-Assisted Software Developer")).toBeVisible();
     await expect(page.getByText("bodybuilding in particular")).toBeVisible();
 
+    // How the games are played and reviewed, and the only PC clients in use.
+    await expect(page.getByRole("heading", { level: 2, name: "How I play and review" })).toBeVisible();
+    await expect(page.getByText("DLC and expansions included, so I get the whole experience")).toBeVisible();
+    await expect(page.getByText("they earned a paragraph of their own")).toBeVisible();
+    await expect(page.getByText("Steam, Ubisoft Connect, Battle.net, EA app", { exact: true })).toBeVisible();
+
     const steam = page.getByRole("complementary").getByRole("link", { name: /My Steam profile/ });
     await expect(steam).toHaveAttribute("href", "https://steamcommunity.com/profiles/76561198066959401/");
     await expect(steam).toHaveAttribute("target", "_blank");
@@ -43,6 +49,8 @@ test.describe("public navigation", () => {
     await expect(page.getByRole("link", { name: /Il mio profilo Steam/ })).toBeVisible();
     await expect(page.getByRole("heading", { level: 1, name: "Ciao, sono Salvatore" })).toBeVisible();
     await expect(page.getByText("mia madre, che non c'è più")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Come gioco e recensisco" })).toBeVisible();
+    await expect(page.getByText("Steam, Ubisoft Connect, Battle.net, EA app", { exact: true })).toBeVisible();
     await expect(page.getByText("League of Legends e Rainbow Six: Siege")).toBeVisible();
     await expect(page.getByText("da ragazzino avevo il sogno di fare il recensore, il critico")).toBeVisible();
     await expect(page.getByRole("heading", { level: 2, name: "Oltre i videogiochi" })).toBeVisible();
@@ -263,7 +271,7 @@ test.describe("public navigation", () => {
   test("the look: ratings are coloured by tier, the hero wall is decoration, cards fade in only if motion is welcome", async ({ page }) => {
     // The wall of covers behind the hero is hidden from assistive technology and has no alternative text.
     await page.goto("/");
-    const wall = page.locator("section [aria-hidden='true'] img");
+    const wall = page.locator("div[aria-hidden='true'] img");
     test.skip((await wall.count()) === 0, "needs at least six covers");
     expect(await wall.count()).toBeGreaterThanOrEqual(6);
     for (const alt of await wall.evaluateAll((imgs) => imgs.map((i) => i.getAttribute("alt")))) expect(alt).toBe("");
@@ -301,6 +309,18 @@ test.describe("public navigation", () => {
     if ((await page.getByRole("region", { name: "Standout reviews" }).count()) > 0) {
       expect(await glow.count()).toBeGreaterThan(0);
       expect(await glow.first().evaluate((el) => getComputedStyle(el).backgroundImage)).toContain("radial-gradient");
+
+      // The title and the cover both open the game's page (the same one as "Read the full review").
+      const slide = page.getByRole("region", { name: "Standout reviews" }).locator("li[role=group]").first();
+      const href = await slide.getByRole("link", { name: /Read the full review/ }).getAttribute("href");
+      expect(href).toMatch(/^\/games\//);
+      await expect(slide.locator("h3 a")).toHaveAttribute("href", href!);
+      await expect(slide.locator(`a[aria-hidden='true'][href='${href}'] img`).first()).toBeVisible();
+      await slide.locator(`a[aria-hidden='true'][href='${href}']`).click();
+      await expect(page).toHaveURL(new RegExp(`${href}$`));
+      await page.goto("/");
+      await page.getByRole("region", { name: "Standout reviews" }).locator("li[role=group] h3 a").first().click();
+      await expect(page).toHaveURL(new RegExp(`${href}$`));
     }
 
     // Library: hovering a card slides up the genres and hours over the cover.
