@@ -78,6 +78,8 @@ Cosa è stato fatto, nell'ordine, e i problemi incontrati con le relative soluzi
 | Cliccando uno sviluppatore si apre una pagina con tutti i suoi giochi | Nuova pagina `/developers/[slug]`; i nomi sono link su card, lista, gioco in evidenza e scheda del gioco. Gestiti anche i giochi con più sviluppatori. |
 | "Playing now" non serve: i giochi si aggiungono solo a gioco finito | Rimossi il numero "Playing now" (home e Statistics) e lo scaffale "Currently playing"; in home al suo posto "Reviewed". Lo stato "Playing" resta disponibile nel form e nei filtri. |
 | Via anche "Abandoned" dalle statistiche (difficilmente abbandona giochi) | Rimosso il numero "Abandoned" dalla pagina Statistics, che ora mostra quattro numeri: giochi, completati, voto medio, ore. Lo stato "Dropped" resta nel form e nei filtri. |
+| Nel carosello cliccare copertina o titolo deve aprire il gioco; "Main story + side quests" nello stile degli altri dati; sezione About su come gioca e recensisce (giochi completi con DLC) e sui client PC | Copertina e titolo del carosello sono link alla pagina del gioco; il valore di "Completion" nella scheda del gioco ha ora la stessa dimensione e colore di Status e Playtime; nuova sezione "Come gioco e recensisco" e voci "In breve" nell'About; la qualità immagine 55 della parete di copertine è ora consentita (`qualities`). Test aggiornati. |
+| About "un blocco di testo": spezzare la monotonia (stesso copy) | Capitoli numerati lungo una linea con titoli più grandi, loghi Steam / Ubisoft Connect / Battle.net / EA app come pillole sotto "Come gioco e recensisco" (campo `launchers` della sezione in `content/about.ts`), "1,500+" in grande nel riquadro "In breve", citazione finale in un riquadro con alone e virgolette; entrata a cascata per chi non ha chiesto meno movimento. Provato a 1280, 820 e 375 px. Test sulla struttura. |
 | Jurassic War (1997): data di uscita con il solo anno | Interruttore "Only the year" nel form: l'anno si salva come 1 gennaio e la nuova colonna `release_year_only` (migrazione `release_year_only`) dice che il giorno non conta: il sito mostra solo l'anno e un 1 gennaio vero resta una data intera. Jurassic War impostato a 1997. Test su validazione, formato e form. |
 | Oltre a "Main story", anche "Main story + side quests" | Nuovo valore dell'enum `completion_status` (migrazione `main_story_side_quests`), presente nel form, nei filtri della libreria e nelle schede. |
 
@@ -130,7 +132,7 @@ another"** e **"Parti da un gioco esistente"** (vedi [04-cms-admin.md](04-cms-ad
 
 ## 5. Stato attuale
 
-- Typecheck, lint, build e suite Playwright (89 test su desktop, mobile e tablet) passano.
+- Typecheck, lint, build e suite Playwright (93 test su desktop, mobile e tablet) passano.
 - Il database contiene i giochi reali di Salvatore, con copertine; nessun dato di test residuo.
 - Ogni push su `master` genera un deploy su Vercel.
 

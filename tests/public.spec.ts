@@ -34,6 +34,14 @@ test.describe("public navigation", () => {
     await expect(page.getByText("AI-Assisted Software Developer")).toBeVisible();
     await expect(page.getByText("bodybuilding in particular")).toBeVisible();
 
+    // The story is laid out as numbered chapters, with the number of games as a big figure and the launchers as logos.
+    const chapters = page.locator("#about-panel ol > li");
+    await expect(chapters).toHaveCount(5);
+    await expect(chapters.first()).toContainText("01");
+    await expect(chapters.last()).toContainText("05");
+    await expect(page.getByRole("complementary").getByText("1,500+", { exact: true })).toBeVisible();
+    await expect(page.locator("#about-panel ul[aria-hidden='true'] svg")).toHaveCount(4);
+
     // How the games are played and reviewed, and the only PC clients in use.
     await expect(page.getByRole("heading", { level: 2, name: "How I play and review" })).toBeVisible();
     await expect(page.getByText("DLC and expansions included, so I get the whole experience")).toBeVisible();

@@ -1,4 +1,4 @@
-import type { Lang } from "@/lib/types";
+import type { LauncherId, Lang } from "@/lib/types";
 
 export const STEAM_URL = "https://steamcommunity.com/profiles/76561198066959401/";
 
@@ -9,7 +9,12 @@ export interface AboutContent {
   eyebrow: string;
   title: string;
   intro: string;
-  sections: { heading: string; paragraphs: string[] }[];
+  sections: {
+    heading: string;
+    paragraphs: string[];
+    /** Launchers shown as logo pills under the text (the names are already in the paragraphs). */
+    launchers?: LauncherId[];
+  }[];
   /** Closing paragraph, set apart from the rest. */
   closing: string;
   factsTitle: string;
@@ -54,6 +59,7 @@ export const about: Record<Lang, AboutContent> = {
           "If a review talks about DLC, it's because they earned a paragraph of their own. Otherwise they're folded into the review of the base game.",
           "On PC, the only clients I use are Steam, Ubisoft Connect, Battle.net and the EA app.",
         ],
+        launchers: ["steam", "ubisoft-connect", "battle-net", "ea-app"],
       },
       {
         heading: "Beyond the games",
@@ -112,6 +118,7 @@ export const about: Record<Lang, AboutContent> = {
           "Se nelle recensioni parlo dei DLC è perché hanno meritato un paragrafo a parte; altrimenti integro tutto nella recensione del gioco base.",
           "Su PC gli unici client che utilizzo sono Steam, Ubisoft Connect, Battle.net e EA app.",
         ],
+        launchers: ["steam", "ubisoft-connect", "battle-net", "ea-app"],
       },
       {
         heading: "Oltre i videogiochi",

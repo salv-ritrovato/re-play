@@ -61,7 +61,9 @@ integrato sotto `/admin`.
   feed delle ultime 20 recensioni (`/reviews/feed.xml`, in inglese, con il **testo completo**).
 - **Statistics** (`/statistics`): totali, generi, piattaforme, launcher, solo/online, i cinque giochi con più
   ore, distribuzione dei voti, giochi per anno.
-- **About** (`/about`): presentazione personale in italiano e inglese, riquadro "In breve" e link al
+- **About** (`/about`): presentazione personale in italiano e inglese, con la storia a **capitoli numerati** lungo una
+  linea (titolo grande, testo a paragrafi, loghi dei client PC sotto la sezione "Come gioco e recensisco"), la citazione
+  finale in un riquadro, il numero di giochi in grande e il resto del riquadro "In breve" a lato, e link al
   profilo Steam (presente anche nel footer). Una sezione spiega il metodo ("Come gioco e recensisco": giochi completi
   con DLC ed espansioni, DLC trattati a parte solo se meritano un paragrafo) e quali client PC usa (Steam, Ubisoft
   Connect, Battle.net, EA app).

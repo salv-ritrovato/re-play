@@ -53,7 +53,7 @@ AVIF (più GIF e TIFF, non proposti). Attenzione: `sharp` chiama **"heif"** un f
 possono leggere. `isAcceptedFormat` tiene conto di questo, e `unsupportedMessage` dà un messaggio chiaro per
 HEIC, SVG e il resto.
 
-In lettura, `next/image` serve AVIF/WebP alla dimensione giusta (`qualities` 60/75/85, `remotePatterns`
+In lettura, `next/image` serve AVIF/WebP alla dimensione giusta (`qualities` 55/60/75/85, `remotePatterns`
 verso Supabase). Le server action accettano body fino a 12 MB (`serverActions.bodySizeLimit`).
 
 ## Ricerca, filtri, ordinamento, paginazione
@@ -155,7 +155,9 @@ di debug.
 ## Home
 
 **Carosello "Standout reviews"** (`src/components/games/standout-carousel.tsx`): una slide per gioco con
-copertina, titolo, anno e sviluppatore, voto, l'inizio della recensione e il link "Read the full review". I
+copertina, titolo, anno e sviluppatore, voto, l'inizio della recensione e il link "Read the full review"
+(anche la copertina e il titolo aprono la pagina del gioco; il link sulla copertina è nascosto a tastiera e a
+screen reader perché il titolo porta già allo stesso posto). I
 giochi sono quelli con voto **almeno 9** (`STANDOUT_MIN_RATING`) e una recensione, dal voto più alto, **al
 massimo 5** (`STANDOUT_MAX`), presi con `library_search`. Scorre di lato con scorrimento a scatti (swipe, frecce,
 puntini e tasti freccia), non parte da solo e ha i ruoli ARIA di un carosello; un selettore English/Italiano

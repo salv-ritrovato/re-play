@@ -3,9 +3,10 @@
 import { ArrowUpRight, Gamepad2, Heart, Joystick, Layers, Library, Monitor, Trophy, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { IconLabel } from "@/components/ui/icon-label";
-import { SteamIcon } from "@/components/ui/launcher-icon";
+import { LauncherIcon, SteamIcon } from "@/components/ui/launcher-icon";
 import { STEAM_URL, type AboutContent, type FactIcon } from "@/content/about";
-import { LANGS, LANG_LABEL, type Lang } from "@/lib/types";
+import { REVEAL, revealDelay } from "@/lib/motion";
+import { LANGS, LANG_LABEL, LAUNCHER_NAME, type Lang } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
 const FACT_ICONS: Record<FactIcon, LucideIcon> = {
@@ -22,6 +23,8 @@ const FACT_ICONS: Record<FactIcon, LucideIcon> = {
 export function AboutView({ content }: { content: Record<Lang, AboutContent> }) {
   const [lang, setLang] = useState<Lang>("en");
   const c = content[lang];
+  // The first fact (the number of games played) is shown big, like a number on a scoreboard.
+  const [headline, ...facts] = c.facts;
 
   return (
     <div lang={lang}>
@@ -67,32 +70,89 @@ export function AboutView({ content }: { content: Record<Lang, AboutContent> }) 
             {c.intro}
           </p>
 
-          <div className="mt-14 space-y-12">
-            {c.sections.map((section) => (
-              <section key={section.heading} aria-labelledby={`about-${slug(section.heading)}`}>
-                <h2 id={`about-${slug(section.heading)}`} className="eyebrow mb-4">
-                  {section.heading}
-                </h2>
-                <div className="prose-review space-y-0 text-pretty">
-                  {section.paragraphs.map((p) => (
-                    <p key={p}>{p}</p>
-                  ))}
-                </div>
-              </section>
-            ))}
-          </div>
+          {/* The story as chapters along a line: a number, a heading and a few paragraphs each. */}
+          <ol className="mt-14">
+            {c.sections.map((section, i) => {
+              const last = i === c.sections.length - 1;
+              return (
+                <li
+                  key={section.heading}
+                  className={cn("relative pl-12 sm:pl-16", REVEAL, !last && "pb-12")}
+                  style={revealDelay(i)}
+                >
+                  {/* The line joining the chapters, and the numbered dot of this one. */}
+                  {!last && (
+                    <span aria-hidden className="absolute top-10 bottom-0 left-[1.0625rem] w-px bg-border sm:left-[1.1875rem]" />
+                  )}
+                  <span
+                    aria-hidden
+                    className="absolute top-0 left-0 grid size-9 place-items-center rounded-full border border-border bg-surface text-xs font-medium text-violet tabular-nums sm:size-10 sm:text-sm"
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
 
-          <blockquote className="mt-16 border-l-2 border-violet/60 pl-6 sm:pl-8">
-            <p className="text-xl leading-relaxed text-pretty text-foreground/90 sm:text-[1.375rem]">
-              {c.closing}
-            </p>
+                  <section aria-labelledby={`about-${slug(section.heading)}`}>
+                    <h2
+                      id={`about-${slug(section.heading)}`}
+                      className="text-xl leading-9 font-medium tracking-tight text-foreground sm:text-2xl sm:leading-10"
+                    >
+                      {section.heading}
+                    </h2>
+                    {/* Same size for every paragraph: the lead-in look of reviews would make each chapter start loud. */}
+                    <div className="mt-4 text-[1.0625rem] leading-[1.8] text-pretty text-foreground/90 [&>p+p]:mt-6">
+                      {section.paragraphs.map((p) => (
+                        <p key={p}>{p}</p>
+                      ))}
+                    </div>
+
+                    {section.launchers && (
+                      <ul aria-hidden className="mt-6 flex flex-wrap gap-2.5">
+                        {section.launchers.map((id) => (
+                          <li
+                            key={id}
+                            className="inline-flex items-center gap-2 rounded-full border border-border bg-surface px-3.5 py-1.5 text-sm text-foreground/90"
+                          >
+                            <LauncherIcon id={id} className="size-4 text-muted-foreground" />
+                            {LAUNCHER_NAME[id]}
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </section>
+                </li>
+              );
+            })}
+          </ol>
+
+          <blockquote className="relative mt-16 overflow-hidden rounded-md border border-border bg-surface px-6 py-8 sm:px-10 sm:py-10">
+            <div
+              aria-hidden
+              className="pointer-events-none absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,color-mix(in_oklab,var(--accent-violet)_16%,transparent),transparent_65%)]"
+            />
+            <span
+              aria-hidden
+              className="pointer-events-none absolute -top-3 left-4 font-serif text-[7rem] leading-none text-violet/25 select-none sm:left-8"
+            >
+              “
+            </span>
+            <p className="relative text-xl leading-relaxed text-pretty text-foreground/90 sm:text-[1.375rem]">{c.closing}</p>
           </blockquote>
         </article>
 
         <aside aria-label={c.factsTitle} className="lg:sticky lg:top-24 lg:self-start">
           <h2 className="eyebrow mb-5 border-b border-border pb-3">{c.factsTitle}</h2>
+
+          {headline && (
+            <div className="mb-8 rounded-md border border-border bg-surface p-5">
+              <p className="eyebrow">
+                <IconLabel icon={FACT_ICONS[headline.icon]}>{headline.label}</IconLabel>
+              </p>
+              <p className="mt-2 text-5xl font-semibold tracking-tight text-foreground tabular-nums">{headline.value}</p>
+            </div>
+          )}
+
           <dl className="space-y-6">
-            {c.facts.map((fact) => (
+            {facts.map((fact) => (
               <div key={fact.label} className="space-y-1">
                 <dt className="eyebrow">
                   <IconLabel icon={FACT_ICONS[fact.icon]}>{fact.label}</IconLabel>
