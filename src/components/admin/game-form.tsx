@@ -44,7 +44,9 @@ function toDefaults(game?: GameDetail): GameFormInput {
     slug: game?.slug ?? "",
     short_description: game?.short_description ?? "",
     description: game?.description ?? "",
-    release_date: game?.release_date ?? "",
+    // A year-only date is shown as the year alone.
+    release_date: game?.release_year_only ? (game.release_date ?? "").slice(0, 4) : (game?.release_date ?? ""),
+    release_year_only: game?.release_year_only ?? false,
     developer: game?.developer ?? "",
     publisher: game?.publisher ?? "",
     genre_ids: game?.genres.map((g) => g.id) ?? [],
@@ -87,6 +89,8 @@ export function GameForm({
   const [epoch, setEpoch] = useState(0);
   // Auto-generate the slug from the title until the user edits it by hand.
   const [slugTouched, setSlugTouched] = useState(isEdit);
+  // The release date can be a full date or just a year (for games with no precise date).
+  const [yearOnly, setYearOnly] = useState(game?.release_year_only ?? false);
 
   const form = useForm<GameFormInput, unknown, GameFormValues>({
     resolver: zodResolver(gameSchema),
@@ -114,6 +118,15 @@ export function GameForm({
     window.addEventListener("beforeunload", warn);
     return () => window.removeEventListener("beforeunload", warn);
   }, [hasUnsavedChanges, isSaving]);
+
+  /** Switches the release date between a full date and a year, keeping the year that was already typed. */
+  function changeYearOnly(on: boolean) {
+    setYearOnly(on);
+    setValue("release_year_only", on, { shouldDirty: true });
+    const current = form.getValues("release_date");
+    const next = on ? current.slice(0, 4) : /^\d{4}$/.test(current) ? `${current}-01-01` : "";
+    setValue("release_date", next, { shouldDirty: true, shouldValidate: formState.isSubmitted });
+  }
 
   /** Pasted bold markers (asterisks) vanish as soon as they land in a text field, keeping the cursor in place. */
   function noAsterisks(name: "short_description" | "description" | "review_en" | "review_it" | "pros" | "cons") {
@@ -162,6 +175,7 @@ export function GameForm({
     if (values) {
       form.reset(toDefaults(game));
       setSlugTouched(isEdit);
+      setYearOnly(game?.release_year_only ?? false);
       setEpoch((n) => n + 1);
     }
   }
@@ -298,8 +312,34 @@ export function GameForm({
         <Field id="description" label="Full description" error={err("description")} className="sm:col-span-2">
           <Textarea id="description" rows={6} {...register("description", noAsterisks("description"))} {...aria("description")} />
         </Field>
-        <Field id="release_date" label="Release date" error={err("release_date")}>
-          <Input id="release_date" type="date" {...register("release_date")} {...aria("release_date")} />
+        <Field
+          id="release_date"
+          label="Release date"
+          error={err("release_date")}
+          hint="No precise date? Switch on “Only the year” and type just the year."
+        >
+          <div className="space-y-3">
+            {yearOnly ? (
+              <Input
+                key="year"
+                id="release_date"
+                type="text"
+                inputMode="numeric"
+                maxLength={4}
+                placeholder="e.g. 1997"
+                {...register("release_date")}
+                {...aria("release_date")}
+              />
+            ) : (
+              <Input key="date" id="release_date" type="date" {...register("release_date")} {...aria("release_date")} />
+            )}
+            <div className="flex items-center gap-2">
+              <Switch id="release_year_only" checked={yearOnly} onCheckedChange={changeYearOnly} />
+              <label htmlFor="release_year_only" className="text-sm text-muted-foreground">
+                Only the year
+              </label>
+            </div>
+          </div>
         </Field>
         <div className="hidden sm:block" />
         <Field id="developer" label="Developer" error={err("developer")}>

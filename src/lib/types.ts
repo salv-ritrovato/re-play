@@ -102,6 +102,8 @@ export interface GameDetail {
   short_description: string | null;
   description: string | null;
   release_date: string | null;
+  /** Only the year of release is known: the date is the 1st of January and the day and month mean nothing. */
+  release_year_only: boolean;
   developer: string | null;
   publisher: string | null;
   rating: number | null;

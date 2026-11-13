@@ -17,7 +17,8 @@ Tutto sotto `/admin`, accessibile solo al proprietario (vedi i tre livelli di pr
 
 Basato su React Hook Form + Zod (`gameSchema` in `src/lib/validation.ts`).
 
-Campi: titolo e slug, descrizione breve e completa, data di uscita, sviluppatore, publisher, generi,
+Campi: titolo e slug, descrizione breve e completa, data di uscita (oppure **solo l'anno**, con l'interruttore "Only the year": si salva come 1 gennaio di quell'anno con `release_year_only` acceso, e il sito
+mostra solo l'anno; un gioco uscito davvero il 1 gennaio resta distinto e mostra la data intera), sviluppatore, publisher, generi,
 piattaforme, **launcher** (Steam, Ubisoft Connect, EA app, Battle.net, scelta multipla; vuoto per i giochi console),
 voto, stato di gioco, stato di completamento, ore di gioco, data di completamento
 (opzionale), recensione in inglese e in italiano, pro e contro, "in evidenza", interruttore **Online**,

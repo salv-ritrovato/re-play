@@ -414,6 +414,50 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.getByText("9-10")).toBeVisible();
   });
 
+  test("a release date can be just the year, and goes back to a full date", async ({ page }) => {
+    await page.goto(`/admin/games?q=${encodeURIComponent(title)}`);
+    await page.getByRole("link", { name: `Edit ${title}` }).click();
+    await expect(page.locator("#release_date")).toHaveValue("2021-06-15");
+
+    // Only the year: the field becomes a text box that keeps the year already typed.
+    await page.getByRole("switch", { name: "Only the year" }).click();
+    await expect(page.locator("#release_date")).toHaveValue("2021");
+    await page.locator("#release_date").fill("97");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page.getByText("Use a year (1997) or a valid date")).toBeVisible();
+    await page.locator("#release_date").fill("1997");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page).toHaveURL(/\/admin\/games$/);
+
+    // The game page shows just the year, and the library still files it under 1997.
+    await page.goto(`/games/${slug}`);
+    await expect(page.locator("dl > div", { hasText: "Release date" })).toContainText("1997");
+    await expect(page.locator("dl > div", { hasText: "Release date" })).not.toContainText("January");
+    await page.goto("/library?year=1997");
+    await expect(page.getByRole("link", { name: title, exact: true })).toBeVisible();
+
+    // Editing it again opens the year box; switching back gives a full date to fill in.
+    await page.goto(`/admin/games?q=${encodeURIComponent(title)}`);
+    await page.getByRole("link", { name: `Edit ${title}` }).click();
+    await expect(page.locator("#release_date")).toHaveValue("1997");
+    await page.getByRole("switch", { name: "Only the year" }).click();
+    await expect(page.locator("#release_date")).toHaveValue("1997-01-01");
+    await page.locator("#release_date").fill("2021-06-15");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page).toHaveURL(/\/admin\/games$/);
+    await page.goto(`/games/${slug}`);
+    await expect(page.locator("dl > div", { hasText: "Release date" })).toContainText("15 June 2021");
+
+    // A game really released on 1 January is not mistaken for a year-only one: it keeps its full date.
+    await page.goto(`/admin/games?q=${encodeURIComponent(title)}`);
+    await page.getByRole("link", { name: `Edit ${title}` }).click();
+    await page.locator("#release_date").fill("2021-01-01");
+    await page.getByRole("button", { name: "Save changes" }).click();
+    await expect(page).toHaveURL(/\/admin\/games$/);
+    await page.goto(`/games/${slug}`);
+    await expect(page.locator("dl > div", { hasText: "Release date" })).toContainText("1 January 2021");
+  });
+
   test("the home page carousel shows the reviews of games rated 9 or more (5 at most)", async ({ page }) => {
     // The test game was just raised to 9.5 and has a review in both languages.
     await page.goto("/");

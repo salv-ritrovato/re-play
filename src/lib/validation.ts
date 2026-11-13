@@ -19,6 +19,15 @@ const dateString = z
   .refine((v) => v === "" || !Number.isNaN(Date.parse(v)), "Use a valid date")
   .transform((v) => (v === "" ? null : v));
 
+/** A release date: a full date, or just a year (kept as the 1st of January of that year). */
+const releaseDate = z
+  .string()
+  .trim()
+  .refine((v) => v === "" || /^\d{4}$/.test(v) || /^\d{4}-\d{2}-\d{2}$/.test(v), "Use a year (1997) or a valid date")
+  .transform((v) => (/^\d{4}$/.test(v) ? `${v}-01-01` : v))
+  .refine((v) => v === "" || (!Number.isNaN(Date.parse(v)) && Number(v.slice(0, 4)) >= 1900 && Number(v.slice(0, 4)) <= 2100), "Use a year (1997) or a valid date")
+  .transform((v) => (v === "" ? null : v));
+
 const numberString = (min: number, max: number, label: string) =>
   z
     .string()
@@ -54,7 +63,9 @@ export const gameSchema = z
       .regex(/^[a-z0-9]+(-[a-z0-9]+)*$/, "Lowercase letters, numbers and single hyphens only"),
     short_description: prose(280),
     description: prose(8000),
-    release_date: dateString,
+    release_date: releaseDate,
+    /** Only the year is known (the date is then the 1st of January of that year). */
+    release_year_only: z.boolean(),
     developer: text(120),
     publisher: text(120),
 

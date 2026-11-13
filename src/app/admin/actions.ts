@@ -86,6 +86,7 @@ export async function saveGame(
     short_description: v.short_description,
     description: v.description,
     release_date: v.release_date,
+    release_year_only: v.release_date !== null && v.release_year_only,
     developer: v.developer,
     publisher: v.publisher,
     rating: v.rating,

@@ -29,7 +29,7 @@ import { IconLabel } from "@/components/ui/icon-label";
 import { LauncherIcon } from "@/components/ui/launcher-icon";
 import { Skeleton } from "@/components/ui/skeleton";
 import { getGameBySlug, getRelatedGames } from "@/lib/data/public";
-import { excerpt, formatDate, formatPlaytime, yearOf } from "@/lib/format";
+import { excerpt, formatDate, formatPlaytime, formatRelease, yearOf } from "@/lib/format";
 import { LAUNCHER_NAME, type GameDetail } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -161,7 +161,7 @@ async function GameContent({ params }: { params: PageProps<"/games/[slug]">["par
               {game.description ?? "No description has been added for this game yet."}
             </div>
             <dl className="space-y-5 text-sm">
-              <Detail icon={Calendar} label="Release date" value={formatDate(game.release_date)} />
+              <Detail icon={Calendar} label="Release date" value={formatRelease(game.release_date, game.release_year_only)} />
               <Detail
                 icon={Building2}
                 label="Developer"

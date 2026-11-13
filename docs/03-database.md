@@ -8,7 +8,7 @@ Le migrazioni sono in `supabase/migrations/` e vanno applicate **in ordine** (SQ
 | Tabella | Contenuto |
 | --- | --- |
 | `profiles` | Un record per utente auth, con `role` (`owner`). Il primo utente creato diventa `owner`. |
-| `games` | Il gioco: `slug`, `title`, descrizioni, `release_date`, `developer`, `publisher`, `rating` (0-10), `play_status`, `completion_status`, `playtime_hours`, `completed_on`, `review_en`, `review_it`, `pros[]`, `cons[]`, `cover_path`, `cover_blur`, `featured`, `is_online`, timestamp. |
+| `games` | Il gioco: `slug`, `title`, descrizioni, `release_date`, `release_year_only` (la data è solo l'anno: si salva come 1 gennaio e il sito mostra solo l'anno), `developer`, `publisher`, `rating` (0-10), `play_status`, `completion_status`, `playtime_hours`, `completed_on`, `review_en`, `review_it`, `pros[]`, `cons[]`, `cover_path`, `cover_blur`, `featured`, `is_online`, timestamp. |
 | `games.launchers` | Colonna `text[]` con i launcher su cui il gioco è posseduto (`steam`, `ubisoft-connect`, `ea-app`, `battle-net`). Vuota per i giochi console, già coperti dalle piattaforme. I valori ammessi sono validati nell'app (`LAUNCHERS` in `src/lib/types.ts`), quindi aggiungere un launcher non richiede una migrazione. Indice GIN `games_launchers_idx`. |
 | `games.rank` | Testo libero, solo per i giochi online: il rank raggiunto ("Diamond", "Legend"...) oppure "None" se il gioco non ha classifica. Vuoto negli altri casi. Vincoli: non vuoto, al massimo 40 caratteri, ammesso solo se `is_online`. |
 | `genres`, `platforms` | Tassonomie con nome univoco (case-insensitive) e `slug`, precaricate. |

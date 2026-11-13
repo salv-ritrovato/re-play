@@ -9,6 +9,7 @@ const base = {
   short_description: "",
   description: "",
   release_date: "",
+  release_year_only: false,
   developer: "",
   publisher: "",
   genre_ids: [],
@@ -27,6 +28,21 @@ const base = {
   is_online: false,
   rank: "",
 };
+
+test.describe("release date", () => {
+  test("a year alone is saved as the 1st of January of that year; a full date and an empty date stay as they are", () => {
+    expect(gameSchema.parse({ ...base, release_date: "1997" }).release_date).toBe("1997-01-01");
+    expect(gameSchema.parse({ ...base, release_date: " 2005 " }).release_date).toBe("2005-01-01");
+    expect(gameSchema.parse({ ...base, release_date: "2021-06-15" }).release_date).toBe("2021-06-15");
+    expect(gameSchema.parse({ ...base, release_date: "" }).release_date).toBeNull();
+  });
+
+  test("anything else is rejected", () => {
+    for (const bad of ["97", "19977", "1997-13-40", "abc", "1850", "2500", "1997/06/15"]) {
+      expect(gameSchema.safeParse({ ...base, release_date: bad }).success, bad).toBe(false);
+    }
+  });
+});
 
 test.describe("pasted asterisks", () => {
   test("stripAsterisks removes every asterisk and nothing else", () => {

@@ -19,6 +19,15 @@ export function formatDate(value: string | null | undefined, short = false): str
   return (short ? shortDateFmt : dateFmt).format(d);
 }
 
+/**
+ * The release date as people read it. A game known only by its year ("year only") is stored as the 1st of
+ * January of that year, and shows just the year.
+ */
+export function formatRelease(value: string | null | undefined, yearOnly = false): string | null {
+  if (!value) return null;
+  return yearOnly ? String(yearOf(value)) : formatDate(value);
+}
+
 export function yearOf(value: string | null | undefined): number | null {
   if (!value) return null;
   const y = new Date(value).getUTCFullYear();
