@@ -397,6 +397,42 @@ test.describe("public navigation", () => {
     expect(errors, "the pages raised console errors").toEqual([]);
   });
 
+  test("the year chart shows its latest year and the calendar skips runs of empty years", async ({ page }) => {
+    await page.goto("/statistics");
+    await page.waitForLoadState("networkidle");
+
+    // The year chart shows its latest year: it fits its column, or starts scrolled to the recent end.
+    const hidden = await page.evaluate(() => {
+      const bad: string[] = [];
+      for (const scroller of document.querySelectorAll<HTMLElement>("main *")) {
+        const style = getComputedStyle(scroller);
+        if (style.direction !== "rtl" || style.overflowX !== "auto") continue;
+        const last = scroller.querySelector("ul > li:last-child");
+        if (!last) continue;
+        const box = scroller.getBoundingClientRect();
+        const item = last.getBoundingClientRect();
+        if (item.right > box.right + 1 || item.left < box.left - 1) bad.push("the last column is out of view");
+      }
+      return bad;
+    });
+    expect(hidden).toEqual([]);
+
+    // The month calendar never lists empty years one by one: a run of them is a single thin row.
+    const table = page.getByRole("table", { name: "Games finished per month" });
+    if ((await table.count()) > 0) {
+      const rows = await table.locator("tbody tr").evaluateAll((trs) =>
+        trs.map((tr) => ({
+          label: tr.querySelector("th")?.textContent?.trim() ?? "",
+          empty: [...tr.querySelectorAll("td")].every((td) => td.textContent?.trim() === "0"),
+        })),
+      );
+      for (let i = 1; i < rows.length; i++) {
+        const twoEmptyYears = /^\d{4}$/.test(rows[i].label) && /^\d{4}$/.test(rows[i - 1].label) && rows[i].empty && rows[i - 1].empty;
+        expect(twoEmptyYears, `empty years ${rows[i - 1].label} and ${rows[i].label} should be one row`).toBe(false);
+      }
+    }
+  });
+
   test("the sitemap lists every public page, and the reviews have an RSS feed", async ({ page, request }) => {
     // Sitemap: sections, every game, and it is announced in robots.txt.
     const robots = await (await request.get("/robots.txt")).text();

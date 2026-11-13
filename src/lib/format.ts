@@ -34,6 +34,25 @@ export function yearOf(value: string | null | undefined): number | null {
   return Number.isNaN(y) ? null : y;
 }
 
+/**
+ * Whole percentages that always add up to 100 (rounding each one on its own can give 101): every share is rounded
+ * down and the missing points go to the shares with the largest remainders.
+ */
+export function wholePercentages(values: number[]): number[] {
+  const total = values.reduce((sum, n) => sum + n, 0);
+  if (total === 0) return values.map(() => 0);
+  const exact = values.map((n) => (n / total) * 100);
+  const result = exact.map(Math.floor);
+  let missing = 100 - result.reduce((sum, n) => sum + n, 0);
+  const byRemainder = exact.map((x, i) => ({ i, rest: x - Math.floor(x) })).sort((a, b) => b.rest - a.rest || a.i - b.i);
+  for (const { i } of byRemainder) {
+    if (missing <= 0) break;
+    result[i] += 1;
+    missing -= 1;
+  }
+  return result;
+}
+
 export function formatRating(value: number | null | undefined): string {
   if (value === null || value === undefined) return "-";
   const text = Number(value).toFixed(1);

@@ -1,3 +1,4 @@
+import { wholePercentages } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 /** Horizontal bars, pure CSS: no client JS, great for genres and platforms. */
@@ -50,16 +51,30 @@ export function Columns({
   const top = Math.max(1, ...items.map((i) => i.value));
   if (items.length === 0) return <p className="text-sm text-subtle">{emptyLabel}</p>;
 
+  // With many columns (a timeline of years) the bars get narrow and only some of them carry a label,
+  // always the last one, so the chart fits its column instead of hiding its recent end behind a scroll.
+  const dense = items.length > 12;
+  const labelEvery = dense ? Math.ceil(items.length / 12) : 1;
+
   return (
-    // Scrolls sideways only when there are too many columns for a narrow screen;
-    // never vertically (overflow-y hidden), and the scrollbar itself stays out of sight.
-    <div className={cn("relative overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", className)}>
+    // Scrolls sideways only when there are too many columns even for that, and then it starts from the
+    // end (the most recent years): rtl puts the scroll at the right, the list inside is ltr again.
+    // Never vertically (overflow-y hidden), and the scrollbar itself stays out of sight.
+    <div
+      className={cn(
+        "relative -mx-2 overflow-x-auto px-2 overflow-y-hidden [direction:rtl] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
+        className,
+      )}
+    >
       <ul
-        className="flex h-52 min-w-full items-stretch gap-2"
-        style={{ minWidth: `${items.length * 2.25}rem` }}
+        className={cn("flex h-52 min-w-full items-stretch [direction:ltr]", dense ? "gap-1" : "gap-2")}
+        style={{ minWidth: `${items.length * (dense ? 1.25 : 2)}rem` }}
       >
-        {items.map((item) => (
-          <li key={item.label} className="flex h-full max-w-20 min-w-8 flex-1 flex-col gap-2 text-center">
+        {items.map((item, index) => (
+          <li
+            key={item.label}
+            className={cn("flex h-full flex-1 flex-col gap-2 text-center", dense ? "min-w-0" : "max-w-20 min-w-6")}
+          >
             {/* The track takes whatever height the label row leaves; its top padding is the headroom for the value above the tallest bar, so nothing can overflow. */}
             <div className="flex min-h-0 flex-1 items-end pt-6">
               <span
@@ -73,12 +88,17 @@ export function Columns({
                 )}
                 style={{ height: `${Math.max((item.value / top) * 100, item.value === 0 ? 2 : 4)}%` }}
               >
-                <span className="absolute bottom-full left-0 mb-1.5 w-full text-xs tabular-nums text-muted-foreground">
+                <span className="absolute bottom-full left-1/2 mb-1.5 -translate-x-1/2 text-xs tabular-nums whitespace-nowrap text-muted-foreground">
                   {item.value || ""}
                 </span>
               </span>
             </div>
-            <span className="text-xs text-subtle">{item.label}</span>
+            {/* The label is centred under its column and may be wider than it. */}
+            <span aria-hidden={(items.length - 1 - index) % labelEvery !== 0 || undefined} className="relative h-4 text-xs text-subtle">
+              {(items.length - 1 - index) % labelEvery === 0 && (
+                <span className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap">{item.label}</span>
+              )}
+            </span>
             <span className="sr-only">{item.value} games</span>
           </li>
         ))}
@@ -111,6 +131,7 @@ export function Donut({
   const radius = 40;
   const circumference = 2 * Math.PI * radius;
   const gap = shown.length > 1 ? 1.5 : 0;
+  const shares = wholePercentages(shown.map((i) => i.value));
   const lengths = shown.map((item) => (item.value / total) * circumference);
   const starts = lengths.map((_, i) => lengths.slice(0, i).reduce((sum, n) => sum + n, 0));
 
@@ -146,7 +167,7 @@ export function Donut({
           <li key={item.label} className="flex items-center gap-2">
             <span aria-hidden className="size-2.5 shrink-0 rounded-full" style={{ background: DONUT_COLORS[i % DONUT_COLORS.length] }} />
             <span className="min-w-0 flex-1 truncate text-muted-foreground">{item.label}</span>
-            <span className="text-xs tabular-nums text-subtle">{Math.round((item.value / total) * 100)}%</span>
+            <span className="text-xs tabular-nums text-subtle">{shares[i]}%</span>
             <span className="w-7 text-right tabular-nums">{item.value}</span>
           </li>
         ))}
@@ -169,19 +190,29 @@ export function MonthGrid({ cells }: { cells: { year: number; month: number; gam
   const first = cells[0].year;
   const last = cells[cells.length - 1].year;
   const years = Array.from({ length: last - first + 1 }, (_, i) => first + i);
+  const isEmpty = (year: number) => MONTHS.every((_, i) => !counts.get(`${year}-${i + 1}`));
+
+  // Years with no completions at all are not drawn one by one: two or more in a row become a single thin row
+  // (`1999-2013`), so the calendar stays short on a phone without hiding that those years were empty.
+  const rows: { from: number; to: number }[] = [];
+  for (let i = 0; i < years.length; ) {
+    let j = i;
+    if (isEmpty(years[i])) while (j + 1 < years.length && isEmpty(years[j + 1])) j++;
+    rows.push(j > i ? { from: years[i], to: years[j] } : { from: years[i], to: years[i] });
+    i = j + 1;
+  }
 
   return (
-    <div className="max-w-2xl">
+    <div className="max-w-sm">
       <table className="w-full table-fixed border-separate border-spacing-[3px] sm:border-spacing-1">
         <caption className="sr-only">Games finished per month</caption>
         <thead>
           <tr>
-            <td className="w-10 sm:w-14" />
+            <td className="w-[4.25rem] sm:w-20" />
             {MONTHS.map((m) => (
               <th key={m} scope="col" className="pb-1 text-center text-[0.625rem] font-normal text-subtle sm:text-xs">
                 <abbr title={m} className="no-underline">
-                  <span className="sm:hidden" aria-hidden>{m[0]}</span>
-                  <span className="hidden sm:inline" aria-hidden>{m.slice(0, 3)}</span>
+                  <span aria-hidden>{m[0]}</span>
                   <span className="sr-only">{m}</span>
                 </abbr>
               </th>
@@ -189,24 +220,40 @@ export function MonthGrid({ cells }: { cells: { year: number; month: number; gam
           </tr>
         </thead>
         <tbody>
-          {years.map((year) => (
-            <tr key={year}>
-              <th scope="row" className="pr-1 text-right text-xs font-normal tabular-nums text-subtle sm:text-sm">{year}</th>
-              {MONTHS.map((m, i) => {
-                const games = counts.get(`${year}-${i + 1}`) ?? 0;
-                return (
-                  <td key={m} className="p-0">
-                    <div
-                      title={`${m} ${year}: ${games} ${games === 1 ? "game" : "games"}`}
-                      className={cn("aspect-square w-full rounded-[3px]", games === 0 ? "bg-elevated/70" : MONTH_STEPS[Math.min(games, 4) - 1])}
-                    >
-                      <span className="sr-only">{games}</span>
-                    </div>
-                  </td>
-                );
-              })}
-            </tr>
-          ))}
+          {rows.map(({ from, to }) => {
+            const collapsed = to > from;
+            const label = collapsed ? `${from}-${to}` : String(from);
+            return (
+              <tr key={from}>
+                <th
+                  scope="row"
+                  className={cn(
+                    "pr-1 text-right font-normal tabular-nums whitespace-nowrap",
+                    collapsed ? "text-[0.625rem] text-subtle/70 sm:text-xs" : "text-xs text-subtle sm:text-sm",
+                  )}
+                >
+                  {label}
+                </th>
+                {MONTHS.map((m, i) => {
+                  const games = collapsed ? 0 : (counts.get(`${from}-${i + 1}`) ?? 0);
+                  return (
+                    <td key={m} className="p-0">
+                      <div
+                        title={collapsed ? `${m} ${label}: no games` : `${m} ${from}: ${games} ${games === 1 ? "game" : "games"}`}
+                        className={cn(
+                          "w-full rounded-[3px]",
+                          collapsed ? "h-1.5 rounded-[2px]" : "aspect-square",
+                          games === 0 ? "bg-elevated/70" : MONTH_STEPS[Math.min(games, 4) - 1],
+                        )}
+                      >
+                        <span className="sr-only">{games}</span>
+                      </div>
+                    </td>
+                  );
+                })}
+              </tr>
+            );
+          })}
         </tbody>
       </table>
       <div className="mt-4 flex items-center justify-end gap-2 text-xs text-subtle" aria-hidden>

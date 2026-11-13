@@ -119,11 +119,18 @@ verso Supabase). Le server action accettano body fino a 12 MB (`serverActions.bo
   scaffali della home). CSS in `globals.css`, spento con `prefers-reduced-motion`; senza supporto del browser non cambia nulla.
 - **Calendario dei completamenti**: `MonthGrid` (`components/stats/charts.tsx`), una vera `<table>` (un anno per riga, un mese per
   colonna, quadrati più scuri con più giochi, 4 livelli), dati da `getStats().completions` (conteggio per mese delle `completed_on`).
-  Larghezza massima `max-w-2xl`; su telefono i mesi sono una lettera e i quadrati restano di almeno 14 px.
+  Larghezza massima `max-w-sm`, mesi sempre con l'iniziale; due o più anni consecutivi senza completamenti diventano
+  **una sola riga sottile** (`1999-2013`), così il calendario resta corto anche con molti anni vuoti; i quadrati restano
+  di almeno 14 px su telefono.
 - **Recensioni**: `ReviewTabs` rende un paragrafo per riga di testo; `.prose-review > p:first-child` è più grande e più
   chiaro (apertura), larghezza massima 66 caratteri.
 - **App sul telefono**: `src/app/manifest.ts` (nome, colori, `display: standalone`), icone in `public/icons/` (192, 512 e
   una "maskable" con margine di sicurezza) e `src/app/apple-icon.png`, tutte con il logo contratto su fondo scuro.
+- **Percentuali**: `wholePercentages()` (`lib/format.ts`) arrotonda per difetto e assegna i punti mancanti ai resti più
+  grandi, quindi le quote del `Donut` sommano sempre 100 (prima 97+2+2 dava 101).
+- **Grafico a colonne** (`Columns`): con più di 12 colonne (la timeline degli anni) le barre sono strette e solo alcune
+  hanno l'etichetta (sempre l'ultima), così entra nella sua colonna; se non basta, scorre di lato partendo dalla fine
+  (gli anni più recenti, con `direction: rtl` sul contenitore) e non dal passato.
 - **Statistiche**: il componente `Donut` (SVG puro, in `components/stats/charts.tsx`) mostra launcher e solo/online con
   legenda (quota e numero).
 

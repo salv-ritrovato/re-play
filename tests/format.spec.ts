@@ -1,5 +1,5 @@
 import { expect, test } from "@playwright/test";
-import { formatRating, formatRelease, ratingTier } from "../src/lib/format";
+import { formatRating, formatRelease, ratingTier, wholePercentages } from "../src/lib/format";
 
 // Pure formatting rules, no browser.
 test.describe("rating format", () => {
@@ -37,5 +37,18 @@ test.describe("release date known only by its year", () => {
     expect(formatRelease("2021-06-15")).toBe("15 June 2021");
     expect(formatRelease(null, true)).toBeNull();
     expect(formatRelease(null)).toBeNull();
+  });
+});
+
+test.describe("percentages", () => {
+  test("shares always add up to 100, never 101", () => {
+    expect(wholePercentages([60, 1, 1])).toEqual([97, 2, 1]);
+    expect(wholePercentages([1, 1, 1])).toEqual([34, 33, 33]);
+    expect(wholePercentages([1, 1])).toEqual([50, 50]);
+    expect(wholePercentages([5])).toEqual([100]);
+    expect(wholePercentages([0, 0])).toEqual([0, 0]);
+    for (const values of [[7, 7, 7, 7, 7, 7, 7], [1, 2, 3, 4, 5, 6, 7, 8, 9], [97, 1, 1, 1], [33, 33, 34], [2, 2, 2, 1, 1, 1, 1]]) {
+      expect(wholePercentages(values).reduce((sum, n) => sum + n, 0)).toBe(100);
+    }
   });
 });
