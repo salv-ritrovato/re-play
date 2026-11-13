@@ -520,7 +520,7 @@ export async function getStats() {
   // The figures that need no view of their own: counted from the games themselves.
   const launcherCounts = new Map<string, number>();
   for (const g of library) {
-    if (g.launchers.length === 0) launcherCounts.set("Console / none", (launcherCounts.get("Console / none") ?? 0) + 1);
+    if (g.launchers.length === 0) launcherCounts.set("No launcher", (launcherCounts.get("No launcher") ?? 0) + 1);
     for (const id of g.launchers) launcherCounts.set(LAUNCHER_NAME[id] ?? id, (launcherCounts.get(LAUNCHER_NAME[id] ?? id) ?? 0) + 1);
   }
   const launchers = [...launcherCounts.entries()]

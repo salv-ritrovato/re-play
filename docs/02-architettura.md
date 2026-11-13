@@ -233,7 +233,8 @@ profilo Steam è la costante `STEAM_URL`.
   della lista e accanto allo sviluppatore nella scheda del gioco (con nome e tooltip per chi usa lo screen
   reader), per esteso nei dettagli (etichetta pubblica "Played via"; nel form e nei filtri resta "Launcher", più chiaro quando
   si sceglie), e come filtro "Launcher" in libreria (`?launcher=steam,ea-app`). I giochi
-  Nintendo e console restano gestiti dalle piattaforme e non hanno launcher.
+  Nintendo e console restano gestiti dalle piattaforme e non hanno launcher. Nelle statistiche i giochi senza launcher
+  (console, MS-DOS come Jurassic War) formano la voce **"No launcher"** del grafico dei launcher.
 - **Footer** (`site-footer.tsx`): due gruppi separati. In alto i link del sito (Library, Reviews, Statistics,
   About, Admin); sotto, in una riga a parte "Find me elsewhere", i profili esterni come icone (Steam,
   Instagram, AniList, inLumine). Gli indirizzi e le descrizioni stanno in `src/content/links.ts`
