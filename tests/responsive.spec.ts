@@ -28,39 +28,35 @@ test.describe("responsive layouts", () => {
     }
   });
 
-  test("the year chart shows its latest year and the calendar skips runs of empty years", async ({ page }) => {
+  test("the timeline lists the years with finished games, latest first, and the calendar leaves out the empty years", async ({ page }) => {
     await page.goto("/statistics");
     await page.waitForLoadState("networkidle");
 
-    // The year chart shows its latest year: it fits its column, or starts scrolled to the recent end.
-    const hidden = await page.evaluate(() => {
-      const bad: string[] = [];
-      for (const scroller of document.querySelectorAll<HTMLElement>("main *")) {
-        const style = getComputedStyle(scroller);
-        if (style.direction !== "rtl" || style.overflowX !== "auto") continue;
-        const last = scroller.querySelector("ul > li:last-child");
-        if (!last) continue;
-        const box = scroller.getBoundingClientRect();
-        const item = last.getBoundingClientRect();
-        if (item.right > box.right + 1 || item.left < box.left - 1) bad.push("the last column is out of view");
-      }
-      return bad;
-    });
-    expect(hidden).toEqual([]);
+    // Timeline: one row per year, newest first, every one with at least a game; nothing is cut off or scrolls.
+    const timeline = page.locator("section", { has: page.getByRole("heading", { name: "Games played by year" }) });
+    const rows = await timeline.locator("ul > li").evaluateAll((lis) =>
+      lis.map((li) => ({ year: Number(li.children[0]?.textContent), games: Number(li.children[2]?.textContent) })),
+    );
+    for (let i = 0; i < rows.length; i++) {
+      expect(rows[i].games, `year ${rows[i].year}`).toBeGreaterThan(0);
+      if (i > 0) expect(rows[i].year).toBeLessThan(rows[i - 1].year);
+    }
+    await expect(timeline.locator("ul")).toBeVisible();
 
-    // The month calendar never lists empty years one by one: a run of them is a single thin row.
+    // Calendar: the same years (the ones with a completion date), newest first, none of them empty.
     const table = page.getByRole("table", { name: "Games finished per month" });
     if ((await table.count()) > 0) {
-      const rows = await table.locator("tbody tr").evaluateAll((trs) =>
+      const calendar = await table.locator("tbody tr").evaluateAll((trs) =>
         trs.map((tr) => ({
-          label: tr.querySelector("th")?.textContent?.trim() ?? "",
-          empty: [...tr.querySelectorAll("td")].every((td) => td.textContent?.trim() === "0"),
+          year: Number(tr.querySelector("th")?.textContent),
+          total: [...tr.querySelectorAll("td")].reduce((sum, td) => sum + Number(td.textContent?.trim() || 0), 0),
         })),
       );
-      for (let i = 1; i < rows.length; i++) {
-        const twoEmptyYears = /^\d{4}$/.test(rows[i].label) && /^\d{4}$/.test(rows[i - 1].label) && rows[i].empty && rows[i - 1].empty;
-        expect(twoEmptyYears, `empty years ${rows[i - 1].label} and ${rows[i].label} should be one row`).toBe(false);
+      for (let i = 0; i < calendar.length; i++) {
+        expect(calendar[i].total, `calendar year ${calendar[i].year} is empty`).toBeGreaterThan(0);
+        if (i > 0) expect(calendar[i].year).toBeLessThan(calendar[i - 1].year);
       }
+      await expect(page.getByText("Years with no finished games aren't shown.")).toBeVisible();
     }
   });
 

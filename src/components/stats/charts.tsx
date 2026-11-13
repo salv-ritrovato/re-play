@@ -36,7 +36,7 @@ export function BarList({
   );
 }
 
-/** Vertical columns, pure CSS: rating distribution and games per year. */
+/** Vertical columns, pure CSS: the rating distribution. */
 export function Columns({
   items,
   highlight,
@@ -51,30 +51,16 @@ export function Columns({
   const top = Math.max(1, ...items.map((i) => i.value));
   if (items.length === 0) return <p className="text-sm text-subtle">{emptyLabel}</p>;
 
-  // With many columns (a timeline of years) the bars get narrow and only some of them carry a label,
-  // always the last one, so the chart fits its column instead of hiding its recent end behind a scroll.
-  const dense = items.length > 12;
-  const labelEvery = dense ? Math.ceil(items.length / 12) : 1;
-
   return (
-    // Scrolls sideways only when there are too many columns even for that, and then it starts from the
-    // end (the most recent years): rtl puts the scroll at the right, the list inside is ltr again.
-    // Never vertically (overflow-y hidden), and the scrollbar itself stays out of sight.
-    <div
-      className={cn(
-        "relative -mx-2 overflow-x-auto px-2 overflow-y-hidden [direction:rtl] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden",
-        className,
-      )}
-    >
+    // Scrolls sideways only when there are too many columns for a narrow screen;
+    // never vertically (overflow-y hidden), and the scrollbar itself stays out of sight.
+    <div className={cn("relative overflow-x-auto overflow-y-hidden [scrollbar-width:none] [&::-webkit-scrollbar]:hidden", className)}>
       <ul
-        className={cn("flex h-52 min-w-full items-stretch [direction:ltr]", dense ? "gap-1" : "gap-2")}
-        style={{ minWidth: `${items.length * (dense ? 1.25 : 2)}rem` }}
+        className="flex h-52 min-w-full items-stretch gap-2"
+        style={{ minWidth: `${items.length * 2}rem` }}
       >
-        {items.map((item, index) => (
-          <li
-            key={item.label}
-            className={cn("flex h-full flex-1 flex-col gap-2 text-center", dense ? "min-w-0" : "max-w-20 min-w-6")}
-          >
+        {items.map((item) => (
+          <li key={item.label} className="flex h-full max-w-20 min-w-6 flex-1 flex-col gap-2 text-center">
             {/* The track takes whatever height the label row leaves; its top padding is the headroom for the value above the tallest bar, so nothing can overflow. */}
             <div className="flex min-h-0 flex-1 items-end pt-6">
               <span
@@ -93,12 +79,7 @@ export function Columns({
                 </span>
               </span>
             </div>
-            {/* The label is centred under its column and may be wider than it. */}
-            <span aria-hidden={(items.length - 1 - index) % labelEvery !== 0 || undefined} className="relative h-4 text-xs text-subtle">
-              {(items.length - 1 - index) % labelEvery === 0 && (
-                <span className="absolute left-1/2 -translate-x-1/2 whitespace-nowrap">{item.label}</span>
-              )}
-            </span>
+            <span className="text-xs text-subtle">{item.label}</span>
             <span className="sr-only">{item.value} games</span>
           </li>
         ))}
@@ -181,38 +162,28 @@ const MONTHS = ["January", "February", "March", "April", "May", "June", "July", 
 const MONTH_STEPS = ["bg-violet/25", "bg-violet/50", "bg-violet/75", "bg-violet"];
 
 /**
- * One row per year, one square per month: the darker the square, the more games were finished that month.
- * A real table (a screen reader reads the counts), pure CSS, and it fits a phone: the squares shrink with the width.
+ * One row per year, newest first, one square per month: the darker the square, the more games were finished that
+ * month. Only the years in which something was finished are listed (a note says so). A real table (a screen reader
+ * reads the counts), pure CSS, and it fits a phone: the squares shrink with the width.
  */
 export function MonthGrid({ cells }: { cells: { year: number; month: number; games: number }[] }) {
   if (cells.length === 0) return null;
   const counts = new Map(cells.map((c) => [`${c.year}-${c.month}`, c.games]));
-  const first = cells[0].year;
-  const last = cells[cells.length - 1].year;
-  const years = Array.from({ length: last - first + 1 }, (_, i) => first + i);
-  const isEmpty = (year: number) => MONTHS.every((_, i) => !counts.get(`${year}-${i + 1}`));
-
-  // Years with no completions at all are not drawn one by one: two or more in a row become a single thin row
-  // (`1999-2013`), so the calendar stays short on a phone without hiding that those years were empty.
-  const rows: { from: number; to: number }[] = [];
-  for (let i = 0; i < years.length; ) {
-    let j = i;
-    if (isEmpty(years[i])) while (j + 1 < years.length && isEmpty(years[j + 1])) j++;
-    rows.push(j > i ? { from: years[i], to: years[j] } : { from: years[i], to: years[i] });
-    i = j + 1;
-  }
+  const years = [...new Set(cells.filter((c) => c.games > 0).map((c) => c.year))].sort((a, b) => b - a);
+  if (years.length === 0) return null;
 
   return (
-    <div className="max-w-sm">
+    <div className="max-w-md">
       <table className="w-full table-fixed border-separate border-spacing-[3px] sm:border-spacing-1">
         <caption className="sr-only">Games finished per month</caption>
         <thead>
           <tr>
-            <td className="w-[4.25rem] sm:w-20" />
+            <td className="w-10 sm:w-14" />
             {MONTHS.map((m) => (
               <th key={m} scope="col" className="pb-1 text-center text-[0.625rem] font-normal text-subtle sm:text-xs">
                 <abbr title={m} className="no-underline">
-                  <span aria-hidden>{m[0]}</span>
+                  <span className="sm:hidden" aria-hidden>{m[0]}</span>
+                  <span className="hidden sm:inline" aria-hidden>{m.slice(0, 3)}</span>
                   <span className="sr-only">{m}</span>
                 </abbr>
               </th>
@@ -220,49 +191,36 @@ export function MonthGrid({ cells }: { cells: { year: number; month: number; gam
           </tr>
         </thead>
         <tbody>
-          {rows.map(({ from, to }) => {
-            const collapsed = to > from;
-            const label = collapsed ? `${from}-${to}` : String(from);
-            return (
-              <tr key={from}>
-                <th
-                  scope="row"
-                  className={cn(
-                    "pr-1 text-right font-normal tabular-nums whitespace-nowrap",
-                    collapsed ? "text-[0.625rem] text-subtle/70 sm:text-xs" : "text-xs text-subtle sm:text-sm",
-                  )}
-                >
-                  {label}
-                </th>
-                {MONTHS.map((m, i) => {
-                  const games = collapsed ? 0 : (counts.get(`${from}-${i + 1}`) ?? 0);
-                  return (
-                    <td key={m} className="p-0">
-                      <div
-                        title={collapsed ? `${m} ${label}: no games` : `${m} ${from}: ${games} ${games === 1 ? "game" : "games"}`}
-                        className={cn(
-                          "w-full rounded-[3px]",
-                          collapsed ? "h-1.5 rounded-[2px]" : "aspect-square",
-                          games === 0 ? "bg-elevated/70" : MONTH_STEPS[Math.min(games, 4) - 1],
-                        )}
-                      >
-                        <span className="sr-only">{games}</span>
-                      </div>
-                    </td>
-                  );
-                })}
-              </tr>
-            );
-          })}
+          {years.map((year) => (
+            <tr key={year}>
+              <th scope="row" className="pr-1 text-right text-xs font-normal tabular-nums text-subtle sm:text-sm">{year}</th>
+              {MONTHS.map((m, i) => {
+                const games = counts.get(`${year}-${i + 1}`) ?? 0;
+                return (
+                  <td key={m} className="p-0">
+                    <div
+                      title={`${m} ${year}: ${games} ${games === 1 ? "game" : "games"}`}
+                      className={cn("aspect-square w-full rounded-[3px]", games === 0 ? "bg-elevated/70" : MONTH_STEPS[Math.min(games, 4) - 1])}
+                    >
+                      <span className="sr-only">{games}</span>
+                    </div>
+                  </td>
+                );
+              })}
+            </tr>
+          ))}
         </tbody>
       </table>
-      <div className="mt-4 flex items-center justify-end gap-2 text-xs text-subtle" aria-hidden>
-        Fewer
-        <span className="size-3 rounded-[3px] bg-elevated/70" />
-        {MONTH_STEPS.map((step) => (
-          <span key={step} className={cn("size-3 rounded-[3px]", step)} />
-        ))}
-        More
+      <div className="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs text-subtle">
+        <p>Years with no finished games aren&apos;t shown.</p>
+        <div className="flex items-center gap-2" aria-hidden>
+          Fewer
+          <span className="size-3 rounded-[3px] bg-elevated/70" />
+          {MONTH_STEPS.map((step) => (
+            <span key={step} className={cn("size-3 rounded-[3px]", step)} />
+          ))}
+          More
+        </div>
       </div>
     </div>
   );

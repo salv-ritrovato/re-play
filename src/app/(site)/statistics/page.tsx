@@ -49,15 +49,11 @@ async function StatsContent() {
     value: ratings.find((r) => r.bucket === i)?.games ?? 0,
   }));
 
-  // Fill year gaps between first and last year for an honest timeline.
-  const yearItems: { label: string; value: number }[] = [];
-  if (years.length > 0) {
-    const first = years[0].year;
-    const last = years[years.length - 1].year;
-    for (let y = first; y <= last; y++) {
-      yearItems.push({ label: String(y), value: years.find((r) => r.year === y)?.games ?? 0 });
-    }
-  }
+  // One row per year in which something was finished, the latest first (years with no games are left out).
+  const yearItems = years
+    .filter((r) => r.games > 0)
+    .sort((a, b) => b.year - a.year)
+    .map((r) => ({ label: String(r.year), value: r.games }));
 
   return (
     <div className="space-y-20">
@@ -101,8 +97,9 @@ async function StatsContent() {
           <Columns items={ratingBuckets} emptyLabel="No rated games yet." />
         </Section>
         <Section eyebrow="Timeline" title="Games played by year">
-          <Columns
+          <BarList
             items={yearItems}
+            max={yearItems.length}
             emptyLabel="Add completion dates to see your timeline."
           />
         </Section>
