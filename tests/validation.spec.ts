@@ -53,6 +53,18 @@ test.describe("developer", () => {
   });
 });
 
+test.describe("pros and cons", () => {
+  test("never end with a full stop, whatever was typed or pasted", () => {
+    const parsed = gameSchema.parse({
+      ...base,
+      pros: "Great world.\nFast combat . \nWait for it...\nNo dots at all\nVersion 2.5 is out",
+      cons: "Too long.\n.\nStill fine",
+    });
+    expect(parsed.pros).toEqual(["Great world", "Fast combat", "Wait for it", "No dots at all", "Version 2.5 is out"]);
+    expect(parsed.cons).toEqual(["Too long", "Still fine"]);
+  });
+});
+
 test.describe("pasted asterisks", () => {
   test("stripAsterisks removes every asterisk and nothing else", () => {
     expect(stripAsterisks("**bold** and *italic*")).toBe("bold and italic");

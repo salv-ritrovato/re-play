@@ -48,7 +48,8 @@ const lines = z
   .transform((v) =>
     v
       .split("\n")
-      .map((l) => l.trim())
+      // Pros and cons never end with a full stop, whatever was typed or pasted.
+      .map((l) => l.trim().replace(/\s*\.+$/, ""))
       .filter(Boolean),
   );
 

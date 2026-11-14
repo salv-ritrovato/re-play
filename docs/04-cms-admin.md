@@ -27,6 +27,8 @@ copertina.
 Comportamenti da conoscere:
 
 - **Recensioni a coppia**: se si compila una lingua, l'altra è obbligatoria.
+- **Pro e contro senza punto finale**: il server toglie i punti (e gli spazi prima) alla fine di ogni riga, qualunque
+  cosa si scriva o si incolli (`lines` in `lib/validation.ts`); i punti dentro la frase, come in "2.5", restano.
 - **Reset dopo il salvataggio e su "Cancel"**: `resetForm({ values })`. Senza, Next riutilizzerebbe lo stato
   del gioco precedente (le pagine visitate restano in memoria).
 - **Protezione dalle perdite di dati**: `beforeunload` avvisa se ci sono modifiche non salvate.
