@@ -44,6 +44,15 @@ test.describe("release date", () => {
   });
 });
 
+test.describe("developer", () => {
+  test("a long list of studios fits (Assassin's Creed Odyssey), but not an unbounded one", () => {
+    const studios = "Ubisoft Quebec, Ubisoft Montreal, Ubisoft Bucharest, Ubisoft Singapore, Ubisoft Montpellier, Ubisoft Kiev, Ubisoft Shanghai";
+    expect(studios.length).toBeGreaterThan(120);
+    expect(gameSchema.parse({ ...base, developer: studios }).developer).toBe(studios);
+    expect(gameSchema.safeParse({ ...base, developer: "x".repeat(301) }).success).toBe(false);
+  });
+});
+
 test.describe("pasted asterisks", () => {
   test("stripAsterisks removes every asterisk and nothing else", () => {
     expect(stripAsterisks("**bold** and *italic*")).toBe("bold and italic");

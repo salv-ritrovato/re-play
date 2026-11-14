@@ -66,7 +66,8 @@ export const gameSchema = z
     release_date: releaseDate,
     /** Only the year is known (the date is then the 1st of January of that year). */
     release_year_only: z.boolean(),
-    developer: text(120),
+    // Long enough for a game made by many studios (Assassin's Creed Odyssey lists seven).
+    developer: text(300),
     publisher: text(120),
 
     genre_ids: z.array(z.uuid()),
