@@ -14,6 +14,7 @@ import { cn } from "@/lib/utils";
 const DOT: Record<PlayStatus, string> = {
   backlog: "bg-subtle",
   playing: "bg-violet",
+  occasional: "bg-violet/50",
   completed: "bg-foreground",
   on_hold: "bg-muted-foreground",
   dropped: "bg-destructive/80",

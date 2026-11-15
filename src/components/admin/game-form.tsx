@@ -36,7 +36,7 @@ import { emptyMedia, MediaFields, type MediaState } from "./media-fields";
 import { TaxonomyPicker } from "./taxonomy-picker";
 
 /** Online / competitive games have no ending, so only these statuses make sense for them. */
-const ONLINE_PLAY_STATUSES: readonly string[] = ["playing", "on_hold", "dropped"];
+const ONLINE_PLAY_STATUSES: readonly string[] = ["playing", "occasional", "on_hold", "dropped"];
 
 function toDefaults(game?: GameDetail): GameFormInput {
   return {
@@ -185,6 +185,7 @@ export function GameForm({
     setValue("is_online", on, { shouldDirty: true });
     if (!on) {
       setValue("rank", "", { shouldDirty: true }); // only online games have a rank
+      if (form.getValues("play_status") === "occasional") setValue("play_status", "playing", { shouldDirty: true }); // and only they are played "now and then"
       return;
     }
     setValue("completion_status", "none", { shouldDirty: true });
@@ -419,7 +420,7 @@ export function GameForm({
                 id="play_status"
                 value={field.value}
                 onValueChange={field.onChange}
-                options={PLAY_STATUSES.filter((s) => !isOnline || ONLINE_PLAY_STATUSES.includes(s)).map((s) => ({
+                options={PLAY_STATUSES.filter((s) => (isOnline ? ONLINE_PLAY_STATUSES.includes(s) : s !== "occasional")).map((s) => ({
                   value: s,
                   label: PLAY_STATUS_LABEL[s],
                 }))}

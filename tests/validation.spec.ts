@@ -53,6 +53,19 @@ test.describe("developer", () => {
   });
 });
 
+test.describe("play status", () => {
+  test("'occasional' (played now and then) is only for online games", () => {
+    expect(gameSchema.safeParse({ ...base, is_online: true, play_status: "occasional", completion_status: "none" }).success).toBe(true);
+    const offline = gameSchema.safeParse({ ...base, is_online: false, play_status: "occasional" });
+    expect(offline.success).toBe(false);
+    // an online game can be playing, occasional, on hold or dropped, never completed
+    for (const ok of ["playing", "occasional", "on_hold", "dropped"]) {
+      expect(gameSchema.safeParse({ ...base, is_online: true, play_status: ok }).success, ok).toBe(true);
+    }
+    expect(gameSchema.safeParse({ ...base, is_online: true, play_status: "completed" }).success).toBe(false);
+  });
+});
+
 test.describe("pros and cons", () => {
   test("never end with a full stop, whatever was typed or pasted", () => {
     const parsed = gameSchema.parse({

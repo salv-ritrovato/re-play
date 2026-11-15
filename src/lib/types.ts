@@ -1,4 +1,4 @@
-export const PLAY_STATUSES = ["backlog", "playing", "completed", "on_hold", "dropped"] as const;
+export const PLAY_STATUSES = ["backlog", "playing", "occasional", "completed", "on_hold", "dropped"] as const;
 export type PlayStatus = (typeof PLAY_STATUSES)[number];
 
 export const COMPLETION_STATUSES = ["none", "main_story", "main_story_side_quests", "completionist"] as const;
@@ -32,6 +32,7 @@ export const RANK_SUGGESTIONS = [
 export const PLAY_STATUS_LABEL: Record<PlayStatus, string> = {
   backlog: "Backlog",
   playing: "Playing",
+  occasional: "Occasional",
   completed: "Completed",
   on_hold: "On hold",
   dropped: "Dropped",

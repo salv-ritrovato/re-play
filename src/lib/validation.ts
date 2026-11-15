@@ -100,7 +100,12 @@ export const gameSchema = z
   })
   .refine((v) => !v.is_online || v.play_status !== "completed", {
     path: ["play_status"],
-    message: "An online game can't be completed: use Playing, On hold or Dropped",
+    message: "An online game can't be completed: use Playing, Occasional, On hold or Dropped",
+  })
+  // "Occasional" (played now and then) is for online games, which have no ending to come back to.
+  .refine((v) => v.is_online || v.play_status !== "occasional", {
+    path: ["play_status"],
+    message: "Only online games can be played occasionally",
   })
   // Only online games have a rank.
   .refine((v) => !v.rank || v.is_online, {

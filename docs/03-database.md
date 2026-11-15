@@ -14,7 +14,8 @@ Le migrazioni sono in `supabase/migrations/` e vanno applicate **in ordine** (SQ
 | `genres`, `platforms` | Tassonomie con nome univoco (case-insensitive) e `slug`, precaricate. |
 | `game_genres`, `game_platforms` | Tabelle ponte molti-a-molti. |
 
-Tipi enumerati: `play_status` (`backlog`, `playing`, `completed`, `on_hold`, `dropped`) e
+Tipi enumerati: `play_status` (`backlog`, `playing`, `occasional`, `completed`, `on_hold`, `dropped`; "Occasional" è
+riservato ai giochi online che si riprendono ogni tanto) e
 `completion_status` (`none`, `main_story`, `main_story_side_quests`, `completionist`; in interfaccia:
 "Not completed", "Main story", "Main story + side quests", "100%").
 

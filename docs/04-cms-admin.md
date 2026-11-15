@@ -41,8 +41,9 @@ Comportamenti da conoscere:
   `gameSchema`). Un testo fatto solo di asterischi conta come vuoto.
 - **Giochi online / competitivi** (interruttore "Online / competitive game"): non hanno una fine, quindi
   accendendo l'interruttore il form nasconde "Completion status" e "Completion date" (e li azzera), toglie
-  "Completed" e "Backlog" dalle scelte di "Playing status" (restano Playing, On hold, Dropped, e se serve
-  passa a Playing) e mostra una nota. La stessa regola vale sul server (`gameSchema`): un gioco online non può
+  "Completed" e "Backlog" dalle scelte di "Playing status" (restano Playing, Occasional, On hold, Dropped, e
+  se serve passa a Playing) e mostra una nota. "Occasional" ("ogni tanto ci rigioco") esiste solo per i giochi
+  online: per gli altri il form non lo offre e il server lo rifiuta. La stessa regola vale sul server (`gameSchema`): un gioco online non può
   avere livello o data di completamento né stato "completed". Sul sito pubblico un gioco online non mostra
   il completamento (scheda in alto, lista, data nella barra laterale).
   Al posto del completamento c'è il **rank raggiunto** ("Rank reached"): testo libero con scelte rapide
