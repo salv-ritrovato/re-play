@@ -1,5 +1,6 @@
 import { Rss } from "lucide-react";
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { ReviewsBrowser } from "@/components/games/reviews-browser";
 import { Container, PageHeader } from "@/components/layout/page-header";
@@ -32,6 +33,15 @@ export default function ReviewsPage({ searchParams }: PageProps<"/reviews">) {
           </a>
         }
       />
+      <p className="-mt-6 text-sm text-muted-foreground">
+        Every score stands on its own, from 1 to 10, and is never compared with another game.{" "}
+        <Link
+          href="/about#about-how-i-rate-games"
+          className="text-foreground/90 underline underline-offset-4 outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"
+        >
+          How I rate games
+        </Link>
+      </p>
       <Suspense fallback={<ReviewsSkeleton />}>
         <ReviewsContent searchParams={searchParams} />
       </Suspense>

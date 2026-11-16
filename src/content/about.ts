@@ -5,6 +5,15 @@ export const STEAM_URL = "https://steamcommunity.com/profiles/76561198066959401/
 /** Which icon goes in front of each fact (the page maps these names to icons). */
 export type FactIcon = "games" | "heart" | "console" | "pc" | "story" | "complete" | "launchers";
 
+/** Icon in front of each group of the hardware section (the page maps these names to icons). */
+export type SetupIcon = "rig" | "peripherals";
+
+/** The hardware the games are played on: the part names are the same in both languages, only the labels change. */
+export interface SetupContent {
+  title: string;
+  groups: { name: string; icon: SetupIcon; items: { label: string; value: string }[] }[];
+}
+
 export interface AboutContent {
   eyebrow: string;
   title: string;
@@ -15,6 +24,8 @@ export interface AboutContent {
     /** Launchers shown as logo pills under the text (the names are already in the paragraphs). */
     launchers?: LauncherId[];
   }[];
+  /** Hardware and peripherals, shown after the story and before the closing words. */
+  setup: SetupContent;
   /** Closing paragraph, set apart from the rest. */
   closing: string;
   factsTitle: string;
@@ -63,6 +74,13 @@ export const about: Record<Lang, AboutContent> = {
         launchers: ["steam", "ubisoft-connect", "battle-net", "ea-app"],
       },
       {
+        heading: "How I rate games",
+        paragraphs: [
+          "Every score is a scale of its own, from 1 to 10, and I never compare games with each other. The 10/10 of Cyberpunk will never be the same as the 10/10 of Red Dead Redemption 2: each game gets its own rating and can't be compared with any other.",
+          "When I rate a game I weigh three things, in this order. First the technical side, judged both against the year the game came out and against the year I wrote the review. Then the “general consensus”, what players and critics think of it. And finally my personal take, based on the feelings and emotions I lived through while playing.",
+        ],
+      },
+      {
         heading: "Beyond the games",
         paragraphs: [
           "My interests are wide-ranging, and most of them live in the nerd world: anime, manga, comics, TV series, fantasy books and, of course, video games.",
@@ -71,6 +89,38 @@ export const about: Record<Lang, AboutContent> = {
         ],
       },
     ],
+    setup: {
+      title: "My setup",
+      groups: [
+        {
+          name: "PC rig",
+          icon: "rig",
+          items: [
+            { label: "CPU", value: "AMD Ryzen 7 9800X3D" },
+            { label: "GPU", value: "MSI GAMING TRIO OC GeForce RTX 5090" },
+            { label: "Motherboard", value: "MSI MAG X870E TOMAHAWK WIFI" },
+            { label: "CPU cooler", value: "ARCTIC Liquid Freezer III 360 A-RGB" },
+            { label: "RAM", value: "G.Skill Trident Z5 Neo RGB 64 GB DDR5-6000 CL30" },
+            { label: "SSD", value: "Samsung 990 Pro 2 TB" },
+            { label: "Storage", value: "Seagate Barracuda Compute 8 TB" },
+            { label: "Power supply", value: "NZXT C1200 (2024) 1200 W 80+ Gold Certified" },
+            { label: "Case", value: "Fractal Design North XL" },
+          ],
+        },
+        {
+          name: "Peripherals",
+          icon: "peripherals",
+          items: [
+            { label: "Keyboard", value: "Logitech PRO X TKL RAPID" },
+            { label: "Mouse", value: "Logitech G PRO X Superlight 2" },
+            { label: "Headset", value: "Logitech G PRO X 2 LIGHTSPEED" },
+            { label: "Mousepad", value: "TITANWOLF Wolf Skull" },
+            { label: "Monitors", value: "Alienware 27 QD-OLED AW2725DF 360 Hz + BenQ ZOWIE XL2540 240 Hz" },
+            { label: "Speakers", value: "BOSE Companion II" },
+          ],
+        },
+      ],
+    },
     closing:
       "Today, gaming is my escape from the harsh reality of “adults”, and it's also a sweet memory of my mother, who is no longer with us. Going back to the games that made my childhood takes me back to when I was a kid, having fun with her.",
     factsTitle: "At a glance",
@@ -123,6 +173,13 @@ export const about: Record<Lang, AboutContent> = {
         launchers: ["steam", "ubisoft-connect", "battle-net", "ea-app"],
       },
       {
+        heading: "Come valuto i giochi",
+        paragraphs: [
+          "Ogni voto è una scala a sé, da 1 a 10, e non faccio mai paragoni tra i giochi. Il 10/10 di Cyberpunk non sarà mai uguale al 10/10 di Red Dead Redemption 2: ogni gioco ha una valutazione a parte ed è incomparabile con gli altri.",
+          "Quando valuto un gioco tengo conto di tre cose, in quest'ordine. Prima di tutto il comparto tecnico, sia rispetto all'anno d'uscita sia rispetto all'anno in cui ho scritto la recensione. Poi il “general consensus”, cioè cosa ne pensano giocatori e critica. Infine la mia valutazione personale, basata sulle sensazioni e sulle emozioni vissute durante il gioco.",
+        ],
+      },
+      {
         heading: "Oltre i videogiochi",
         paragraphs: [
           "I miei interessi sono molto ampi e per la maggior parte vivono nel mondo nerd: anime, manga, fumetti, serie TV, libri fantasy e, naturalmente, i videogiochi.",
@@ -131,6 +188,38 @@ export const about: Record<Lang, AboutContent> = {
         ],
       },
     ],
+    setup: {
+      title: "Il mio setup",
+      groups: [
+        {
+          name: "PC",
+          icon: "rig",
+          items: [
+            { label: "CPU", value: "AMD Ryzen 7 9800X3D" },
+            { label: "GPU", value: "MSI GAMING TRIO OC GeForce RTX 5090" },
+            { label: "Scheda madre", value: "MSI MAG X870E TOMAHAWK WIFI" },
+            { label: "Dissipatore CPU", value: "ARCTIC Liquid Freezer III 360 A-RGB" },
+            { label: "RAM", value: "G.Skill Trident Z5 Neo RGB 64 GB DDR5-6000 CL30" },
+            { label: "SSD", value: "Samsung 990 Pro 2 TB" },
+            { label: "Archiviazione", value: "Seagate Barracuda Compute 8 TB" },
+            { label: "Alimentatore", value: "NZXT C1200 (2024) 1200 W 80+ Gold Certified" },
+            { label: "Case", value: "Fractal Design North XL" },
+          ],
+        },
+        {
+          name: "Periferiche",
+          icon: "peripherals",
+          items: [
+            { label: "Tastiera", value: "Logitech PRO X TKL RAPID" },
+            { label: "Mouse", value: "Logitech G PRO X Superlight 2" },
+            { label: "Cuffie", value: "Logitech G PRO X 2 LIGHTSPEED" },
+            { label: "Tappetino", value: "TITANWOLF Wolf Skull" },
+            { label: "Monitor", value: "Alienware 27 QD-OLED AW2725DF 360 Hz + BenQ ZOWIE XL2540 240 Hz" },
+            { label: "Casse", value: "BOSE Companion II" },
+          ],
+        },
+      ],
+    },
     closing:
       "Oggi il gaming è la mia via di fuga dalla dura realtà degli “adulti” ed è anche un dolce ricordo di mia madre, che non c'è più. Tornare su quei titoli che hanno fatto la mia infanzia mi riporta a quando ero bambino e mi divertivo con lei.",
     factsTitle: "In breve",

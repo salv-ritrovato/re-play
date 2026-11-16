@@ -222,7 +222,8 @@ scorrimento visibile.
 ## Pagina About
 
 I testi stanno in `src/content/about.ts` (un oggetto per lingua: titolo, introduzione, sezioni, chiusura,
-riquadro "In breve", link Steam). `AboutView` (client) gestisce il cambio EN/IT; entrambe le versioni sono
+riquadro "In breve", sezione `setup` con l'hardware e le periferiche, link Steam). `AboutView` (client)
+gestisce il cambio EN/IT; entrambe le versioni sono
 incluse nella pagina. Per cambiare testi o aggiungere giochi alla lista basta modificare quel file; l'URL del
 profilo Steam è la costante `STEAM_URL`.
 

@@ -36,9 +36,9 @@ test.describe("public navigation", () => {
 
     // The story is laid out as numbered chapters, with the number of games as a big figure and the launchers as logos.
     const chapters = page.locator("#about-panel ol > li");
-    await expect(chapters).toHaveCount(5);
+    await expect(chapters).toHaveCount(6);
     await expect(chapters.first()).toContainText("01");
-    await expect(chapters.last()).toContainText("05");
+    await expect(chapters.last()).toContainText("06");
     await expect(page.getByRole("complementary").getByText("1,500+", { exact: true })).toBeVisible();
     await expect(page.locator("#about-panel ul[aria-hidden='true'] svg")).toHaveCount(4);
 
@@ -47,6 +47,17 @@ test.describe("public navigation", () => {
     await expect(page.getByText("DLC and expansions included, so I get the whole experience")).toBeVisible();
     await expect(page.getByText("they earned a paragraph of their own")).toBeVisible();
     await expect(page.getByText("Steam, Ubisoft Connect, Battle.net, EA app", { exact: true })).toBeVisible();
+
+    // How the games are rated: each score on its own, and the three things weighed in order.
+    await expect(page.getByRole("heading", { level: 2, name: "How I rate games" })).toBeVisible();
+    await expect(page.getByText("never compare games with each other")).toBeVisible();
+    await expect(page.getByText("First the technical side")).toBeVisible();
+
+    // The hardware: a PC rig and the peripherals, each as a list of part and name.
+    await expect(page.getByRole("heading", { level: 2, name: "My setup" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: "PC rig" })).toBeVisible();
+    await expect(page.getByText("AMD Ryzen 7 9800X3D", { exact: true })).toBeVisible();
+    await expect(page.getByText("Logitech G PRO X Superlight 2", { exact: true })).toBeVisible();
 
     const steam = page.getByRole("complementary").getByRole("link", { name: /My Steam profile/ });
     await expect(steam).toHaveAttribute("href", "https://steamcommunity.com/profiles/76561198066959401/");
@@ -61,6 +72,9 @@ test.describe("public navigation", () => {
     await expect(page.getByText("Steam, Ubisoft Connect, Battle.net, EA app", { exact: true })).toBeVisible();
     await expect(page.getByText("League of Legends e Rainbow Six: Siege")).toBeVisible();
     await expect(page.getByText("da ragazzino avevo il sogno di fare il recensore, il critico")).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Come valuto i giochi" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 2, name: "Il mio setup" })).toBeVisible();
+    await expect(page.getByRole("heading", { level: 3, name: "Periferiche" })).toBeVisible();
     await expect(page.getByRole("heading", { level: 2, name: "Oltre i videogiochi" })).toBeVisible();
     await expect(page.getByText("anime, manga, fumetti, serie TV, libri fantasy")).toBeVisible();
     await expect(page.locator("div[lang=it]")).toBeVisible();

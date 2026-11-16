@@ -1,10 +1,10 @@
 "use client";
 
-import { ArrowUpRight, Gamepad2, Heart, Joystick, Layers, Library, Monitor, Trophy, type LucideIcon } from "lucide-react";
+import { ArrowUpRight, Cpu, Gamepad2, Heart, Joystick, Layers, Library, Monitor, Mouse, Trophy, type LucideIcon } from "lucide-react";
 import { useState } from "react";
 import { IconLabel } from "@/components/ui/icon-label";
 import { LauncherIcon, SteamIcon } from "@/components/ui/launcher-icon";
-import { STEAM_URL, type AboutContent, type FactIcon } from "@/content/about";
+import { STEAM_URL, type AboutContent, type FactIcon, type SetupIcon } from "@/content/about";
 import { REVEAL, revealDelay } from "@/lib/motion";
 import { LANGS, LANG_LABEL, LAUNCHER_NAME, type Lang } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -17,6 +17,11 @@ const FACT_ICONS: Record<FactIcon, LucideIcon> = {
   story: Trophy,
   complete: Layers,
   launchers: Library,
+};
+
+const SETUP_ICONS: Record<SetupIcon, LucideIcon> = {
+  rig: Cpu,
+  peripherals: Mouse,
 };
 
 /** About page body with an English / Italian switch (both versions ship with the page). */
@@ -123,6 +128,30 @@ export function AboutView({ content }: { content: Record<Lang, AboutContent> }) 
               );
             })}
           </ol>
+
+          {/* The hardware: one card per group, each a list of part and name. */}
+          <section aria-labelledby="about-setup" className={cn("mt-16", REVEAL)}>
+            <h2 id="about-setup" className="text-xl font-medium tracking-tight text-foreground sm:text-2xl">
+              {c.setup.title}
+            </h2>
+            <div className="mt-6 grid gap-5 md:grid-cols-2">
+              {c.setup.groups.map((group) => (
+                <div key={group.name} className="rounded-md border border-border bg-surface p-5 sm:p-6">
+                  <h3 className="eyebrow mb-4 border-b border-border pb-3">
+                    <IconLabel icon={SETUP_ICONS[group.icon]}>{group.name}</IconLabel>
+                  </h3>
+                  <dl className="space-y-4">
+                    {group.items.map((item) => (
+                      <div key={item.label} className="space-y-0.5">
+                        <dt className="text-xs text-muted-foreground">{item.label}</dt>
+                        <dd className="text-base text-foreground/90">{item.value}</dd>
+                      </div>
+                    ))}
+                  </dl>
+                </div>
+              ))}
+            </div>
+          </section>
 
           {/* The closing words, set apart by a violet bar (the same mark as the review excerpts) over a soft glow. */}
           <blockquote className="relative mt-16 overflow-hidden rounded-md border border-border bg-surface px-7 py-8 sm:px-10 sm:py-10">
