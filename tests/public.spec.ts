@@ -50,7 +50,8 @@ test.describe("public navigation", () => {
 
     // How the games are rated: each score on its own, and the three things weighed in order.
     await expect(page.getByRole("heading", { level: 2, name: "How I rate games" })).toBeVisible();
-    await expect(page.getByText("never compare games with each other")).toBeVisible();
+    await expect(page.getByText("never compare the scores of different games")).toBeVisible();
+    await expect(page.getByText("I don't change its score afterwards")).toBeVisible();
     await expect(page.getByText("First the technical side")).toBeVisible();
 
     // The hardware: a PC rig and the peripherals, each as a list of part and name.

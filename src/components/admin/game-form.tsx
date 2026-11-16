@@ -405,7 +405,7 @@ export function GameForm({
 
       {/* Personal ------------------------------------------------------------ */}
       <FormSection title="Personal" description="Your experience with the game.">
-        <Field id="rating" label="Rating (0-10)" error={err("rating")} hint="Decimals allowed, e.g. 8.5">
+        <Field id="rating" label="Rating (1-10)" error={err("rating")} hint="Decimals allowed, e.g. 8.5">
           <Input id="rating" type="text" inputMode="decimal" autoComplete="off" {...register("rating", decimalDot("rating"))} {...aria("rating")} />
         </Field>
         <Field id="playtime_hours" label="Total playtime (hours)" error={err("playtime_hours")} hint="Decimals allowed, e.g. 12.5">

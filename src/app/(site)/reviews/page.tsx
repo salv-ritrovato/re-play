@@ -34,7 +34,7 @@ export default function ReviewsPage({ searchParams }: PageProps<"/reviews">) {
         }
       />
       <p className="-mt-6 text-sm text-muted-foreground">
-        Every score stands on its own, from 1 to 10, and is never compared with another game.{" "}
+        Every score stands on its own, from 1 to 10, and scores are never compared across games.{" "}
         <Link
           href="/about#about-how-i-rate-games"
           className="text-foreground/90 underline underline-offset-4 outline-none hover:text-foreground focus-visible:ring-3 focus-visible:ring-ring/50"

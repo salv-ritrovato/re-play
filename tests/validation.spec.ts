@@ -116,5 +116,10 @@ test.describe("pasted asterisks", () => {
     expect(gameSchema.parse({ ...base, rating: "9.5", playtime_hours: "100" }).playtime_hours).toBe(100);
     expect(decimalPoint("1,5")).toBe("1.5");
     expect(gameSchema.safeParse({ ...base, rating: "8,5,1" }).success).toBe(false);
+    // scores go from 1 to 10: 1 and 10 are fine, 0.5 and 10.5 are not
+    expect(gameSchema.parse({ ...base, rating: "1" }).rating).toBe(1);
+    expect(gameSchema.parse({ ...base, rating: "10" }).rating).toBe(10);
+    expect(gameSchema.safeParse({ ...base, rating: "0.5" }).success).toBe(false);
+    expect(gameSchema.safeParse({ ...base, rating: "10.5" }).success).toBe(false);
   });
 });

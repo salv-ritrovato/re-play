@@ -75,7 +75,8 @@ export const gameSchema = z
     platform_ids: z.array(z.uuid()),
     launchers: z.array(z.enum(LAUNCHER_IDS)).max(LAUNCHER_IDS.length),
 
-    rating: numberString(0, 10, "Rating"),
+    // Scores go from 1 to 10, decimals included (see "How I rate games" in the About page).
+    rating: numberString(1, 10, "Rating"),
     play_status: z.enum(PLAY_STATUSES),
     completion_status: z.enum(COMPLETION_STATUSES),
     playtime_hours: numberString(0, 99999, "Playtime"),

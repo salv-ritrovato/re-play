@@ -76,8 +76,9 @@ export const about: Record<Lang, AboutContent> = {
       {
         heading: "How I rate games",
         paragraphs: [
-          "Every score is a scale of its own, from 1 to 10, and I never compare games with each other. The 10/10 of Cyberpunk will never be the same as the 10/10 of Red Dead Redemption 2: each game gets its own rating and can't be compared with any other.",
+          "Every score is a scale of its own, from 1 to 10, decimals included, and I never compare the scores of different games. The 10/10 of Cyberpunk will never be the same as the 10/10 of Red Dead Redemption 2: each game gets its own rating, and the scores can't be compared with one another.",
           "When I rate a game I weigh three things, in this order. First the technical side, judged both against the year the game came out and against the year I wrote the review. Then the “general consensus”, what players and critics think of it. And finally my personal take, based on the feelings and emotions I lived through while playing.",
+          "If a game is later shut down or removed from sale, I don't change its score afterwards, not even if fans bring it back: the review explains how much the closure weighs on my verdict.",
         ],
       },
       {
@@ -175,8 +176,9 @@ export const about: Record<Lang, AboutContent> = {
       {
         heading: "Come valuto i giochi",
         paragraphs: [
-          "Ogni voto è una scala a sé, da 1 a 10, e non faccio mai paragoni tra i giochi. Il 10/10 di Cyberpunk non sarà mai uguale al 10/10 di Red Dead Redemption 2: ogni gioco ha una valutazione a parte ed è incomparabile con gli altri.",
+          "Ogni voto è una scala a sé, da 1 a 10, anche con i decimali, e non paragono mai i voti di giochi diversi. Il 10/10 di Cyberpunk non sarà mai uguale al 10/10 di Red Dead Redemption 2: ogni gioco ha una valutazione a parte e i voti non sono confrontabili tra loro.",
           "Quando valuto un gioco tengo conto di tre cose, in quest'ordine. Prima di tutto il comparto tecnico, sia rispetto all'anno d'uscita sia rispetto all'anno in cui ho scritto la recensione. Poi il “general consensus”, cioè cosa ne pensano giocatori e critica. Infine la mia valutazione personale, basata sulle sensazioni e sulle emozioni vissute durante il gioco.",
+          "Se un gioco viene chiuso o rimosso dalla vendita dopo l'uscita, non ne modifico il voto a posteriori, nemmeno se i fan lo riportano in vita: la recensione spiega quanto la chiusura pesa sul mio giudizio.",
         ],
       },
       {

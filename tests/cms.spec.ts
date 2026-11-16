@@ -397,14 +397,16 @@ test.describe.serial("CMS end to end", () => {
     await expect(page.locator("#title")).toHaveValue(title);
     await expect(page.locator("#slug")).toHaveValue(slug);
 
-    await page.locator("#rating").fill("9.5");
+    // A 10, so it makes the home carousel (5 slides, best rated first) however many games in the real archive are
+    // rated 9 or more: among equal ratings the most recently added comes first, and this test game is the newest.
+    await page.locator("#rating").fill("10");
     await page.locator("#review_en").fill("Updated English review.");
     await page.locator("#review_it").fill("Recensione italiana aggiornata.");
     await page.getByRole("button", { name: "Save changes" }).click();
     await expect(page).toHaveURL(/\/admin\/games$/);
 
     await page.goto(`/games/${slug}`);
-    await expect(page.getByText("9.5").first()).toBeVisible();
+    await expect(page.getByText("10", { exact: true }).first()).toBeVisible();
     await expect(page.getByText("Updated English review.")).toBeVisible();
     await page.getByRole("tab", { name: "Italiano" }).click();
     await expect(page.getByText("Recensione italiana aggiornata.")).toBeVisible();
@@ -459,7 +461,7 @@ test.describe.serial("CMS end to end", () => {
   });
 
   test("the home page carousel shows the reviews of games rated 9 or more (5 at most)", async ({ page }) => {
-    // The test game was just raised to 9.5 and has a review in both languages.
+    // The test game was just raised to 10 and has a review in both languages.
     await page.goto("/");
     const carousel = page.getByRole("region", { name: "Standout reviews" });
     await expect(carousel).toBeVisible();
@@ -476,7 +478,7 @@ test.describe.serial("CMS end to end", () => {
     for (const rating of ratings) expect(rating).toBeGreaterThanOrEqual(9);
     expect(ratings).toEqual([...ratings].sort((a, b) => b - a));
 
-    // The test game (9.5) is in it, whatever else is rated higher in the real archive.
+    // The test game (10, and the newest of the 10s) is in it, whatever else is rated 9 or more in the real archive.
     const mine = slides.filter({ hasText: title });
     await expect(mine).toHaveCount(1);
     await expect(mine).toContainText("Updated English review.");
