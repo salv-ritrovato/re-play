@@ -29,8 +29,8 @@ integrato sotto `/admin`.
 - **Overview** (`/`): numeri chiave (giochi, ore giocate, voto medio, studi diversi), il **carosello "Standout reviews"** (le
   recensioni dei giochi con voto 9 o più, al massimo 5, anche in italiano), il gioco scelto con "Feature on the
   home page" (se c'è) e gli scaffali
-  "Recently added" (solo i giochi aggiunti negli ultimi 7 giorni, `RECENT_DAYS`; se non ce ne sono, lo
-  scaffale non compare), "Browse by genre" (i dieci generi più grandi, con il numero di giochi; "All genres" apre la
+  "Recently added" (sempre pieno: gli ultimi 6 giochi aggiunti, `RECENT_SHELF`, qualunque sia la data),
+  "Browse by genre" (i dieci generi più grandi, con il numero di giochi; "All genres" apre la
   pagina con tutti, e ogni blocco la libreria già filtrata), "Highest rated" e "Lowest rated" ("The blunt truth": mai gli
   stessi giochi di "Highest rated"). Nell'intestazione c'è anche **"Surprise me"**, che apre un gioco a caso
   (`/random`), e in fondo una striscia "Who's behind the reviews" con il link all'About. Non c'è più "Playing now": i giochi si aggiungono

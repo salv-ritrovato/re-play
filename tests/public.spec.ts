@@ -117,6 +117,11 @@ test.describe("public navigation", () => {
     await tiles.first().click();
     await expect(page).toHaveURL(/\/library\?genre=[0-9a-f-]{36}$/);
 
+    // "Recently added" is always full: the six latest games, whenever they were added.
+    await page.goto("/");
+    const recentShelf = page.locator("section").filter({ has: page.getByRole("heading", { name: "Recently added", exact: true }) });
+    await expect(recentShelf.locator("h3")).toHaveCount(6);
+
     // "The blunt truth" never repeats the highest rated shelf.
     await page.goto("/");
     const titlesIn = async (heading: string) => {

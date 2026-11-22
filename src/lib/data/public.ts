@@ -387,8 +387,8 @@ export async function getOgOverview() {
 const STANDOUT_MIN_RATING = 9;
 const STANDOUT_MAX = 5;
 
-/** The home page "Recently added" shelf only shows games added within this many days. */
-const RECENT_DAYS = 7;
+/** The home page "Recently added" shelf always shows the latest games added, this many of them (never less while the archive has them). */
+const RECENT_SHELF = 6;
 
 export async function getHomeData() {
   "use cache";
@@ -444,8 +444,8 @@ export async function getHomeData() {
     .slice(0, 18)
     .map((g) => g.cover_path as string);
 
-  const recentSince = Date.now() - RECENT_DAYS * 24 * 60 * 60 * 1000;
-  const recent = ((added.data ?? []) as GameSummary[]).filter((g) => new Date(g.created_at).getTime() >= recentSince);
+  // The shelf is always full: the latest games added, whenever that was.
+  const recent = ((added.data ?? []) as GameSummary[]).slice(0, RECENT_SHELF);
 
   return {
     totals: totals.data as StatsTotals | null,

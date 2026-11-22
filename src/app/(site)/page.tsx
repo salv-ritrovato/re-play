@@ -102,7 +102,7 @@ async function HomeContent() {
               <Shelf
                 title="Recently added"
                 eyebrow="Latest"
-                games={recentlyAdded.slice(0, 6)}
+                games={recentlyAdded}
                 href="/library"
                 hrefLabel="Open library"
               />
