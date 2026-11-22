@@ -76,6 +76,24 @@ test.describe("pros and cons", () => {
     expect(parsed.pros).toEqual(["Great world", "Fast combat", "Wait for it", "No dots at all", "Version 2.5 is out"]);
     expect(parsed.cons).toEqual(["Too long", "Still fine"]);
   });
+
+  test("never start with a dash or bullet (a pasted list), but keep hyphens inside words", () => {
+    const parsed = gameSchema.parse({
+      ...base,
+      pros: "- Great world\n-Fast combat\n\u2013 Tight controls\n\u2014 Nice music\n\u2022 Good story\n* Pretty\nCompletely free-to-play",
+      cons: " - Short\n-- Dated\n- .\n- Version 2.5 bugs.",
+    });
+    expect(parsed.pros).toEqual([
+      "Great world",
+      "Fast combat",
+      "Tight controls",
+      "Nice music",
+      "Good story",
+      "Pretty",
+      "Completely free-to-play",
+    ]);
+    expect(parsed.cons).toEqual(["Short", "Dated", "Version 2.5 bugs"]);
+  });
 });
 
 test.describe("pasted asterisks", () => {

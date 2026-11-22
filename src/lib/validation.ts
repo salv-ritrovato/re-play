@@ -48,8 +48,9 @@ const lines = z
   .transform((v) =>
     v
       .split("\n")
-      // Pros and cons never end with a full stop, whatever was typed or pasted.
-      .map((l) => l.trim().replace(/\s*\.+$/, ""))
+      // Pros and cons never start with a dash or bullet (a pasted list) and never end with a full
+      // stop, whatever was typed or pasted. A hyphen inside a word ("free-to-play") is fine.
+      .map((l) => l.trim().replace(/^[\s\-\u2013\u2014\u2022\u00b7*.]+/, "").replace(/\s*\.+$/, ""))
       .filter(Boolean),
   );
 
